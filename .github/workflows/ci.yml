@@ -78,3 +78,131 @@ jobs:
           assert isinstance(payload["open_issues"], list)
           assert isinstance(payload["open_pull_requests"], list)
           PY
+      - name: Interpret automatic public evidence
+        run: |
+          python scripts/interpret_evidence.py \
+            /tmp/project-status-engine-evidence.json \
+            --output /tmp/project-status-engine-interpretation.json
+      - name: Validate automatic interpretation contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          evidence = json.loads(
+              Path("/tmp/project-status-engine-evidence.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          payload = json.loads(
+              Path("/tmp/project-status-engine-interpretation.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          assert payload["schema_version"] == 1
+          assert payload["source_evidence_schema_version"] == 1
+          assert payload["repository"] == "armpitpete/project-status-engine"
+          assert len(payload["source_commit"]) == 40
+          assert payload["purpose"]["kind"] == "fact"
+          assert (
+              "Automatic activity and authority-backed completion reporting"
+              in payload["purpose"]["text"]
+          )
+
+          authority = payload["owner_authority_records"]
+          assert authority[0]["path"] == ".project/progress.json"
+          assert authority[0]["authority_rank"] == 1
+          assert authority[0]["primary"] is True
+
+          assert len(payload["done"]) == 4
+          assert all(item["kind"] == "fact" for item in payload["done"])
+          assert payload["remaining"][0]["key"] == "remaining:none-listed"
+          assert payload["conflicts"] == []
+
+          evidence_by_key = {item["key"]: item for item in payload["evidence"]}
+          candidate_sections = [
+              [payload["purpose"]],
+              payload["done"],
+              payload["remaining"],
+              payload["technologies"],
+              payload["uncertainties"],
+          ]
+          assert all(
+              set(candidate["evidence_keys"]) <= set(evidence_by_key)
+              for section in candidate_sections
+              for candidate in section
+          )
+
+          queue_count = len(evidence["open_issues"]) + len(
+              evidence["open_pull_requests"]
+          )
+          queue_candidate = next(
+              (
+                  item
+                  for item in payload["uncertainties"]
+                  if item["key"] == "uncertainty:open-queues"
+              ),
+              None,
+          )
+          if queue_count:
+              assert queue_candidate is not None
+              assert len(queue_candidate["evidence_keys"]) == queue_count
+              assert all(
+                  evidence_by_key[key]["role"]
+                  in {"open_issue", "open_pull_request"}
+                  for key in queue_candidate["evidence_keys"]
+              )
+          else:
+              assert queue_candidate is None
+
+          assert {item["topic"] for item in payload["refusals"]} == {
+              "completion_percentage",
+              "likelihood_assessment",
+              "final_status",
+          }
+          assert not any(
+              key in payload
+              for key in ("completion_percentage", "likelihood", "status")
+          )
+          PY
+      - name: Collect technology-manifest evidence
+        run: |
+          python scripts/collect_public_evidence.py \
+            https://github.com/armpitpete/over-my-home \
+            --output /tmp/over-my-home-evidence.json
+      - name: Interpret technology-manifest evidence
+        run: |
+          python scripts/interpret_evidence.py \
+            /tmp/over-my-home-evidence.json \
+            --output /tmp/over-my-home-interpretation.json
+      - name: Validate evidence-linked technology candidate
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          evidence = json.loads(
+              Path("/tmp/over-my-home-evidence.json").read_text(encoding="utf-8")
+          )
+          interpretation = json.loads(
+              Path("/tmp/over-my-home-interpretation.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          assert evidence["repository"] == "armpitpete/over-my-home"
+          files = {item["path"]: item for item in evidence["important_files"]}
+          manifest = files["package.json"]
+          assert manifest["role"] == "technology_manifest"
+          assert manifest["source_commit"] == evidence["source_commit"]
+          assert manifest["source_url"].endswith(
+              f'{evidence["source_commit"]}/package.json'
+          )
+
+          technologies = {item["text"]: item for item in interpretation["technologies"]}
+          javascript = technologies["This repository uses JavaScript or Node.js."]
+          assert javascript["kind"] == "fact"
+          assert javascript["evidence_keys"] == ["file:package.json"]
+          references = {item["key"]: item for item in interpretation["evidence"]}
+          assert references["file:package.json"]["role"] == "technology_manifest"
+          assert references["file:package.json"]["usable"] is True
+          PY

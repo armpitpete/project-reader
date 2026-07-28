@@ -14,7 +14,6 @@ from urllib.request import Request, urlopen
 
 from .ingest import RepositoryDigest, read_repository
 
-
 _GITHUB_NAME = re.compile(r"^[A-Za-z0-9_.-]+$")
 _SEPARATOR = "=" * 48
 _FILE_BLOCK = re.compile(
@@ -29,6 +28,14 @@ _PROGRESS_RULES = (
     ("ROADMAP.md", "roadmap", 3),
     ("MILESTONES.md", "milestones", 3),
 )
+_TECHNOLOGY_NAMES = {
+    "pyproject.toml",
+    "package.json",
+    "Cargo.toml",
+    "go.mod",
+    "Gemfile",
+    "Dockerfile",
+}
 _IMPORTANT_NAMES = {
     "README.md": "project_overview",
     "CONTRIBUTING.md": "contribution_guide",
@@ -36,6 +43,7 @@ _IMPORTANT_NAMES = {
     "STATUS.md": "project_status",
     "ROADMAP.md": "roadmap",
     "MILESTONES.md": "milestones",
+    **{name: "technology_manifest" for name in _TECHNOLOGY_NAMES},
 }
 _MAX_IMPORTANT_FILE_CHARS = 30_000
 _IMPORTANT_PATTERNS = {
@@ -46,6 +54,13 @@ _IMPORTANT_PATTERNS = {
     "STATUS.md",
     "ROADMAP.md",
     "MILESTONES.md",
+    "pyproject.toml",
+    "package.json",
+    "Cargo.toml",
+    "go.mod",
+    "Gemfile",
+    "Dockerfile",
+    "requirements*.txt",
     "docs/*status*",
     "docs/*roadmap*",
     "docs/*milestone*",
@@ -157,12 +172,18 @@ class GitHubRestClient:
         try:
             with urlopen(request, timeout=self.timeout) as response:
                 payload = json.loads(response.read().decode("utf-8"))
-                response_headers = {key.lower(): value for key, value in response.headers.items()}
+                response_headers = {
+                    key.lower(): value for key, value in response.headers.items()
+                }
                 return payload, response_headers
         except HTTPError as error:
-            raise EvidenceCollectionError(f"GitHub returned HTTP {error.code} for {url}") from error
+            raise EvidenceCollectionError(
+                f"GitHub returned HTTP {error.code} for {url}"
+            ) from error
         except (URLError, TimeoutError, json.JSONDecodeError) as error:
-            raise EvidenceCollectionError(f"Could not read GitHub evidence from {url}") from error
+            raise EvidenceCollectionError(
+                f"Could not read GitHub evidence from {url}"
+            ) from error
 
     def _get(self, path: str) -> Any:
         payload, _ = self._request(f"https://api.github.com{path}")
@@ -208,12 +229,21 @@ def parse_repository_address(source: str) -> RepositoryAddress:
         parts = value.removesuffix(".git").strip("/").split("/")
     else:
         parsed = urlparse(value)
-        if parsed.scheme != "https" or parsed.hostname not in {"github.com", "www.github.com"}:
-            raise ValueError("Only https://github.com public repository addresses are supported")
+        if parsed.scheme != "https" or parsed.hostname not in {
+            "github.com",
+            "www.github.com",
+        }:
+            raise ValueError(
+                "Only https://github.com public repository addresses are supported"
+            )
         parts = parsed.path.removesuffix(".git").strip("/").split("/")
 
-    if len(parts) != 2 or not all(_GITHUB_NAME.fullmatch(part or "") for part in parts):
-        raise ValueError("Use a repository address in the form owner/name or https://github.com/owner/name")
+    if len(parts) != 2 or not all(
+        _GITHUB_NAME.fullmatch(part or "") for part in parts
+    ):
+        raise ValueError(
+            "Use a repository address in the form owner/name or https://github.com/owner/name"
+        )
     return RepositoryAddress(parts[0], parts[1])
 
 
@@ -239,13 +269,19 @@ def _file_role(path: str) -> str | None:
     name = Path(path).name
     if name in _IMPORTANT_NAMES:
         return _IMPORTANT_NAMES[name]
+    if name.casefold().startswith("requirements") and name.casefold().endswith(".txt"):
+        return "technology_manifest"
     lower = path.lower()
-    if lower.startswith("docs/") and ("status" in lower or "roadmap" in lower or "milestone" in lower):
+    if lower.startswith("docs/") and (
+        "status" in lower or "roadmap" in lower or "milestone" in lower
+    ):
         return "supporting_progress"
     return None
 
 
-def _file_source_url(address: RepositoryAddress, source_commit: str, path: str) -> str:
+def _file_source_url(
+    address: RepositoryAddress, source_commit: str, path: str
+) -> str:
     quoted_path = "/".join(quote(part, safe="") for part in path.split("/"))
     return f"{address.url}/blob/{source_commit}/{quoted_path}"
 
@@ -274,8 +310,12 @@ def _important_file(
     )
 
 
-def _progress_record(file: ImportantFileFact, original_text: str) -> ProgressRecordFact | None:
-    match = next((rule for rule in _PROGRESS_RULES if file.path == rule[0]), None)
+def _progress_record(
+    file: ImportantFileFact, original_text: str
+) -> ProgressRecordFact | None:
+    match = next(
+        (rule for rule in _PROGRESS_RULES if file.path == rule[0]), None
+    )
     if match is None and file.role != "supporting_progress":
         return None
 
@@ -299,7 +339,9 @@ def _progress_record(file: ImportantFileFact, original_text: str) -> ProgressRec
                 if isinstance(stages, list):
                     stage_count = len(stages)
                 overall = data.get("overall")
-                if isinstance(overall, dict) and isinstance(overall.get("enabled"), bool):
+                if isinstance(overall, dict) and isinstance(
+                    overall.get("enabled"), bool
+                ):
                     overall_enabled = overall["enabled"]
 
     return ProgressRecordFact(
@@ -340,20 +382,30 @@ def collect_public_evidence(
 ) -> PublicEvidenceBundle:
     """Collect facts for one public GitHub repository without interpreting them."""
     address = parse_repository_address(source)
-    active_client = client or GitHubRestClient(token=token or os.getenv("GITHUB_TOKEN"))
+    active_client = client or GitHubRestClient(
+        token=token or os.getenv("GITHUB_TOKEN")
+    )
 
     repository = active_client.repository(address)
     if repository.get("private") is not False:
-        raise EvidenceCollectionError("Only public repositories are supported in v0.3")
+        raise EvidenceCollectionError(
+            "Only public repositories are supported in v0.3"
+        )
 
     default_branch = repository.get("default_branch")
     if not isinstance(default_branch, str) or not default_branch:
-        raise EvidenceCollectionError("The repository has no readable default branch")
+        raise EvidenceCollectionError(
+            "The repository has no readable default branch"
+        )
 
     commit = active_client.commit(address, default_branch)
     source_commit = commit.get("sha")
-    if not isinstance(source_commit, str) or not re.fullmatch(r"[0-9a-f]{40}", source_commit):
-        raise EvidenceCollectionError("GitHub did not return a full source commit")
+    if not isinstance(source_commit, str) or not re.fullmatch(
+        r"[0-9a-f]{40}", source_commit
+    ):
+        raise EvidenceCollectionError(
+            "GitHub did not return a full source commit"
+        )
 
     source_url = f"{address.url}/tree/{source_commit}"
     try:
@@ -380,7 +432,9 @@ def collect_public_evidence(
                     role,
                     text,
                     collection_method=(
-                        recovered[path].collection_method if path in recovered else "gitingest"
+                        recovered[path].collection_method
+                        if path in recovered
+                        else "gitingest"
                     ),
                     source_url=(
                         recovered[path].source_url
@@ -397,22 +451,38 @@ def collect_public_evidence(
     )
     progress = tuple(
         sorted(
-            (record for file in important if (record := _progress_record(file, files[file.path])) is not None),
+            (
+                record
+                for file in important
+                if (
+                    record := _progress_record(file, files[file.path])
+                )
+                is not None
+            ),
             key=lambda item: (item.authority_rank, item.path.lower()),
         )
     )
 
     issue_payloads = active_client.open_issues(address)
     pull_request_payloads = active_client.open_pull_requests(address)
-    timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    timestamp = (
+        datetime.now(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
 
     issues = tuple(
         _work_item(item, pull_request=False)
-        for item in sorted(issue_payloads, key=lambda value: int(value["number"]))
+        for item in sorted(
+            issue_payloads, key=lambda value: int(value["number"])
+        )
     )
     pull_requests = tuple(
         _work_item(item, pull_request=True)
-        for item in sorted(pull_request_payloads, key=lambda value: int(value["number"]))
+        for item in sorted(
+            pull_request_payloads, key=lambda value: int(value["number"])
+        )
     )
 
     return PublicEvidenceBundle(
@@ -431,6 +501,8 @@ def collect_public_evidence(
     )
 
 
-def write_evidence_bundle(bundle: PublicEvidenceBundle, destination: Path) -> None:
+def write_evidence_bundle(
+    bundle: PublicEvidenceBundle, destination: Path
+) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(bundle.to_json(), encoding="utf-8")
