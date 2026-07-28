@@ -17,37 +17,41 @@ It also offers:
 - one clear next step;
 - a simple explanation of the technology used and why;
 - a safe **Contact the project owner** link;
-- evidence for every score;
+- named evidence for important claims and scores;
 - honest **unknown** states when the repository does not contain enough information.
 
 ## Product rule
 
 The first screen must make sense in under 30 seconds. Technical details stay behind optional controls.
 
-## Current state
+## Current proof
 
-Foundation v0.1 contains:
+The first real proof reads the public repository `armpitpete/project-status-engine` into a cited project page.
 
-- the product contract;
-- the completion and likelihood assessment model;
-- strict data models;
-- a Gitingest ingestion wrapper;
-- a plain HTML renderer;
-- a sample project reading;
-- tests for the scoring rules.
+It demonstrates:
 
-It does **not** yet contain AI project interpretation, GitHub API evidence collection, accounts, writes to repositories, or deployment.
+- a plain-language purpose;
+- evidence-backed status and completion;
+- **Already complete** instead of a misleading future forecast;
+- completed and remaining outcomes;
+- one evidence-backed next decision;
+- educational technology cards;
+- direct links to the GitHub evidence.
 
-## Run the proof
+## Run the static proofs
 
-Requires Python 3.12 or newer. No package installation is needed for the static sample.
+Requires Python 3.12 or newer. Package installation is not needed to render the checked-in examples.
 
 ```bash
 python scripts/render_sample.py
+python scripts/render_project_status_engine.py
 python -m http.server 8000 --directory prototype
 ```
 
-Open `http://localhost:8000/sample.html`.
+Open:
+
+- `http://localhost:8000/sample.html`
+- `http://localhost:8000/project-status-engine.html`
 
 ## Develop and test
 
@@ -58,12 +62,25 @@ python -m pip install -e ".[dev]"
 pytest
 ```
 
+GitHub Actions performs a live Gitingest ingestion of the public proof repository. The dependency installation, tests, proof regeneration and real remote-repository ingestion have passed.
+
 ## Dependency
 
 Project Reader uses [Gitingest](https://github.com/coderamp-labs/gitingest) to collect a structured digest of repository files. Gitingest is MIT-licensed. Project Reader adds its own project evidence, assessment, education, and accessible presentation layers.
 
+## Current boundaries
+
+Project Reader remains read-only. It does not yet contain:
+
+- automatic AI interpretation;
+- owner accounts;
+- writes to analysed repositories;
+- stored contact messages;
+- a multi-repository dashboard;
+- public deployment.
+
 ## Working status
 
-- **Status:** Foundation
-- **Completion:** Not yet measured
-- **Next:** Prove one public repository can be read into the agreed five-question page using cited evidence.
+- **Status:** First public-repository proof
+- **Completion:** Proof implemented and live Gitingest CI passed
+- **Next:** Renew review of the corrected cited reader before starting automatic evidence collection.

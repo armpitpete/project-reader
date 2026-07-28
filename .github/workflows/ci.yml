@@ -1,0 +1,37 @@
+name: Validate Project Reader
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+      - name: Run tests
+        run: pytest
+      - name: Rebuild static proofs
+        run: |
+          python scripts/render_sample.py
+          python scripts/render_project_status_engine.py
+          git diff --exit-code -- prototype
+      - name: Prove real Gitingest public-repository ingestion
+        run: |
+          python - <<'PY'
+          from project_reader.ingest import read_repository
+
+          digest = read_repository("https://github.com/armpitpete/project-status-engine")
+          assert "README.md" in digest.tree
+          assert "Project Status Engine" in digest.content
+          assert len(digest.content) > 10_000
+          print(digest.summary)
+          PY

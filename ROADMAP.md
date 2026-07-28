@@ -1,6 +1,6 @@
 # Roadmap
 
-## Foundation v0.1 — current
+## Foundation v0.1 — complete
 
 - [x] Lock the KISS first-screen contract
 - [x] Separate completion from likelihood of completion
@@ -10,16 +10,17 @@
 - [x] Add deterministic scoring models and tests
 - [x] Add a static accessible reader proof
 
-## First real proof v0.2 — next
+## First real proof v0.2 — current
 
-- [ ] Read one named public repository
-- [ ] Collect README, status, issues, pull requests, releases, milestones, and recent workflow evidence
-- [ ] Produce a cited plain-language project explanation
-- [ ] Produce an evidence-labelled completion result
-- [ ] Produce an evidence-labelled likelihood result
-- [ ] Identify done, remaining, and one next step
-- [ ] Explain the detected technologies and why they are used
+- [x] Read one named public repository
+- [x] Collect README, status, issues, pull requests, releases, milestones, and recent workflow evidence
+- [x] Produce a cited plain-language project explanation
+- [x] Produce an evidence-labelled completion result
+- [x] Produce an evidence-labelled likelihood result
+- [x] Identify done, remaining, and one next step
+- [x] Explain the detected technologies and why they are used
 - [ ] Inspect the page with a non-technical reader lens
+- [ ] Accept the live Gitingest GitHub Actions proof
 
 ## Blocked until separately authorised
 

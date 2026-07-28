@@ -11,6 +11,7 @@ main { max-width: 760px; margin: auto; padding: 2rem 1.1rem 4rem; }
 h1 { font-size: clamp(2rem, 8vw, 3.5rem); line-height: 1; margin-bottom: .4rem; }
 h2 { margin-top: 2.2rem; }
 .lead { font-size: 1.18rem; max-width: 62ch; }
+.reading-meta { font-size: .9rem; }
 .score-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 1rem; margin: 1.5rem 0; }
 .score, .panel, .tech-card { background: white; border: 2px solid #1d1d1b; border-radius: 16px; padding: 1rem; box-shadow: 4px 4px 0 #1d1d1b; }
 .big { font-size: 1.75rem; font-weight: 800; margin: .2rem 0; }
@@ -22,7 +23,10 @@ a.button, button { display: inline-block; background: #fff; color: #1d1d1b; bord
 details { margin-top: 2rem; }
 summary { cursor: pointer; font-weight: 800; font-size: 1.15rem; }
 .tech-grid { display: grid; gap: 1rem; margin-top: 1rem; }
-.evidence { font-size: .9rem; }
+.evidence, .evidence-strength, .citations { font-size: .9rem; }
+.citation { font-weight: 800; }
+.evidence-list { list-style: decimal; padding-left: 1.5rem; }
+.evidence-strength { margin-left: .5rem; }
 :focus-visible { outline: 4px solid currentColor; outline-offset: 4px; }
 @media (prefers-reduced-motion: no-preference) { a.button:hover { transform: translateY(-2px); } }
 </style>
@@ -33,6 +37,7 @@ summary { cursor: pointer; font-weight: 800; font-size: 1.15rem; }
 <h1>Project Reader</h1>
 <p class="lead">A simple and educational way to understand what a GitHub project is, how far it has progressed, and what remains.</p>
 <p><strong>Status:</strong> Active</p>
+
 
 <section class="score-grid" aria-label="Project scores">
   <article class="score">
@@ -107,8 +112,10 @@ summary { cursor: pointer; font-weight: 800; font-size: 1.15rem; }
 
 <details>
 <summary>Why these scores?</summary>
-<p>The completion score uses accepted work against a defined finish line. The likelihood result uses project evidence and is a forecast, not a promise.</p>
+<p>The completion score uses accepted work against a defined finish line. A completed project is marked as already complete rather than given a speculative future probability.</p>
 </details>
+
+
 </main>
 </body>
 </html>
