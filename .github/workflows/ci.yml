@@ -42,7 +42,7 @@ jobs:
           assert payload["repository"] == "armpitpete/project-status-engine"
           assert len(payload["source_commit"]) == 40
           assert payload["source_url"].endswith(payload["source_commit"])
-          assert "Commit:" in payload["gitingest_summary"]
+          assert "Repository: armpitpete/project-status-engine" in payload["gitingest_summary"]
           assert any(
               record["path"] == ".project/progress.json"
               and record["authority_rank"] == 1

@@ -70,8 +70,10 @@ class FakeClient:
         ]
 
 
-def fake_reader(source: str, *, token=None) -> RepositoryDigest:
+def fake_reader(source: str, *, token=None, include_patterns=None) -> RepositoryDigest:
     assert source == f"https://github.com/example/project/tree/{HEAD}"
+    assert ".project/progress.json" in include_patterns
+    assert "README.md" in include_patterns
     return RepositoryDigest(
         summary=f"Repository: example/project\nCommit: {HEAD}",
         tree="Directory structure:\n├── README.md\n└── .project/progress.json",

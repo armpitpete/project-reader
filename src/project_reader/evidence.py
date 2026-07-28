@@ -38,6 +38,21 @@ _IMPORTANT_NAMES = {
     "MILESTONES.md": "milestones",
 }
 _MAX_IMPORTANT_FILE_CHARS = 30_000
+_IMPORTANT_PATTERNS = {
+    ".project/progress.json",
+    "README.md",
+    "CONTRIBUTING.md",
+    "PROJECT_STATUS.md",
+    "STATUS.md",
+    "ROADMAP.md",
+    "MILESTONES.md",
+    "docs/*status*",
+    "docs/*roadmap*",
+    "docs/*milestone*",
+    "docs/**/*status*",
+    "docs/**/*roadmap*",
+    "docs/**/*milestone*",
+}
 
 
 class EvidenceCollectionError(RuntimeError):
@@ -323,7 +338,11 @@ def collect_public_evidence(
         raise EvidenceCollectionError("GitHub did not return a full source commit")
 
     source_url = f"{address.url}/tree/{source_commit}"
-    digest = repository_reader(source_url, token=token or os.getenv("GITHUB_TOKEN"))
+    digest = repository_reader(
+        source_url,
+        token=token or os.getenv("GITHUB_TOKEN"),
+        include_patterns=_IMPORTANT_PATTERNS,
+    )
     files = extract_gitingest_files(digest.content)
 
     important = tuple(
