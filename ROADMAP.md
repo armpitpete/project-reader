@@ -47,7 +47,7 @@ Merged to `main` at `d18f29314dc0acecb403c4deb0313a5bb557afd0`.
 - [x] Produce evidence-linked purpose, done, remaining and technology candidates
 - [x] Refuse unsupported claims
 - [x] Produce structured interpretation JSON
-- [ ] Accept the live evidence-to-interpretation GitHub Actions proof
+- [x] Accept the live evidence-to-interpretation GitHub Actions proof
 - [ ] Review and merge the bounded interpretation contract
 
 ## Blocked until separately authorised
