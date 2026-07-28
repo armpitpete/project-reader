@@ -168,13 +168,13 @@ jobs:
       - name: Collect technology-manifest evidence
         run: |
           python scripts/collect_public_evidence.py \
-            https://github.com/armpitpete/project-reader \
-            --output /tmp/project-reader-evidence.json
+            https://github.com/armpitpete/over-my-home \
+            --output /tmp/over-my-home-evidence.json
       - name: Interpret technology-manifest evidence
         run: |
           python scripts/interpret_evidence.py \
-            /tmp/project-reader-evidence.json \
-            --output /tmp/project-reader-interpretation.json
+            /tmp/over-my-home-evidence.json \
+            --output /tmp/over-my-home-interpretation.json
       - name: Validate evidence-linked technology candidate
         run: |
           python - <<'PY'
@@ -182,26 +182,27 @@ jobs:
           from pathlib import Path
 
           evidence = json.loads(
-              Path("/tmp/project-reader-evidence.json").read_text(encoding="utf-8")
+              Path("/tmp/over-my-home-evidence.json").read_text(encoding="utf-8")
           )
           interpretation = json.loads(
-              Path("/tmp/project-reader-interpretation.json").read_text(
+              Path("/tmp/over-my-home-interpretation.json").read_text(
                   encoding="utf-8"
               )
           )
+          assert evidence["repository"] == "armpitpete/over-my-home"
           files = {item["path"]: item for item in evidence["important_files"]}
-          manifest = files["pyproject.toml"]
+          manifest = files["package.json"]
           assert manifest["role"] == "technology_manifest"
           assert manifest["source_commit"] == evidence["source_commit"]
           assert manifest["source_url"].endswith(
-              f'{evidence["source_commit"]}/pyproject.toml'
+              f'{evidence["source_commit"]}/package.json'
           )
 
           technologies = {item["text"]: item for item in interpretation["technologies"]}
-          python = technologies["This repository uses Python."]
-          assert python["kind"] == "fact"
-          assert python["evidence_keys"] == ["file:pyproject.toml"]
+          javascript = technologies["This repository uses JavaScript or Node.js."]
+          assert javascript["kind"] == "fact"
+          assert javascript["evidence_keys"] == ["file:package.json"]
           references = {item["key"]: item for item in interpretation["evidence"]}
-          assert references["file:pyproject.toml"]["role"] == "technology_manifest"
-          assert references["file:pyproject.toml"]["usable"] is True
+          assert references["file:package.json"]["role"] == "technology_manifest"
+          assert references["file:package.json"]["usable"] is True
           PY
