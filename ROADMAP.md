@@ -36,14 +36,24 @@
 
 Merged to `main` at `d18f29314dc0acecb403c4deb0313a5bb557afd0`.
 
-## No active development lane
+## Automatic Interpretation Contract v0.4 — current
 
-The next product lane requires separate protected authority. The completed collector remains factual, public-only, single-repository and read-only.
+- [x] Accept one Public Evidence Bundle v0.3
+- [x] Identify the strongest explicit project-purpose evidence
+- [x] Identify and preserve owner-authority records
+- [x] Distinguish facts, interpretations and unknowns
+- [x] Detect stale evidence and work-state conflicts
+- [x] Require repository-file support for technology claims
+- [x] Produce evidence-linked purpose, done, remaining and technology candidates
+- [x] Refuse unsupported claims
+- [x] Produce structured interpretation JSON
+- [ ] Accept the live evidence-to-interpretation GitHub Actions proof
+- [ ] Review and merge the bounded interpretation contract
 
 ## Blocked until separately authorised
 
-- Automatic interpretation
 - Automatic completion and likelihood scoring from collected evidence
+- Final project-status judgement
 - Private repository access
 - User accounts
 - Repository writes
