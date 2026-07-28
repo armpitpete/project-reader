@@ -78,3 +78,68 @@ jobs:
           assert isinstance(payload["open_issues"], list)
           assert isinstance(payload["open_pull_requests"], list)
           PY
+      - name: Interpret automatic public evidence
+        run: |
+          python scripts/interpret_evidence.py \
+            /tmp/project-status-engine-evidence.json \
+            --output /tmp/project-status-engine-interpretation.json
+      - name: Validate automatic interpretation contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(
+              Path("/tmp/project-status-engine-interpretation.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          assert payload["schema_version"] == 1
+          assert payload["source_evidence_schema_version"] == 1
+          assert payload["repository"] == "armpitpete/project-status-engine"
+          assert len(payload["source_commit"]) == 40
+          assert payload["purpose"]["kind"] == "fact"
+          assert (
+              "Automatic activity and authority-backed completion reporting"
+              in payload["purpose"]["text"]
+          )
+
+          authority = payload["owner_authority_records"]
+          assert authority[0]["path"] == ".project/progress.json"
+          assert authority[0]["authority_rank"] == 1
+          assert authority[0]["primary"] is True
+
+          assert len(payload["done"]) == 4
+          assert all(item["kind"] == "fact" for item in payload["done"])
+          assert payload["remaining"][0]["key"] == "remaining:none-listed"
+          assert payload["technologies"] == []
+          assert any(
+              item["key"] == "uncertainty:technology"
+              for item in payload["uncertainties"]
+          )
+          assert payload["conflicts"] == []
+
+          evidence_keys = {item["key"] for item in payload["evidence"]}
+          candidate_sections = [
+              [payload["purpose"]],
+              payload["done"],
+              payload["remaining"],
+              payload["technologies"],
+              payload["uncertainties"],
+          ]
+          assert all(
+              set(candidate["evidence_keys"]) <= evidence_keys
+              for section in candidate_sections
+              for candidate in section
+          )
+
+          assert {item["topic"] for item in payload["refusals"]} == {
+              "completion_percentage",
+              "likelihood_assessment",
+              "final_status",
+          }
+          assert not any(
+              key in payload
+              for key in ("completion_percentage", "likelihood", "status")
+          )
+          PY
