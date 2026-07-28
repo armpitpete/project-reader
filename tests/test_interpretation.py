@@ -291,7 +291,9 @@ def test_purpose_selection_skips_non_purpose_preamble():
                 (
                     "# Example\n\n"
                     "Support this project through Ko-fi and sponsorship.\n\n"
-                    "Project Reader helps non-technical people understand public repositories."
+                    "Project Reader helps non-technical people understand public repositories.\n\n"
+                    "## Internal data\n\n"
+                    "The repository system provides a workflow that manages every internal dataset and service."
                 ),
             )
         )
