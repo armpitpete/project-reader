@@ -36,6 +36,15 @@ def test_likelihood_uses_broad_label_and_confidence() -> None:
     assert result.range_high <= 95
 
 
+def test_completed_project_is_not_given_a_future_forecast() -> None:
+    result = assess_likelihood(
+        LikelihoodSignals(20, 20, 15, 15, 15, 10, 5, 1),
+        already_complete=True,
+    )
+    assert result.label == "Already complete"
+    assert (result.range_low, result.range_high) == (100, 100)
+
+
 def test_likelihood_rejects_invalid_signal() -> None:
     with pytest.raises(ValueError):
         assess_likelihood(LikelihoodSignals(21, 0, 0, 0, 0, 0, 0, 1))

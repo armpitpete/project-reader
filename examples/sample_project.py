@@ -1,5 +1,6 @@
 from project_reader.assessment import assess_completion, assess_likelihood
 from project_reader.models import (
+    Claim,
     EvidenceStrength,
     LikelihoodSignals,
     ProjectReading,
@@ -19,8 +20,11 @@ work = [
 
 reading = ProjectReading(
     name="Project Reader",
-    explanation="A simple and educational way to understand what a GitHub project is, how far it has progressed, and what remains.",
+    explanation=Claim(
+        "A simple and educational way to understand what a GitHub project is, how far it has progressed, and what remains."
+    ),
     status="Active",
+    status_evidence_keys=(),
     completion=assess_completion(
         work,
         finish_line_defined=True,
@@ -40,16 +44,16 @@ reading = ProjectReading(
         timeframe="Foundation milestone within 90 days",
     ),
     done=(
-        "The simple first-screen questions are agreed.",
-        "Completion and likelihood are measured separately.",
-        "The educational technology-card format is defined.",
+        Claim("The simple first-screen questions are agreed."),
+        Claim("Completion and likelihood are measured separately."),
+        Claim("The educational technology-card format is defined."),
     ),
     remaining=(
-        "Read a real public repository.",
-        "Connect every important answer to evidence.",
-        "Test the page with a non-technical reader lens.",
+        Claim("Read a real public repository."),
+        Claim("Connect every important answer to evidence."),
+        Claim("Test the page with a non-technical reader lens."),
     ),
-    next_step="Use one public repository to prove the full five-question reading flow.",
+    next_step=Claim("Use one public repository to prove the full five-question reading flow."),
     technologies=(
         Technology(
             name="Python",

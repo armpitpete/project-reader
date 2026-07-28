@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Status Engine — Project Reader</title>
+<style>
+:root { color-scheme: light; font-family: system-ui, sans-serif; line-height: 1.55; }
+body { margin: 0; background: #f7f5ef; color: #1d1d1b; }
+main { max-width: 760px; margin: auto; padding: 2rem 1.1rem 4rem; }
+h1 { font-size: clamp(2rem, 8vw, 3.5rem); line-height: 1; margin-bottom: .4rem; }
+h2 { margin-top: 2.2rem; }
+.lead { font-size: 1.18rem; max-width: 62ch; }
+.score-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 1rem; margin: 1.5rem 0; }
+.score, .panel, .tech-card { background: white; border: 2px solid #1d1d1b; border-radius: 16px; padding: 1rem; box-shadow: 4px 4px 0 #1d1d1b; }
+.big { font-size: 1.75rem; font-weight: 800; margin: .2rem 0; }
+ul { padding-left: 0; list-style: none; }
+li { margin: .65rem 0; }
+.next { font-size: 1.15rem; border-left: 6px solid currentColor; padding-left: 1rem; }
+.actions { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 2rem; }
+a.button, button { display: inline-block; background: #fff; color: #1d1d1b; border: 2px solid #1d1d1b; border-radius: 999px; padding: .75rem 1rem; font-weight: 700; text-decoration: none; }
+details { margin-top: 2rem; }
+summary { cursor: pointer; font-weight: 800; font-size: 1.15rem; }
+.tech-grid { display: grid; gap: 1rem; margin-top: 1rem; }
+.evidence, .evidence-strength, .citations { font-size: .9rem; }
+.citation { font-weight: 800; }
+.evidence-list { list-style: decimal; padding-left: 1.5rem; }
+.evidence-strength { margin-left: .5rem; }
+:focus-visible { outline: 4px solid currentColor; outline-offset: 4px; }
+@media (prefers-reduced-motion: no-preference) { a.button:hover { transform: translateY(-2px); } }
+</style>
+</head>
+<body>
+<main>
+<p><strong>Project Reader</strong></p>
+<h1>Project Status Engine</h1>
+<p class="lead">An automatic system that reads GitHub activity and owner-approved progress records, then produces public and private project-status views. <span class="citations"><a class="citation" href="#evidence-purpose" aria-label="Evidence 1">[1]</a> <a class="citation" href="#evidence-outputs" aria-label="Evidence 2">[2]</a></span></p>
+<p><strong>Status:</strong> Complete <span class="citations"><a class="citation" href="#evidence-completion" aria-label="Evidence 4">[4]</a> <a class="citation" href="#evidence-open-issues" aria-label="Evidence 5">[5]</a> <a class="citation" href="#evidence-open-prs" aria-label="Evidence 6">[6]</a> <a class="citation" href="#evidence-release-commit" aria-label="Evidence 7">[7]</a></span></p>
+
+<section class="score-grid" aria-label="Project scores">
+  <article class="score">
+    <h2>How complete?</h2>
+    <p class="big">100% complete</p>
+    <p>4 of 4 defined work units are accepted as done. <span class="citations"><a class="citation" href="#evidence-completion" aria-label="Evidence 4">[4]</a></span></p>
+    <p class="evidence">Evidence: confirmed</p>
+  </article>
+  <article class="score">
+    <h2>Likely to finish?</h2>
+    <p class="big">Already complete</p>
+    <p>The defined finish has been reached. <span class="citations"><a class="citation" href="#evidence-completion" aria-label="Evidence 4">[4]</a> <a class="citation" href="#evidence-open-issues" aria-label="Evidence 5">[5]</a> <a class="citation" href="#evidence-open-prs" aria-label="Evidence 6">[6]</a> <a class="citation" href="#evidence-release-commit" aria-label="Evidence 7">[7]</a></span></p>
+    <p>The current authorised v1.1 milestone has already been reached.</p>
+    <p class="evidence">Confidence: High</p>
+  </article>
+</section>
+
+<section class="panel">
+<h2>Done</h2>
+<ul><li><span aria-hidden='true'>✓</span> It separates recent activity from authority-backed completion. <span class="citations"><a class="citation" href="#evidence-purpose" aria-label="Evidence 1">[1]</a></span></li><li><span aria-hidden='true'>✓</span> It produces public, private-owner and trusted internal outputs from one scan. <span class="citations"><a class="citation" href="#evidence-outputs" aria-label="Evidence 2">[2]</a></span></li><li><span aria-hidden='true'>✓</span> It validates generated outputs and protects private repository details. <span class="citations"><a class="citation" href="#evidence-validation" aria-label="Evidence 3">[3]</a></span></li><li><span aria-hidden='true'>✓</span> All four authorised project stages are recorded as complete. <span class="citations"><a class="citation" href="#evidence-completion" aria-label="Evidence 4">[4]</a></span></li></ul>
+</section>
+
+<section class="panel">
+<h2>Still to do</h2>
+<ul><li><span aria-hidden='true'>○</span> No unfinished work is currently listed in GitHub issues or pull requests. <span class="citations"><a class="citation" href="#evidence-open-issues" aria-label="Evidence 5">[5]</a> <a class="citation" href="#evidence-open-prs" aria-label="Evidence 6">[6]</a></span></li><li><span aria-hidden='true'>○</span> Any further development would be a new milestone, not unfinished v1.1 work. <span class="citations"><a class="citation" href="#evidence-completion" aria-label="Evidence 4">[4]</a> <a class="citation" href="#evidence-next-inference" aria-label="Evidence 8">[8]</a></span></li></ul>
+</section>
+
+<section>
+<h2>Next</h2>
+<p class="next">Decide whether to archive the project as complete or define a new milestone before starting more development. <span class="citations"><a class="citation" href="#evidence-completion" aria-label="Evidence 4">[4]</a> <a class="citation" href="#evidence-open-issues" aria-label="Evidence 5">[5]</a> <a class="citation" href="#evidence-open-prs" aria-label="Evidence 6">[6]</a> <a class="citation" href="#evidence-next-inference" aria-label="Evidence 8">[8]</a></span></p>
+</section>
+
+<div class="actions">
+  <a class="button" href="https://github.com/armpitpete/project-status-engine">View the project</a>
+  <a class="button" href="https://github.com/armpitpete">Contact the project owner</a>
+</div>
+
+<details>
+<summary>How was this made?</summary>
+<div class="tech-grid">
+        <article class="tech-card">
+          <h3>Python</h3>
+          <p><strong>What is it?</strong> A programming language designed to be readable.</p>
+          <p><strong>What does it do here?</strong> It scans repository data, validates outputs and generates reports.</p>
+          <p><strong>Why was it used?</strong> The README says validation is implemented once in Python instead of being duplicated in workflow files. <span class="citations"><a class="citation" href="#evidence-validation" aria-label="Evidence 3">[3]</a></span></p>
+          <p class="evidence">Reason: confirmed</p>
+          <p><strong>Where can I see it?</strong> The scripts folder.</p>
+          <p><strong>Why does it matter?</strong> One clear implementation is easier to test and less likely to drift.</p>
+        </article>
+        
+        <article class="tech-card">
+          <h3>GitHub Actions</h3>
+          <p><strong>What is it?</strong> GitHub&#x27;s tool for running automatic jobs.</p>
+          <p><strong>What does it do here?</strong> It refreshes status outputs, validates changes and runs the daily synchroniser.</p>
+          <p><strong>Why was it used?</strong> The project needs status information to update automatically rather than by hand. <span class="citations"><a class="citation" href="#evidence-purpose" aria-label="Evidence 1">[1]</a> <a class="citation" href="#evidence-validation" aria-label="Evidence 3">[3]</a></span></p>
+          <p class="evidence">Reason: confirmed</p>
+          <p><strong>Where can I see it?</strong> The .github/workflows folder.</p>
+          <p><strong>Why does it matter?</strong> The owner does not have to maintain a second manual dashboard.</p>
+        </article>
+        
+        <article class="tech-card">
+          <h3>HTML, JSON and Markdown</h3>
+          <p><strong>What is it?</strong> Three common formats for webpages, structured data and readable documents.</p>
+          <p><strong>What does it do here?</strong> They provide a visual dashboard, machine-readable records and plain reports.</p>
+          <p><strong>Why was it used?</strong> Different readers and tools need different views of the same verified information. <span class="citations"><a class="citation" href="#evidence-outputs" aria-label="Evidence 2">[2]</a></span></p>
+          <p class="evidence">Reason: confirmed</p>
+          <p><strong>Where can I see it?</strong> The generated public, private-build and internal-build folders.</p>
+          <p><strong>Why does it matter?</strong> People can read the project while other systems can reuse the same data.</p>
+        </article>
+        </div>
+</details>
+
+<details>
+<summary>Why these scores?</summary>
+<p>The completion score uses accepted work against a defined finish line. A completed project is marked as already complete rather than given a speculative future probability.</p>
+</details>
+
+<details open>
+<summary>Evidence</summary>
+<ol class="evidence-list">
+        <li id="evidence-purpose">
+          <a href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/README.md#L3-L18">README: purpose, source-of-truth rules and completion authority</a>
+          <span class="evidence-strength">confirmed</span>
+        </li>
+        
+        <li id="evidence-outputs">
+          <a href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/README.md#L49-L100">README: public, private and trusted outputs</a>
+          <span class="evidence-strength">confirmed</span>
+        </li>
+        
+        <li id="evidence-validation">
+          <a href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/README.md#L124-L155">README: automated validation, privacy and synchronisation</a>
+          <span class="evidence-strength">confirmed</span>
+        </li>
+        
+        <li id="evidence-completion">
+          <a href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/README.md#L194-L208">README: four authorised stages recorded as 100% complete</a>
+          <span class="evidence-strength">confirmed</span>
+        </li>
+        
+        <li id="evidence-open-issues">
+          <a href="https://github.com/armpitpete/project-status-engine/issues?q=is%3Aissue+is%3Aopen">GitHub issue search: no open issues</a>
+          <span class="evidence-strength">confirmed</span>
+        </li>
+        
+        <li id="evidence-open-prs">
+          <a href="https://github.com/armpitpete/project-status-engine/pulls?q=is%3Apr+is%3Aopen">GitHub pull request search: no open pull requests</a>
+          <span class="evidence-strength">confirmed</span>
+        </li>
+        
+        <li id="evidence-release-commit">
+          <a href="https://github.com/armpitpete/project-status-engine/commit/d24e979e1747206f0c1ac3c66d3999f479f7ab72">Latest main commit: consolidated v1.1 status engine and owner dashboard</a>
+          <span class="evidence-strength">confirmed</span>
+        </li>
+        
+        <li id="evidence-next-inference">
+          <a href="https://github.com/armpitpete/project-status-engine/issues">Inference from completed authority and empty open-work queues</a>
+          <span class="evidence-strength">estimated</span>
+        </li>
+        </ol>
+</details>
+</main>
+</body>
+</html>

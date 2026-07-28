@@ -15,6 +15,7 @@ def assess_completion(
     *,
     finish_line_defined: bool,
     evidence_strength: EvidenceStrength,
+    evidence_keys: tuple[str, ...] = (),
 ) -> CompletionResult:
     """Calculate accepted completion without treating activity as progress."""
     if not finish_line_defined or not work_items:
@@ -22,6 +23,7 @@ def assess_completion(
             percentage=None,
             evidence_strength=EvidenceStrength.UNKNOWN,
             explanation="Completion cannot be measured because the finish line is not defined.",
+            evidence_keys=evidence_keys,
         )
 
     total_weight = sum(item.weight for item in work_items)
@@ -32,6 +34,7 @@ def assess_completion(
         percentage=percentage,
         evidence_strength=evidence_strength,
         explanation=f"{done_weight:g} of {total_weight:g} defined work units are accepted as done.",
+        evidence_keys=evidence_keys,
     )
 
 
@@ -57,9 +60,33 @@ def assess_likelihood(
     signals: LikelihoodSignals,
     *,
     timeframe: str = "Current milestone within 12 months",
+    already_complete: bool = False,
+    evidence_keys: tuple[str, ...] = (),
 ) -> LikelihoodResult:
     """Return a broad, evidence-labelled forecast rather than false precision."""
     _validate_signals(signals)
+
+    if signals.evidence_coverage >= 0.8:
+        confidence = "High"
+        margin = 5
+    elif signals.evidence_coverage >= 0.5:
+        confidence = "Medium"
+        margin = 10
+    else:
+        confidence = "Low"
+        margin = 15
+
+    if already_complete:
+        return LikelihoodResult(
+            score=100,
+            label="Already complete",
+            range_low=100,
+            range_high=100,
+            confidence=confidence,
+            timeframe=timeframe,
+            evidence_keys=evidence_keys,
+        )
+
     score = (
         signals.finish_line_clarity
         + signals.recent_progress
@@ -81,16 +108,6 @@ def assess_likelihood(
     else:
         label = "Very unlikely"
 
-    if signals.evidence_coverage >= 0.8:
-        confidence = "High"
-        margin = 5
-    elif signals.evidence_coverage >= 0.5:
-        confidence = "Medium"
-        margin = 10
-    else:
-        confidence = "Low"
-        margin = 15
-
     return LikelihoodResult(
         score=score,
         label=label,
@@ -98,4 +115,5 @@ def assess_likelihood(
         range_high=min(95, score + margin),
         confidence=confidence,
         timeframe=timeframe,
+        evidence_keys=evidence_keys,
     )
