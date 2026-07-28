@@ -56,12 +56,14 @@ Open issues, pull requests and recent activity are not treated as completion or 
 
 The interpreter examines complete plain-language paragraphs from `README.md` first.
 
+When the README lead section—the material before its first level-two heading—contains a qualifying purpose paragraph, selection is restricted to that lead. This prevents later implementation detail from displacing the repository's opening explanation. The full README is searched only when the lead contains no qualifying purpose paragraph.
+
 Purpose selection is deterministic:
 
 - paragraphs gain weight for purpose-like action words such as *helps*, *explains*, *collects* or *provides*;
 - paragraphs gain weight for project nouns such as *tool*, *application*, *system*, *repository* or *service*;
 - support appeals, funding notices, legal notices, warnings and contribution notices are penalised;
-- the highest-scoring paragraph is selected;
+- the highest-scoring eligible paragraph is selected;
 - an earlier paragraph wins an equal score;
 - a minimum purpose score is required.
 
