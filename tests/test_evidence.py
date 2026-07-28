@@ -29,6 +29,13 @@ File: .project/progress.json
 {{"schema_version": 1, "stages": [{{"id": "one"}}], "overall": {{"enabled": false}}}}
 
 {SEPARATOR}
+File: pyproject.toml
+{SEPARATOR}
+[project]
+name = "example"
+requires-python = ">=3.12"
+
+{SEPARATOR}
 File: src/app.py
 {SEPARATOR}
 print("hello")
@@ -81,9 +88,21 @@ def fake_reader(source: str, *, token=None, include_patterns=None) -> Repository
     assert token is None
     assert ".project/progress.json" in include_patterns
     assert "README.md" in include_patterns
+    assert "pyproject.toml" in include_patterns
+    assert "package.json" in include_patterns
+    assert "Cargo.toml" in include_patterns
+    assert "go.mod" in include_patterns
+    assert "Gemfile" in include_patterns
+    assert "Dockerfile" in include_patterns
+    assert "requirements*.txt" in include_patterns
     return RepositoryDigest(
         summary=f"Repository: example/project\nCommit: {HEAD}",
-        tree="Directory structure:\n├── README.md\n└── .project/progress.json",
+        tree=(
+            "Directory structure:\n"
+            "├── README.md\n"
+            "├── pyproject.toml\n"
+            "└── .project/progress.json"
+        ),
         content=DIGEST_CONTENT,
         file_provenance=(
             RepositoryFileProvenance(
@@ -100,7 +119,10 @@ def fake_reader(source: str, *, token=None, include_patterns=None) -> Repository
 
 def test_parse_repository_address_accepts_url_and_slug() -> None:
     assert parse_repository_address("example/project").full_name == "example/project"
-    assert parse_repository_address("https://github.com/example/project.git").full_name == "example/project"
+    assert (
+        parse_repository_address("https://github.com/example/project.git").full_name
+        == "example/project"
+    )
 
 
 def test_parse_repository_address_rejects_other_hosts() -> None:
@@ -112,6 +134,7 @@ def test_extract_gitingest_files_uses_file_blocks() -> None:
     files = extract_gitingest_files(DIGEST_CONTENT)
     assert files["README.md"].startswith("# Example")
     assert json.loads(files[".project/progress.json"])["schema_version"] == 1
+    assert "requires-python" in files["pyproject.toml"]
 
 
 def test_collect_public_evidence_uses_exact_commit_and_facts() -> None:
@@ -124,17 +147,30 @@ def test_collect_public_evidence_uses_exact_commit_and_facts() -> None:
     assert bundle.source_commit == HEAD
     assert bundle.source_url.endswith(HEAD)
     assert bundle.checked_at.endswith("Z")
-    assert [item.path for item in bundle.important_files] == [".project/progress.json", "README.md"]
+    assert [item.path for item in bundle.important_files] == [
+        ".project/progress.json",
+        "pyproject.toml",
+        "README.md",
+    ]
 
-    progress_file = bundle.important_files[0]
+    files = {item.path: item for item in bundle.important_files}
+    progress_file = files[".project/progress.json"]
     assert progress_file.collection_method == "exact_public_file"
     assert progress_file.source_commit == HEAD
     assert progress_file.source_url.endswith(f"{HEAD}/.project/progress.json")
 
-    readme = bundle.important_files[1]
+    readme = files["README.md"]
     assert readme.collection_method == "gitingest"
     assert readme.source_commit == HEAD
-    assert readme.source_url == f"https://github.com/example/project/blob/{HEAD}/README.md"
+    assert readme.source_url == (
+        f"https://github.com/example/project/blob/{HEAD}/README.md"
+    )
+
+    manifest = files["pyproject.toml"]
+    assert manifest.role == "technology_manifest"
+    assert manifest.source_url == (
+        f"https://github.com/example/project/blob/{HEAD}/pyproject.toml"
+    )
 
     assert bundle.progress_records[0].path == ".project/progress.json"
     assert bundle.progress_records[0].authority_rank == 1
@@ -176,7 +212,9 @@ def test_repository_reader_failure_is_controlled() -> None:
     def failed_reader(*args, **kwargs):
         raise RuntimeError("network failed")
 
-    with pytest.raises(EvidenceCollectionError, match="Could not read repository content"):
+    with pytest.raises(
+        EvidenceCollectionError, match="Could not read repository content"
+    ):
         collect_public_evidence(
             "example/project",
             client=FakeClient(),
@@ -194,4 +232,6 @@ def test_bundle_json_is_structured_and_stable() -> None:
     assert payload["schema_version"] == 1
     assert payload["repository"] == "example/project"
     assert payload["progress_records"][0]["kind"] == "machine_progress"
-    assert payload["important_files"][0]["collection_method"] == "exact_public_file"
+    files = {item["path"]: item for item in payload["important_files"]}
+    assert files[".project/progress.json"]["collection_method"] == "exact_public_file"
+    assert files["pyproject.toml"]["role"] == "technology_manifest"
