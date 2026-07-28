@@ -64,12 +64,39 @@ def render_html(reading: ProjectReading, destination: Path) -> None:
     )
 
     evidence_section = (
-        f"""<details open>
+        f"""<details>
 <summary>Evidence</summary>
 <ol class=\"evidence-list\">{evidence_items}</ol>
 </details>"""
         if reading.evidence
         else ""
+    )
+
+    reading_meta_parts: list[str] = []
+    if reading.source_commit:
+        reading_meta_parts.append(
+            f"<strong>Source commit:</strong> <code>{escape(reading.source_commit)}</code>"
+        )
+    if reading.assessed_at:
+        reading_meta_parts.append(f"<strong>Reading checked:</strong> {escape(reading.assessed_at)}")
+    if reading.open_work_checked_at:
+        reading_meta_parts.append(
+            f"<strong>Issues and pull requests checked:</strong> {escape(reading.open_work_checked_at)}"
+        )
+    reading_meta = (
+        f'<p class="reading-meta">{" · ".join(reading_meta_parts)}</p>'
+        if reading_meta_parts
+        else ""
+    )
+
+    remaining_content = (
+        f"<ul>{_items(reading.remaining, '○', evidence_numbers)}</ul>"
+        if reading.remaining
+        else (
+            f'<p>{_claim(reading.remaining_empty, evidence_numbers)}</p>'
+            if reading.remaining_empty
+            else "<p>Nothing currently listed.</p>"
+        )
     )
 
     html = f"""<!doctype html>
@@ -85,6 +112,7 @@ main {{ max-width: 760px; margin: auto; padding: 2rem 1.1rem 4rem; }}
 h1 {{ font-size: clamp(2rem, 8vw, 3.5rem); line-height: 1; margin-bottom: .4rem; }}
 h2 {{ margin-top: 2.2rem; }}
 .lead {{ font-size: 1.18rem; max-width: 62ch; }}
+.reading-meta {{ font-size: .9rem; }}
 .score-grid {{ display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 1rem; margin: 1.5rem 0; }}
 .score, .panel, .tech-card {{ background: white; border: 2px solid #1d1d1b; border-radius: 16px; padding: 1rem; box-shadow: 4px 4px 0 #1d1d1b; }}
 .big {{ font-size: 1.75rem; font-weight: 800; margin: .2rem 0; }}
@@ -110,6 +138,7 @@ summary {{ cursor: pointer; font-weight: 800; font-size: 1.15rem; }}
 <h1>{escape(reading.name)}</h1>
 <p class="lead">{_claim(reading.explanation, evidence_numbers)}</p>
 <p><strong>Status:</strong> {escape(reading.status)}{_citations(reading.status_evidence_keys, evidence_numbers)}</p>
+{reading_meta}
 
 <section class="score-grid" aria-label="Project scores">
   <article class="score">
@@ -134,7 +163,7 @@ summary {{ cursor: pointer; font-weight: 800; font-size: 1.15rem; }}
 
 <section class="panel">
 <h2>Still to do</h2>
-<ul>{_items(reading.remaining, '○', evidence_numbers)}</ul>
+{remaining_content}
 </section>
 
 <section>
