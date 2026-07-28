@@ -13,6 +13,8 @@ from project_reader.models import (
 HEAD = "d24e979e1747206f0c1ac3c66d3999f479f7ab72"
 REPO = "https://github.com/armpitpete/project-status-engine"
 README = f"{REPO}/blob/{HEAD}/README.md"
+PROGRESS = f"{REPO}/blob/{HEAD}/.project/progress.json"
+CHECKED_AT = "28 July 2026 at 12:02 BST"
 
 EVIDENCE = (
     Evidence(
@@ -32,22 +34,22 @@ EVIDENCE = (
     ),
     Evidence(
         "completion",
-        "README: four authorised stages recorded as 100% complete",
-        f"{README}#L194-L208",
+        ".project/progress.json: four authorised stages complete; overall percentage disabled",
+        PROGRESS,
     ),
     Evidence(
         "open-issues",
-        "GitHub issue search: no open issues",
+        f"GitHub issue search checked {CHECKED_AT}: no open issues",
         f"{REPO}/issues?q=is%3Aissue+is%3Aopen",
     ),
     Evidence(
         "open-prs",
-        "GitHub pull request search: no open pull requests",
+        f"GitHub pull request search checked {CHECKED_AT}: no open pull requests",
         f"{REPO}/pulls?q=is%3Apr+is%3Aopen",
     ),
     Evidence(
         "release-commit",
-        "Latest main commit: consolidated v1.1 status engine and owner dashboard",
+        "Source commit used for this reading: consolidated v1.1 status engine and owner dashboard",
         f"{REPO}/commit/{HEAD}",
     ),
     Evidence(
@@ -92,10 +94,8 @@ reading = ProjectReading(
         Claim("It validates generated outputs and protects private repository details.", ("validation",)),
         Claim("All four authorised project stages are recorded as complete.", ("completion",)),
     ),
-    remaining=(
-        Claim("No unfinished work is currently listed in GitHub issues or pull requests.", ("open-issues", "open-prs")),
-        Claim("Any further development would be a new milestone, not unfinished v1.1 work.", ("completion", "next-inference")),
-    ),
+    remaining=(),
+    remaining_empty=Claim("Nothing currently listed.", ("open-issues", "open-prs")),
     next_step=Claim(
         "Decide whether to archive the project as complete or define a new milestone before starting more development.",
         ("completion", "open-issues", "open-prs", "next-inference"),
@@ -133,6 +133,9 @@ reading = ProjectReading(
         ),
     ),
     evidence=EVIDENCE,
+    source_commit=HEAD,
+    assessed_at=CHECKED_AT,
+    open_work_checked_at=CHECKED_AT,
     project_url=REPO,
     contact_url="https://github.com/armpitpete",
 )
