@@ -8,17 +8,50 @@ HEAD = "a" * 40
 OTHER = "b" * 40
 
 
-def file(path, role, content, *, commit=HEAD, truncated=False):
+def file(
+    path,
+    role,
+    content,
+    *,
+    commit=HEAD,
+    truncated=False,
+    source_url=None,
+):
     return {
         "path": path,
         "role": role,
         "collection_method": "gitingest",
-        "source_url": f"https://github.com/example/project/blob/{commit}/{path}",
+        "source_url": source_url
+        or f"https://github.com/example/project/blob/{commit}/{path}",
         "source_commit": commit,
         "sha256": "0" * 64,
         "characters": len(content),
         "content": content,
         "truncated": truncated,
+    }
+
+
+def issue(number=4):
+    return {
+        "number": number,
+        "title": "Open issue",
+        "url": f"https://github.com/example/project/issues/{number}",
+        "created_at": "2026-01-01T00:00:00Z",
+        "updated_at": "2026-01-02T00:00:00Z",
+        "labels": [],
+        "draft": None,
+    }
+
+
+def pull(number=5):
+    return {
+        "number": number,
+        "title": "Open pull request",
+        "url": f"https://github.com/example/project/pull/{number}",
+        "created_at": "2026-01-03T00:00:00Z",
+        "updated_at": "2026-01-04T00:00:00Z",
+        "labels": [],
+        "draft": True,
     }
 
 
@@ -118,25 +151,39 @@ def test_no_remaining_authority_items_is_not_overstated():
     assert result.remaining[0].owner_authority is True
 
 
-def test_open_queues_are_not_treated_as_remaining_authority():
+def test_open_queues_are_inspectable_but_not_remaining_authority():
     result = interpret_evidence_bundle(
         bundle(
             file(
                 "README.md",
                 "project_overview",
-                "# Example\n\nA public example project with a clear purpose.",
+                "# Example\n\nA tool that explains a public example project.",
             ),
-            issues=({"number": 4, "title": "Maybe later"},),
+            issues=(issue(),),
+            pulls=(pull(),),
         )
     )
     assert result.remaining == ()
-    assert any(
-        item.key == "uncertainty:open-queues" for item in result.uncertainties
+    queue = next(
+        item for item in result.uncertainties if item.key == "uncertainty:open-queues"
     )
+    assert queue.evidence_keys == ("issue:4", "pull_request:5")
+    references = {item.key: item for item in result.evidence}
+    assert references["issue:4"].source_url.endswith("/issues/4")
+    assert references["issue:4"].role == "open_issue"
+    assert references["pull_request:5"].source_url.endswith("/pull/5")
+    assert references["pull_request:5"].role == "open_pull_request"
     assert any(
         item.key == "uncertainty:remaining-authority"
         for item in result.uncertainties
     )
+
+
+def test_invalid_queue_url_is_rejected():
+    bad = issue()
+    bad["url"] = "https://github.com/other/project/issues/4"
+    with pytest.raises(InterpretationError, match="uninspectable open_issues URL"):
+        interpret_evidence_bundle(bundle(issues=(bad,)))
 
 
 def test_lower_rank_conflict_is_visible_but_primary_authority_wins():
@@ -180,7 +227,7 @@ def test_stale_file_is_excluded_and_reported():
             file(
                 "README.md",
                 "project_overview",
-                "# Old\n\nThis should not be trusted as current.",
+                "# Old\n\nThis tool should not be trusted as current.",
                 commit=OTHER,
             )
         )
@@ -194,6 +241,80 @@ def test_stale_file_is_excluded_and_reported():
     )
 
 
+@pytest.mark.parametrize(
+    "source_url",
+    [
+        f"https://github.com/other/project/blob/{HEAD}/README.md",
+        f"https://github.com/example/project/blob/{HEAD}/OTHER.md",
+        f"https://github.com/example/project/blob/{HEAD}/README.md?ref={HEAD}",
+    ],
+)
+def test_file_url_must_match_repository_commit_and_path(source_url):
+    result = interpret_evidence_bundle(
+        bundle(
+            file(
+                "README.md",
+                "project_overview",
+                "# Example\n\nA tool that explains public projects.",
+                source_url=source_url,
+            )
+        )
+    )
+    assert result.purpose.kind == "unknown"
+    assert result.conflicts[0].topic == "stale_evidence"
+    assert "repository, commit, and path" in result.evidence[0].exclusion_reason
+
+
+def test_exact_raw_github_file_url_is_accepted():
+    result = interpret_evidence_bundle(
+        bundle(
+            file(
+                "README.md",
+                "project_overview",
+                "# Example\n\nA tool that explains public projects.",
+                source_url=(
+                    f"https://raw.githubusercontent.com/example/project/{HEAD}/README.md"
+                ),
+            )
+        )
+    )
+    assert result.purpose.kind == "fact"
+    assert result.evidence[0].usable is True
+
+
+def test_purpose_selection_skips_non_purpose_preamble():
+    result = interpret_evidence_bundle(
+        bundle(
+            file(
+                "README.md",
+                "project_overview",
+                (
+                    "# Example\n\n"
+                    "Support this project through Ko-fi and sponsorship.\n\n"
+                    "Project Reader helps non-technical people understand public repositories."
+                ),
+            )
+        )
+    )
+    assert result.purpose.text.startswith("Project Reader helps")
+
+
+def test_truncated_purpose_file_returns_unknown():
+    result = interpret_evidence_bundle(
+        bundle(
+            file(
+                "README.md",
+                "project_overview",
+                "# Example\n\nA tool that explains public projects clearly.",
+                truncated=True,
+            )
+        )
+    )
+    assert result.purpose.kind == "unknown"
+    assert result.purpose.evidence_keys == ()
+    assert any(item.topic == "evidence" for item in result.uncertainties)
+
+
 def test_technologies_require_manifest_evidence():
     result = interpret_evidence_bundle(
         bundle(
@@ -205,6 +326,7 @@ def test_technologies_require_manifest_evidence():
         )
     )
     assert result.technologies[0].text == "This repository uses Python."
+    assert result.technologies[0].evidence_keys == ("file:pyproject.toml",)
     assert not any(
         item.topic == "technology" for item in result.uncertainties
     )
@@ -216,7 +338,7 @@ def test_missing_manifest_returns_unknown_technology():
             file(
                 "README.md",
                 "project_overview",
-                "# Example\n\nMade with futuristic magic and Python maybe.",
+                "# Example\n\nA tool made with futuristic magic and Python maybe.",
             )
         )
     )
@@ -224,20 +346,6 @@ def test_missing_manifest_returns_unknown_technology():
     assert any(
         item.key == "uncertainty:technology" for item in result.uncertainties
     )
-
-
-def test_truncated_file_is_flagged():
-    result = interpret_evidence_bundle(
-        bundle(
-            file(
-                "README.md",
-                "project_overview",
-                "# Example\n\nA clear project purpose is still visible here.",
-                truncated=True,
-            )
-        )
-    )
-    assert any(item.topic == "evidence" for item in result.uncertainties)
 
 
 def test_output_refuses_scoring_and_final_judgement():
