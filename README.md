@@ -79,7 +79,7 @@ Open:
 ```bash
 python -m venv .venv
 . .venv/bin/activate        # Windows PowerShell: .venv\Scripts\Activate.ps1
-python -m pip install -e ".[dev]"
+python -m pip install -e "[dev]"
 pytest
 ```
 
@@ -104,6 +104,6 @@ Project Reader remains read-only. It does not yet contain:
 
 ## Working status
 
-- **Status:** Automatic Public Evidence Collection v0.3 in draft review
-- **Completion:** Tests, proof regeneration and live evidence collection pass
-- **Next:** Review Draft PR #2 before automated interpretation begins
+- **Status:** Automatic Public Evidence Collection v0.3 complete
+- **Completion:** Merged to `main` at `d18f29314dc0acecb403c4deb0313a5bb557afd0`; deterministic tests, static proofs and live public collection passed
+- **Next:** No active development lane. Any next product lane requires separate protected authority
