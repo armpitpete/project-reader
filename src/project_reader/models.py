@@ -114,6 +114,10 @@ class ProjectReading:
     next_step: Claim
     technologies: tuple[Technology, ...] = field(default_factory=tuple)
     evidence: tuple[Evidence, ...] = field(default_factory=tuple)
+    remaining_empty: Claim | None = None
+    source_commit: str | None = None
+    assessed_at: str | None = None
+    open_work_checked_at: str | None = None
     project_url: str | None = None
     contact_url: str | None = None
 
@@ -131,6 +135,8 @@ class ProjectReading:
         references.extend(self.next_step.evidence_keys)
         for claim in (*self.done, *self.remaining):
             references.extend(claim.evidence_keys)
+        if self.remaining_empty:
+            references.extend(self.remaining_empty.evidence_keys)
         for technology in self.technologies:
             references.extend(technology.evidence_keys)
 
