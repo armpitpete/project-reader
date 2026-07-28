@@ -32,6 +32,27 @@ Other hosts and private repositories are rejected.
 8. Detect recognised progress records.
 9. Write one JSON evidence bundle.
 
+## Important-file scope
+
+The bounded important-file set contains:
+
+- project overview and contribution files;
+- recognised progress and status records;
+- recognised status, roadmap and milestone files under `docs/`;
+- root technology manifests and build files needed by the v0.4 interpretation contract.
+
+Recognised root technology files are:
+
+- `pyproject.toml`;
+- `package.json`;
+- `Cargo.toml`;
+- `go.mod`;
+- `Gemfile`;
+- `Dockerfile`;
+- `requirements*.txt`.
+
+These files are collected as factual source text only. v0.3 does not interpret or explain the technology.
+
 ## Progress-record precedence
 
 Detection is deterministic. It does not decide whether a record is truthful.
