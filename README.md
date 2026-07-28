@@ -124,5 +124,5 @@ Project Reader remains read-only. It does not yet contain:
 ## Working status
 
 - **Status:** Automatic Interpretation Contract v0.4 in draft review
-- **Completion:** Contract implementation and deterministic tests are present; live evidence-to-interpretation validation runs in GitHub Actions
+- **Completion:** Deterministic tests, static proofs and the live public evidence-to-interpretation validation pass
 - **Next:** Review the bounded v0.4 draft before any scoring or final-status lane is authorised
