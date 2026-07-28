@@ -55,6 +55,8 @@ The JSON bundle contains:
 - currently open pull requests;
 - the time the live queues were checked.
 
+Gitingest remains the primary repository reader. When it omits an exact public file inside a dot-directory, Project Reader retrieves that named file directly from the same exact commit.
+
 See `docs/EVIDENCE_BUNDLE.md` for the contract and authority precedence.
 
 ## Run the static proofs
@@ -81,7 +83,7 @@ python -m pip install -e ".[dev]"
 pytest
 ```
 
-GitHub Actions installs the package, runs the tests, regenerates both reader proofs and performs a live automatic evidence collection against the public proof repository.
+GitHub Actions separately validates the deterministic test suite and a live automatic evidence collection against the public proof repository.
 
 ## Dependency
 
@@ -102,6 +104,6 @@ Project Reader remains read-only. It does not yet contain:
 
 ## Working status
 
-- **Status:** Automatic Public Evidence Collection v0.3
-- **Completion:** Deterministic collector implemented for one public repository
-- **Next:** Review the collector and its live GitHub Actions proof before automated interpretation begins
+- **Status:** Automatic Public Evidence Collection v0.3 in draft review
+- **Completion:** Tests, proof regeneration and live evidence collection pass
+- **Next:** Review Draft PR #2 before automated interpretation begins
