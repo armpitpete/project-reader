@@ -11,6 +11,7 @@ main { max-width: 760px; margin: auto; padding: 2rem 1.1rem 4rem; }
 h1 { font-size: clamp(2rem, 8vw, 3.5rem); line-height: 1; margin-bottom: .4rem; }
 h2 { margin-top: 2.2rem; }
 .lead { font-size: 1.18rem; max-width: 62ch; }
+.reading-meta { font-size: .9rem; }
 .score-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 1rem; margin: 1.5rem 0; }
 .score, .panel, .tech-card { background: white; border: 2px solid #1d1d1b; border-radius: 16px; padding: 1rem; box-shadow: 4px 4px 0 #1d1d1b; }
 .big { font-size: 1.75rem; font-weight: 800; margin: .2rem 0; }
@@ -36,6 +37,7 @@ summary { cursor: pointer; font-weight: 800; font-size: 1.15rem; }
 <h1>Project Status Engine</h1>
 <p class="lead">An automatic system that reads GitHub activity and owner-approved progress records, then produces public and private project-status views. <span class="citations"><a class="citation" href="#evidence-purpose" aria-label="Evidence 1">[1]</a> <a class="citation" href="#evidence-outputs" aria-label="Evidence 2">[2]</a></span></p>
 <p><strong>Status:</strong> Complete <span class="citations"><a class="citation" href="#evidence-completion" aria-label="Evidence 4">[4]</a> <a class="citation" href="#evidence-open-issues" aria-label="Evidence 5">[5]</a> <a class="citation" href="#evidence-open-prs" aria-label="Evidence 6">[6]</a> <a class="citation" href="#evidence-release-commit" aria-label="Evidence 7">[7]</a></span></p>
+<p class="reading-meta"><strong>Source commit:</strong> <code>d24e979e1747206f0c1ac3c66d3999f479f7ab72</code> · <strong>Reading checked:</strong> 28 July 2026 at 12:02 BST · <strong>Issues and pull requests checked:</strong> 28 July 2026 at 12:02 BST</p>
 
 <section class="score-grid" aria-label="Project scores">
   <article class="score">
@@ -60,7 +62,7 @@ summary { cursor: pointer; font-weight: 800; font-size: 1.15rem; }
 
 <section class="panel">
 <h2>Still to do</h2>
-<ul><li><span aria-hidden='true'>○</span> No unfinished work is currently listed in GitHub issues or pull requests. <span class="citations"><a class="citation" href="#evidence-open-issues" aria-label="Evidence 5">[5]</a> <a class="citation" href="#evidence-open-prs" aria-label="Evidence 6">[6]</a></span></li><li><span aria-hidden='true'>○</span> Any further development would be a new milestone, not unfinished v1.1 work. <span class="citations"><a class="citation" href="#evidence-completion" aria-label="Evidence 4">[4]</a> <a class="citation" href="#evidence-next-inference" aria-label="Evidence 8">[8]</a></span></li></ul>
+<p>Nothing currently listed. <span class="citations"><a class="citation" href="#evidence-open-issues" aria-label="Evidence 5">[5]</a> <a class="citation" href="#evidence-open-prs" aria-label="Evidence 6">[6]</a></span></p>
 </section>
 
 <section>
@@ -113,7 +115,7 @@ summary { cursor: pointer; font-weight: 800; font-size: 1.15rem; }
 <p>The completion score uses accepted work against a defined finish line. A completed project is marked as already complete rather than given a speculative future probability.</p>
 </details>
 
-<details open>
+<details>
 <summary>Evidence</summary>
 <ol class="evidence-list">
         <li id="evidence-purpose">
@@ -132,22 +134,22 @@ summary { cursor: pointer; font-weight: 800; font-size: 1.15rem; }
         </li>
         
         <li id="evidence-completion">
-          <a href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/README.md#L194-L208">README: four authorised stages recorded as 100% complete</a>
+          <a href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/.project/progress.json">.project/progress.json: four authorised stages complete; overall percentage disabled</a>
           <span class="evidence-strength">confirmed</span>
         </li>
         
         <li id="evidence-open-issues">
-          <a href="https://github.com/armpitpete/project-status-engine/issues?q=is%3Aissue+is%3Aopen">GitHub issue search: no open issues</a>
+          <a href="https://github.com/armpitpete/project-status-engine/issues?q=is%3Aissue+is%3Aopen">GitHub issue search checked 28 July 2026 at 12:02 BST: no open issues</a>
           <span class="evidence-strength">confirmed</span>
         </li>
         
         <li id="evidence-open-prs">
-          <a href="https://github.com/armpitpete/project-status-engine/pulls?q=is%3Apr+is%3Aopen">GitHub pull request search: no open pull requests</a>
+          <a href="https://github.com/armpitpete/project-status-engine/pulls?q=is%3Apr+is%3Aopen">GitHub pull request search checked 28 July 2026 at 12:02 BST: no open pull requests</a>
           <span class="evidence-strength">confirmed</span>
         </li>
         
         <li id="evidence-release-commit">
-          <a href="https://github.com/armpitpete/project-status-engine/commit/d24e979e1747206f0c1ac3c66d3999f479f7ab72">Latest main commit: consolidated v1.1 status engine and owner dashboard</a>
+          <a href="https://github.com/armpitpete/project-status-engine/commit/d24e979e1747206f0c1ac3c66d3999f479f7ab72">Source commit used for this reading: consolidated v1.1 status engine and owner dashboard</a>
           <span class="evidence-strength">confirmed</span>
         </li>
         
