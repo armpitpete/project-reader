@@ -24,19 +24,38 @@ It also offers:
 
 The first screen must make sense in under 30 seconds. Technical details stay behind optional controls.
 
-## Current proof
+## Proven foundation
 
-The first real proof reads the public repository `armpitpete/project-status-engine` into a cited project page.
-
-It demonstrates:
+The first cited reader for `armpitpete/project-status-engine` is complete. It demonstrates:
 
 - a plain-language purpose;
-- evidence-backed status and completion;
+- evidence-backed status and defined-stage completion;
 - **Already complete** instead of a misleading future forecast;
 - completed and remaining outcomes;
 - one evidence-backed next decision;
 - educational technology cards;
-- direct links to the GitHub evidence.
+- direct links to GitHub evidence.
+
+## Collect a public evidence bundle
+
+Automatic Public Evidence Collection v0.3 records facts for one public repository without interpreting them.
+
+```bash
+python scripts/collect_public_evidence.py \
+  https://github.com/armpitpete/project-status-engine \
+  --output evidence.json
+```
+
+The JSON bundle contains:
+
+- the exact source commit;
+- important files read through Gitingest;
+- recognised progress records;
+- currently open issues;
+- currently open pull requests;
+- the time the live queues were checked.
+
+See `docs/EVIDENCE_BUNDLE.md` for the contract and authority precedence.
 
 ## Run the static proofs
 
@@ -62,17 +81,19 @@ python -m pip install -e ".[dev]"
 pytest
 ```
 
-GitHub Actions performs a live Gitingest ingestion of the public proof repository. The dependency installation, tests, proof regeneration and real remote-repository ingestion have passed.
+GitHub Actions installs the package, runs the tests, regenerates both reader proofs and performs a live automatic evidence collection against the public proof repository.
 
 ## Dependency
 
-Project Reader uses [Gitingest](https://github.com/coderamp-labs/gitingest) to collect a structured digest of repository files. Gitingest is MIT-licensed. Project Reader adds its own project evidence, assessment, education, and accessible presentation layers.
+Project Reader uses [Gitingest](https://github.com/coderamp-labs/gitingest) to collect a structured digest of repository files. Gitingest is MIT-licensed. Project Reader adds its own evidence contract, assessment, education and accessible presentation layers.
 
 ## Current boundaries
 
 Project Reader remains read-only. It does not yet contain:
 
-- automatic AI interpretation;
+- automatic interpretation;
+- automatic completion or likelihood scoring from collected evidence;
+- private repository access;
 - owner accounts;
 - writes to analysed repositories;
 - stored contact messages;
@@ -81,6 +102,6 @@ Project Reader remains read-only. It does not yet contain:
 
 ## Working status
 
-- **Status:** First public-repository proof
-- **Completion:** Proof implemented and live Gitingest CI passed
-- **Next:** Renew review of the corrected cited reader before starting automatic evidence collection.
+- **Status:** Automatic Public Evidence Collection v0.3
+- **Completion:** Deterministic collector implemented for one public repository
+- **Next:** Review the collector and its live GitHub Actions proof before automated interpretation begins

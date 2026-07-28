@@ -24,14 +24,31 @@ jobs:
           python scripts/render_sample.py
           python scripts/render_project_status_engine.py
           git diff --exit-code -- prototype
-      - name: Prove real Gitingest public-repository ingestion
+      - name: Prove automatic public evidence collection
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
+          python scripts/collect_public_evidence.py \
+            https://github.com/armpitpete/project-status-engine \
+            --output /tmp/project-status-engine-evidence.json
           python - <<'PY'
-          from project_reader.ingest import read_repository
+          import json
+          from pathlib import Path
 
-          digest = read_repository("https://github.com/armpitpete/project-status-engine")
-          assert "README.md" in digest.tree
-          assert "Project Status Engine" in digest.content
-          assert len(digest.content) > 10_000
-          print(digest.summary)
+          payload = json.loads(
+              Path("/tmp/project-status-engine-evidence.json").read_text(encoding="utf-8")
+          )
+          assert payload["schema_version"] == 1
+          assert payload["repository"] == "armpitpete/project-status-engine"
+          assert len(payload["source_commit"]) == 40
+          assert payload["source_url"].endswith(payload["source_commit"])
+          assert "Commit:" in payload["gitingest_summary"]
+          assert any(
+              record["path"] == ".project/progress.json"
+              and record["authority_rank"] == 1
+              and record["valid_json"] is True
+              for record in payload["progress_records"]
+          )
+          assert isinstance(payload["open_issues"], list)
+          assert isinstance(payload["open_pull_requests"], list)
           PY
