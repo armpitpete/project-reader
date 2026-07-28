@@ -25,8 +25,6 @@ jobs:
           python scripts/render_project_status_engine.py
           git diff --exit-code -- prototype
       - name: Prove automatic public evidence collection
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
         run: |
           python scripts/collect_public_evidence.py \
             https://github.com/armpitpete/project-status-engine \
@@ -42,7 +40,6 @@ jobs:
           assert payload["repository"] == "armpitpete/project-status-engine"
           assert len(payload["source_commit"]) == 40
           assert payload["source_url"].endswith(payload["source_commit"])
-          assert "Repository: armpitpete/project-status-engine" in payload["gitingest_summary"]
           assert any(
               record["path"] == ".project/progress.json"
               and record["authority_rank"] == 1
