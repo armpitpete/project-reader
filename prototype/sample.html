@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Reader — Project Reader</title>
+<style>
+:root { color-scheme: light; font-family: system-ui, sans-serif; line-height: 1.55; }
+body { margin: 0; background: #f7f5ef; color: #1d1d1b; }
+main { max-width: 760px; margin: auto; padding: 2rem 1.1rem 4rem; }
+h1 { font-size: clamp(2rem, 8vw, 3.5rem); line-height: 1; margin-bottom: .4rem; }
+h2 { margin-top: 2.2rem; }
+.lead { font-size: 1.18rem; max-width: 62ch; }
+.score-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 1rem; margin: 1.5rem 0; }
+.score, .panel, .tech-card { background: white; border: 2px solid #1d1d1b; border-radius: 16px; padding: 1rem; box-shadow: 4px 4px 0 #1d1d1b; }
+.big { font-size: 1.75rem; font-weight: 800; margin: .2rem 0; }
+ul { padding-left: 0; list-style: none; }
+li { margin: .65rem 0; }
+.next { font-size: 1.15rem; border-left: 6px solid currentColor; padding-left: 1rem; }
+.actions { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 2rem; }
+a.button, button { display: inline-block; background: #fff; color: #1d1d1b; border: 2px solid #1d1d1b; border-radius: 999px; padding: .75rem 1rem; font-weight: 700; text-decoration: none; }
+details { margin-top: 2rem; }
+summary { cursor: pointer; font-weight: 800; font-size: 1.15rem; }
+.tech-grid { display: grid; gap: 1rem; margin-top: 1rem; }
+.evidence { font-size: .9rem; }
+:focus-visible { outline: 4px solid currentColor; outline-offset: 4px; }
+@media (prefers-reduced-motion: no-preference) { a.button:hover { transform: translateY(-2px); } }
+</style>
+</head>
+<body>
+<main>
+<p><strong>Project Reader</strong></p>
+<h1>Project Reader</h1>
+<p class="lead">A simple and educational way to understand what a GitHub project is, how far it has progressed, and what remains.</p>
+<p><strong>Status:</strong> Active</p>
+
+<section class="score-grid" aria-label="Project scores">
+  <article class="score">
+    <h2>How complete?</h2>
+    <p class="big">46% complete</p>
+    <p>6 of 13 defined work units are accepted as done.</p>
+    <p class="evidence">Evidence: confirmed</p>
+  </article>
+  <article class="score">
+    <h2>Likely to finish?</h2>
+    <p class="big">Likely</p>
+    <p>Estimated range: 74–94%</p>
+    <p>Foundation milestone within 90 days</p>
+    <p class="evidence">Confidence: Medium</p>
+  </article>
+</section>
+
+<section class="panel">
+<h2>Done</h2>
+<ul><li><span aria-hidden='true'>✓</span> The simple first-screen questions are agreed.</li><li><span aria-hidden='true'>✓</span> Completion and likelihood are measured separately.</li><li><span aria-hidden='true'>✓</span> The educational technology-card format is defined.</li></ul>
+</section>
+
+<section class="panel">
+<h2>Still to do</h2>
+<ul><li><span aria-hidden='true'>○</span> Read a real public repository.</li><li><span aria-hidden='true'>○</span> Connect every important answer to evidence.</li><li><span aria-hidden='true'>○</span> Test the page with a non-technical reader lens.</li></ul>
+</section>
+
+<section>
+<h2>Next</h2>
+<p class="next">Use one public repository to prove the full five-question reading flow.</p>
+</section>
+
+<div class="actions">
+  <a class="button" href="https://github.com/armpitpete/project-reader">View the project</a>
+  <a class="button" href="https://github.com/armpitpete">Contact the project owner</a>
+</div>
+
+<details>
+<summary>How was this made?</summary>
+<div class="tech-grid">
+        <article class="tech-card">
+          <h3>Python</h3>
+          <p><strong>What is it?</strong> A language used to give computers clear instructions.</p>
+          <p><strong>What does it do here?</strong> It calculates project scores and prepares the project reading.</p>
+          <p><strong>Why was it used?</strong> It is readable, widely supported, and works directly with Gitingest.</p>
+          <p class="evidence">Reason: confirmed</p>
+          <p><strong>Where can I see it?</strong> The src/project_reader folder.</p>
+          <p><strong>Why does it matter?</strong> Readable code makes the scoring rules easier to inspect and challenge.</p>
+        </article>
+        
+        <article class="tech-card">
+          <h3>Gitingest</h3>
+          <p><strong>What is it?</strong> A tool that gathers useful information from a Git repository.</p>
+          <p><strong>What does it do here?</strong> It collects the repository structure and readable file contents.</p>
+          <p><strong>Why was it used?</strong> It avoids rebuilding reliable repository extraction from scratch.</p>
+          <p class="evidence">Reason: confirmed</p>
+          <p><strong>Where can I see it?</strong> The repository-ingestion layer.</p>
+          <p><strong>Why does it matter?</strong> Project Reader can focus on meaning, evidence, and accessibility.</p>
+        </article>
+        
+        <article class="tech-card">
+          <h3>HTML and CSS</h3>
+          <p><strong>What is it?</strong> The standard building blocks for webpage content and appearance.</p>
+          <p><strong>What does it do here?</strong> They display the simple project page.</p>
+          <p><strong>Why was it used?</strong> They create a fast, accessible proof without a large frontend framework.</p>
+          <p class="evidence">Reason: confirmed</p>
+          <p><strong>Where can I see it?</strong> The HTML renderer and generated prototype.</p>
+          <p><strong>Why does it matter?</strong> A small page is easier to load, understand, test, and maintain.</p>
+        </article>
+        </div>
+</details>
+
+<details>
+<summary>Why these scores?</summary>
+<p>The completion score uses accepted work against a defined finish line. The likelihood result uses project evidence and is a forecast, not a promise.</p>
+</details>
+</main>
+</body>
+</html>
