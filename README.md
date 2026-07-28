@@ -62,7 +62,7 @@ python -m pip install -e ".[dev]"
 pytest
 ```
 
-GitHub Actions also performs a live Gitingest ingestion of the public proof repository. This verifies the real dependency and remote-repository path in an environment with network access.
+GitHub Actions performs a live Gitingest ingestion of the public proof repository. The dependency installation, tests, proof regeneration and real remote-repository ingestion have passed.
 
 ## Dependency
 
@@ -82,5 +82,5 @@ Project Reader remains read-only. It does not yet contain:
 ## Working status
 
 - **Status:** First public-repository proof
-- **Completion:** Proof implemented; live Gitingest CI evidence pending
-- **Next:** Review the proof and its GitHub Actions result before starting automatic evidence collection.
+- **Completion:** Proof implemented and live Gitingest CI passed
+- **Next:** Renew review of the corrected cited reader before starting automatic evidence collection.
