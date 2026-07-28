@@ -89,6 +89,11 @@ jobs:
           import json
           from pathlib import Path
 
+          evidence = json.loads(
+              Path("/tmp/project-status-engine-evidence.json").read_text(
+                  encoding="utf-8"
+              )
+          )
           payload = json.loads(
               Path("/tmp/project-status-engine-interpretation.json").read_text(
                   encoding="utf-8"
@@ -112,14 +117,9 @@ jobs:
           assert len(payload["done"]) == 4
           assert all(item["kind"] == "fact" for item in payload["done"])
           assert payload["remaining"][0]["key"] == "remaining:none-listed"
-          assert payload["technologies"] == []
-          assert any(
-              item["key"] == "uncertainty:technology"
-              for item in payload["uncertainties"]
-          )
           assert payload["conflicts"] == []
 
-          evidence_keys = {item["key"] for item in payload["evidence"]}
+          evidence_by_key = {item["key"]: item for item in payload["evidence"]}
           candidate_sections = [
               [payload["purpose"]],
               payload["done"],
@@ -128,10 +128,32 @@ jobs:
               payload["uncertainties"],
           ]
           assert all(
-              set(candidate["evidence_keys"]) <= evidence_keys
+              set(candidate["evidence_keys"]) <= set(evidence_by_key)
               for section in candidate_sections
               for candidate in section
           )
+
+          queue_count = len(evidence["open_issues"]) + len(
+              evidence["open_pull_requests"]
+          )
+          queue_candidate = next(
+              (
+                  item
+                  for item in payload["uncertainties"]
+                  if item["key"] == "uncertainty:open-queues"
+              ),
+              None,
+          )
+          if queue_count:
+              assert queue_candidate is not None
+              assert len(queue_candidate["evidence_keys"]) == queue_count
+              assert all(
+                  evidence_by_key[key]["role"]
+                  in {"open_issue", "open_pull_request"}
+                  for key in queue_candidate["evidence_keys"]
+              )
+          else:
+              assert queue_candidate is None
 
           assert {item["topic"] for item in payload["refusals"]} == {
               "completion_percentage",
@@ -142,4 +164,44 @@ jobs:
               key in payload
               for key in ("completion_percentage", "likelihood", "status")
           )
+          PY
+      - name: Collect technology-manifest evidence
+        run: |
+          python scripts/collect_public_evidence.py \
+            https://github.com/armpitpete/project-reader \
+            --output /tmp/project-reader-evidence.json
+      - name: Interpret technology-manifest evidence
+        run: |
+          python scripts/interpret_evidence.py \
+            /tmp/project-reader-evidence.json \
+            --output /tmp/project-reader-interpretation.json
+      - name: Validate evidence-linked technology candidate
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          evidence = json.loads(
+              Path("/tmp/project-reader-evidence.json").read_text(encoding="utf-8")
+          )
+          interpretation = json.loads(
+              Path("/tmp/project-reader-interpretation.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          files = {item["path"]: item for item in evidence["important_files"]}
+          manifest = files["pyproject.toml"]
+          assert manifest["role"] == "technology_manifest"
+          assert manifest["source_commit"] == evidence["source_commit"]
+          assert manifest["source_url"].endswith(
+              f'{evidence["source_commit"]}/pyproject.toml'
+          )
+
+          technologies = {item["text"]: item for item in interpretation["technologies"]}
+          python = technologies["This repository uses Python."]
+          assert python["kind"] == "fact"
+          assert python["evidence_keys"] == ["file:pyproject.toml"]
+          references = {item["key"]: item for item in interpretation["evidence"]}
+          assert references["file:pyproject.toml"]["role"] == "technology_manifest"
+          assert references["file:pyproject.toml"]["usable"] is True
           PY
