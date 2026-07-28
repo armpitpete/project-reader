@@ -57,7 +57,26 @@ The JSON bundle contains:
 
 Gitingest remains the primary repository reader. When it omits an exact public file inside a dot-directory, Project Reader retrieves that named file directly from the same exact commit.
 
-See `docs/EVIDENCE_BUNDLE.md` for the contract and authority precedence.
+See `docs/EVIDENCE_BUNDLE.md` for the collection contract and authority precedence.
+
+## Interpret an evidence bundle
+
+Automatic Interpretation Contract v0.4 turns one v0.3 bundle into evidence-linked candidate statements for human review.
+
+```bash
+python scripts/interpret_evidence.py evidence.json \
+  --output interpretation.json
+```
+
+The interpretation output:
+
+- labels statements as `fact`, `interpretation` or `unknown`;
+- identifies explicit owner-authority records;
+- proposes purpose, done, remaining and technology statements only when supported;
+- exposes stale or contradictory evidence;
+- refuses completion percentages, likelihood forecasts and final status judgements.
+
+See `docs/INTERPRETATION_CONTRACT.md` for the exact contract.
 
 ## Run the static proofs
 
@@ -83,18 +102,18 @@ python -m pip install -e ".[dev]"
 pytest
 ```
 
-GitHub Actions separately validates the deterministic test suite and a live automatic evidence collection against the public proof repository.
+GitHub Actions separately validates the deterministic test suite and a live public evidence-to-interpretation proof against the public proof repository.
 
 ## Dependency
 
-Project Reader uses [Gitingest](https://github.com/coderamp-labs/gitingest) to collect a structured digest of repository files. Gitingest is MIT-licensed. Project Reader adds its own evidence contract, assessment, education and accessible presentation layers.
+Project Reader uses [Gitingest](https://github.com/coderamp-labs/gitingest) to collect a structured digest of repository files. Gitingest is MIT-licensed. Project Reader adds its own evidence contract, interpretation, assessment, education and accessible presentation layers.
 
 ## Current boundaries
 
 Project Reader remains read-only. It does not yet contain:
 
-- automatic interpretation;
 - automatic completion or likelihood scoring from collected evidence;
+- a final automatic project-status judgement;
 - private repository access;
 - owner accounts;
 - writes to analysed repositories;
@@ -104,6 +123,6 @@ Project Reader remains read-only. It does not yet contain:
 
 ## Working status
 
-- **Status:** Automatic Public Evidence Collection v0.3 complete
-- **Completion:** Merged to `main` at `d18f29314dc0acecb403c4deb0313a5bb557afd0`; deterministic tests, static proofs and live public collection passed
-- **Next:** No active development lane. Any next product lane requires separate protected authority
+- **Status:** Automatic Interpretation Contract v0.4 in draft review
+- **Completion:** Contract implementation and deterministic tests are present; live evidence-to-interpretation validation runs in GitHub Actions
+- **Next:** Review the bounded v0.4 draft before any scoring or final-status lane is authorised
