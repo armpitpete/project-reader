@@ -79,7 +79,7 @@ Open:
 ```bash
 python -m venv .venv
 . .venv/bin/activate        # Windows PowerShell: .venv\Scripts\Activate.ps1
-python -m pip install -e "[dev]"
+python -m pip install -e ".[dev]"
 pytest
 ```
 
