@@ -40,21 +40,21 @@ It does **not** yet contain AI project interpretation, GitHub API evidence colle
 
 ## Run the proof
 
-Requires Python 3.12 or newer.
+Requires Python 3.12 or newer. No package installation is needed for the static sample.
 
 ```bash
-python -m venv .venv
-. .venv/bin/activate        # Windows PowerShell: .venv\Scripts\Activate.ps1
-python -m pip install -e ".[dev]"
 python scripts/render_sample.py
 python -m http.server 8000 --directory prototype
 ```
 
 Open `http://localhost:8000/sample.html`.
 
-## Test
+## Develop and test
 
 ```bash
+python -m venv .venv
+. .venv/bin/activate        # Windows PowerShell: .venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev]"
 pytest
 ```
 
