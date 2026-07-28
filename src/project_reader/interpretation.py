@@ -7,9 +7,29 @@ from pathlib import Path
 import re
 import tomllib
 from typing import Any, Mapping
+from urllib.parse import unquote, urlparse
 
 _SHA = re.compile(r"^[0-9a-f]{40}$")
+_REPOSITORY = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
 _TASK = re.compile(r"^\s*[-*]\s+\[(?P<mark>[ xX])\]\s+(?P<label>.+?)\s*$")
+_PURPOSE_ACTION = re.compile(
+    r"\b(help|helps|helping|allow|allows|enable|enables|let|lets|provide|provides|"
+    r"offer|offers|create|creates|build|builds|track|tracks|collect|collects|"
+    r"explain|explains|turn|turns|generate|generates|manage|manages|report|"
+    r"reports|analyse|analyses|analyze|analyzes)\b",
+    re.IGNORECASE,
+)
+_PURPOSE_NOUN = re.compile(
+    r"\b(tool|app|application|service|library|project|system|platform|engine|"
+    r"website|dashboard|repository|repositories|workflow|reader|collector)\b",
+    re.IGNORECASE,
+)
+_PURPOSE_NEGATIVE = re.compile(
+    r"\b(support|sponsor|sponsorship|donate|donation|fund|funding|copyright|"
+    r"licen[cs]e|warranty|disclaimer|security|contribut|warning|caution|notice|"
+    r"ko-fi|patreon)\b",
+    re.IGNORECASE,
+)
 
 
 class InterpretationError(ValueError):
@@ -110,6 +130,10 @@ def _key(path: str) -> str:
     return f"file:{path}"
 
 
+def _queue_key(kind: str, number: int) -> str:
+    return f"{kind}:{number}"
+
+
 def _payload(value: Mapping[str, Any] | Any) -> dict[str, Any]:
     if isinstance(value, Mapping):
         return dict(value)
@@ -120,16 +144,34 @@ def _payload(value: Mapping[str, Any] | Any) -> dict[str, Any]:
     raise InterpretationError("Expected one v0.3 evidence bundle")
 
 
+def _validate_queue(data: dict[str, Any], name: str, segment: str) -> None:
+    seen: set[int] = set()
+    for item in data[name]:
+        if not isinstance(item, dict):
+            raise InterpretationError(f"The evidence bundle contains an invalid {name} item")
+        number = item.get("number")
+        url = item.get("url")
+        if not isinstance(number, int) or isinstance(number, bool) or number <= 0:
+            raise InterpretationError(f"The evidence bundle contains an invalid {name} number")
+        if number in seen:
+            raise InterpretationError(f"The evidence bundle contains a duplicate {name} number")
+        seen.add(number)
+        expected = f"{data['repository_url']}/{segment}/{number}"
+        if url != expected:
+            raise InterpretationError(
+                f"The evidence bundle contains an uninspectable {name} URL"
+            )
+
+
 def _validate(data: dict[str, Any]) -> None:
     if data.get("schema_version") != 1:
         raise InterpretationError(
             "Automatic Interpretation Contract v0.4 requires evidence schema version 1"
         )
-    if not isinstance(data.get("repository"), str) or not data["repository"].strip():
+    repository = data.get("repository")
+    if not isinstance(repository, str) or not _REPOSITORY.fullmatch(repository):
         raise InterpretationError("The evidence bundle has no repository name")
-    if not isinstance(data.get("repository_url"), str) or not data[
-        "repository_url"
-    ].startswith("https://github.com/"):
+    if data.get("repository_url") != f"https://github.com/{repository}":
         raise InterpretationError(
             "The evidence bundle has no supported public repository URL"
         )
@@ -149,6 +191,8 @@ def _validate(data: dict[str, Any]) -> None:
             raise InterpretationError(
                 f"The evidence bundle has no {name.replace('_', '-')} list"
             )
+    _validate_queue(data, "open_issues", "issues")
+    _validate_queue(data, "open_pull_requests", "pull")
 
 
 def _plain(text: str) -> str:
@@ -162,7 +206,7 @@ def _normal(text: str) -> str:
     return _plain(text).casefold().rstrip(".:")
 
 
-def _paragraph(markdown: str) -> str | None:
+def _paragraphs(markdown: str) -> tuple[str, ...]:
     paragraphs: list[str] = []
     current: list[str] = []
     fenced = False
@@ -187,11 +231,70 @@ def _paragraph(markdown: str) -> str | None:
         current.append(line)
     if current:
         paragraphs.append(" ".join(current))
-    for value in paragraphs:
-        value = _plain(value)
-        if 20 <= len(value) <= 500:
-            return value
-    return None
+    return tuple(
+        value
+        for raw in paragraphs
+        if 20 <= len(value := _plain(raw)) <= 500
+    )
+
+
+def _purpose_score(text: str) -> int:
+    score = 0
+    if _PURPOSE_ACTION.search(text):
+        score += 4
+    if _PURPOSE_NOUN.search(text):
+        score += 3
+    if re.search(r"\b(for|to)\b", text, re.IGNORECASE):
+        score += 2
+    if _PURPOSE_NEGATIVE.search(text):
+        score -= 8
+    return score
+
+
+def _purpose_paragraph(markdown: str) -> str | None:
+    ranked = [
+        (_purpose_score(text), -index, text)
+        for index, text in enumerate(_paragraphs(markdown))
+    ]
+    if not ranked:
+        return None
+    score, _, text = max(ranked)
+    return text if score >= 4 else None
+
+
+def _valid_file_path(path: str) -> bool:
+    parts = path.split("/")
+    return bool(path) and not path.startswith("/") and all(
+        part not in {"", ".", ".."} for part in parts
+    )
+
+
+def _source_url_matches(
+    repository: str, source_commit: str, path: str, source_url: Any
+) -> bool:
+    if not _valid_file_path(path) or not isinstance(source_url, str):
+        return False
+    parsed = urlparse(source_url)
+    if parsed.scheme != "https" or parsed.query or parsed.fragment:
+        return False
+    parts = [unquote(part) for part in parsed.path.strip("/").split("/")]
+    owner, name = repository.split("/", 1)
+    if parsed.hostname in {"github.com", "www.github.com"}:
+        if len(parts) < 5 or parts[2] != "blob":
+            return False
+        url_owner, url_name, _, url_commit, *url_path = parts
+    elif parsed.hostname == "raw.githubusercontent.com":
+        if len(parts) < 4:
+            return False
+        url_owner, url_name, url_commit, *url_path = parts
+    else:
+        return False
+    return (
+        url_owner.casefold() == owner.casefold()
+        and url_name.casefold() == name.casefold()
+        and url_commit == source_commit
+        and "/".join(url_path) == path
+    )
 
 
 def _files(
@@ -223,12 +326,14 @@ def _files(
         seen.add(path)
         commit = raw.get("source_commit")
         url = raw.get("source_url")
-        exact = commit == source_commit and isinstance(url, str) and source_commit in url
+        exact = commit == source_commit and _source_url_matches(
+            data["repository"], source_commit, path, url
+        )
         reason = None
         if commit != source_commit:
             reason = "source commit does not match the bundle"
-        elif not isinstance(url, str) or source_commit not in url:
-            reason = "source URL is not anchored to the bundle commit"
+        elif not _source_url_matches(data["repository"], source_commit, path, url):
+            reason = "source URL does not match the bundle repository, commit, and path"
         references.append(
             EvidenceReference(
                 key=_key(path),
@@ -274,6 +379,33 @@ def _files(
     )
 
 
+def _queue_references(
+    data: dict[str, Any],
+) -> tuple[tuple[EvidenceReference, ...], tuple[str, ...]]:
+    references: list[EvidenceReference] = []
+    keys: list[str] = []
+    for name, kind, segment, role in (
+        ("open_issues", "issue", "issues", "open_issue"),
+        ("open_pull_requests", "pull_request", "pull", "open_pull_request"),
+    ):
+        for item in data[name]:
+            number = item["number"]
+            key = _queue_key(kind, number)
+            keys.append(key)
+            references.append(
+                EvidenceReference(
+                    key=key,
+                    path=f"{segment}/{number}",
+                    source_url=item["url"],
+                    source_commit="",
+                    role=role,
+                    authority_rank=None,
+                    usable=True,
+                )
+            )
+    return tuple(references), tuple(keys)
+
+
 def _purpose(files: dict[str, dict[str, Any]]) -> CandidateStatement:
     order = sorted(
         files,
@@ -281,13 +413,15 @@ def _purpose(files: dict[str, dict[str, Any]]) -> CandidateStatement:
     )
     for path in order:
         raw = files[path]
+        if raw.get("truncated") is True:
+            continue
         if path != "README.md" and raw.get("role") not in {
             "project_overview",
             "project_status",
         }:
             continue
         if isinstance(raw.get("content"), str) and (
-            text := _paragraph(raw["content"])
+            text := _purpose_paragraph(raw["content"])
         ):
             return CandidateStatement(
                 key="purpose",
@@ -301,7 +435,7 @@ def _purpose(files: dict[str, dict[str, Any]]) -> CandidateStatement:
                 basis=(
                     "The repository states this in README.md."
                     if path == "README.md"
-                    else f"This is the clearest purpose-like statement in {path}."
+                    else f"This is the strongest purpose-like statement in {path}."
                 ),
                 evidence_keys=(_key(path),),
             )
@@ -313,7 +447,7 @@ def _purpose(files: dict[str, dict[str, Any]]) -> CandidateStatement:
             "evidence."
         ),
         kind=StatementKind.UNKNOWN,
-        basis="No suitable plain-language purpose statement was found.",
+        basis="No complete, purpose-like plain-language paragraph was found.",
     )
 
 
@@ -626,10 +760,8 @@ def _technologies(
         found.setdefault(
             name,
             CandidateStatement(
-                (
-                    "technology:"
-                    + re.sub(r"[^a-z0-9]+", "-", name.casefold()).strip("-")
-                ),
+                "technology:"
+                + re.sub(r"[^a-z0-9]+", "-", name.casefold()).strip("-"),
                 "technology",
                 f"This repository uses {name}.",
                 StatementKind.FACT,
@@ -689,7 +821,7 @@ def _technologies(
             add("Ruby", path, "Gemfile defines Ruby dependencies.")
         elif lower == "dockerfile" or lower.endswith("/dockerfile"):
             add("Docker", path, "Dockerfile defines a container build.")
-        elif lower.startswith("requirements") and lower.endswith(".txt"):
+        elif Path(lower).name.startswith("requirements") and lower.endswith(".txt"):
             add("Python", path, f"{path} lists Python dependencies.")
     if found:
         return tuple(found[name] for name in sorted(found, key=str.casefold)), []
@@ -711,28 +843,34 @@ def interpret_evidence_bundle(value: Mapping[str, Any] | Any) -> InterpretationB
     """Produce reviewable candidate statements from one factual v0.3 bundle."""
     data = _payload(value)
     _validate(data)
-    files, evidence, stale, unknowns = _files(data)
+    files, file_evidence, stale, unknowns = _files(data)
+    queue_evidence, queue_keys = _queue_references(data)
     authorities = _authorities(files, data["progress_records"])
     done, remaining, work_conflicts, work_unknowns = _work(files, authorities)
     technologies, technology_unknowns = _technologies(files)
     unknowns.extend(work_unknowns)
     unknowns.extend(technology_unknowns)
-    if data["open_issues"] or data["open_pull_requests"]:
+    if queue_keys:
+        issue_count = len(data["open_issues"])
+        pull_count = len(data["open_pull_requests"])
         unknowns.append(
             CandidateStatement(
                 "uncertainty:open-queues",
                 "remaining",
                 (
-                    "Open GitHub items exist, but they are not automatically treated "
-                    "as the project finish line."
+                    f"The evidence bundle records {issue_count} open issue(s) and "
+                    f"{pull_count} open pull request(s), but they are not automatically "
+                    "treated as the project finish line."
                 ),
                 StatementKind.UNKNOWN,
                 (
-                    "Activity and queue state do not prove owner-authorised remaining "
-                    "work."
+                    "The cited queue entries are inspectable, but queue state does not "
+                    "prove owner-authorised remaining work."
                 ),
+                queue_keys,
             )
         )
+    evidence = tuple(sorted((*file_evidence, *queue_evidence), key=lambda item: item.key))
     return InterpretationBundle(
         schema_version=1,
         source_evidence_schema_version=1,
