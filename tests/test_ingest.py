@@ -1,6 +1,9 @@
 import importlib
+from urllib.error import URLError
 
-from project_reader.ingest import read_repository
+import pytest
+
+from project_reader.ingest import RepositoryReadError, read_repository
 
 
 ingest_module = importlib.import_module("project_reader.ingest")
@@ -49,6 +52,9 @@ def test_exact_hidden_public_file_is_recovered(monkeypatch) -> None:
     assert requested_urls == [
         f"https://raw.githubusercontent.com/example/project/{HEAD}/.project/progress.json"
     ]
+    assert digest.file_provenance[0].path == ".project/progress.json"
+    assert digest.file_provenance[0].collection_method == "exact_public_file"
+    assert digest.file_provenance[0].source_url == requested_urls[0]
 
 
 def test_wildcard_patterns_are_left_to_gitingest(monkeypatch) -> None:
@@ -69,3 +75,34 @@ def test_wildcard_patterns_are_left_to_gitingest(monkeypatch) -> None:
     )
 
     assert digest.content == "content"
+    assert digest.file_provenance == ()
+
+
+def test_gitingest_failure_is_controlled(monkeypatch) -> None:
+    monkeypatch.setattr(
+        ingest_module,
+        "ingest",
+        lambda *args, **kwargs: (_ for _ in ()).throw(OSError("clone failed")),
+    )
+
+    with pytest.raises(RepositoryReadError, match="Gitingest"):
+        read_repository("https://github.com/example/project")
+
+
+def test_exact_file_network_failure_is_controlled(monkeypatch) -> None:
+    monkeypatch.setattr(
+        ingest_module,
+        "ingest",
+        lambda source, token=None, include_patterns=None: ("summary", "tree", ""),
+    )
+    monkeypatch.setattr(
+        ingest_module,
+        "urlopen",
+        lambda request, timeout: (_ for _ in ()).throw(URLError("offline")),
+    )
+
+    with pytest.raises(RepositoryReadError, match=r"\.project/progress\.json"):
+        read_repository(
+            f"https://github.com/example/project/tree/{HEAD}",
+            include_patterns={".project/progress.json"},
+        )

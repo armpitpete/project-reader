@@ -26,17 +26,12 @@ def main() -> int:
         required=True,
         help="JSON file to write",
     )
-    parser.add_argument(
-        "--checked-at",
-        help="Optional fixed RFC 3339 timestamp for a reproducible proof",
-    )
     args = parser.parse_args()
 
     try:
         bundle = collect_public_evidence(
             args.repository,
             token=os.getenv("GITHUB_TOKEN"),
-            checked_at=args.checked_at,
         )
         write_evidence_bundle(bundle, args.output)
     except (ValueError, EvidenceCollectionError) as error:

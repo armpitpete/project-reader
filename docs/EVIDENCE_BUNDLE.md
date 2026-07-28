@@ -22,13 +22,15 @@ Other hosts and private repositories are rejected.
 
 ## Collection sequence
 
-1. Read public repository metadata from GitHub.
+1. Read public repository metadata from GitHub, using an optional token only for GitHub API facts.
 2. Resolve the default branch to one exact 40-character commit.
-3. Run Gitingest against the exact commit URL.
+3. Run Gitingest anonymously against the exact public commit URL.
 4. Extract important files from Gitingest's file blocks.
-5. Collect all currently open issues and pull requests.
-6. Detect recognised progress records.
-7. Write one JSON evidence bundle.
+5. Recover only exact named public files that Gitingest omitted.
+6. Collect all currently open issues and pull requests.
+7. Record `checked_at` after both live queues have returned.
+8. Detect recognised progress records.
+9. Write one JSON evidence bundle.
 
 ## Progress-record precedence
 
@@ -62,7 +64,10 @@ Each important file records:
 
 - path;
 - detected role;
-- SHA-256 hash of the complete ingested text;
+- collection method: `gitingest` or `exact_public_file`;
+- exact source URL;
+- exact source commit;
+- SHA-256 hash of the complete collected text;
 - character count;
 - up to 30,000 characters of text;
 - whether the stored text was truncated.
@@ -76,7 +81,11 @@ Machine-readable progress JSON also records only structural facts when available
 
 ## Time boundary
 
-Repository files are pinned to `source_commit`. Open issues and pull requests are live queue facts captured at `checked_at`; they can change after the bundle is written.
+Repository files are pinned to `source_commit`. Open issues and pull requests are live queue facts. `checked_at` is generated immediately after both queues have been fetched and cannot be supplied by the caller. The queues can change after the bundle is written.
+
+## Failure boundary
+
+GitHub API, Gitingest, exact-file and network failures are returned as controlled evidence-collection errors. The command-line tool reports the error without an uncontrolled traceback.
 
 ## Explicit exclusions
 

@@ -1,3 +1,5 @@
+from datetime import datetime as RealDateTime
+import importlib
 import json
 
 import pytest
@@ -8,9 +10,10 @@ from project_reader.evidence import (
     extract_gitingest_files,
     parse_repository_address,
 )
-from project_reader.ingest import RepositoryDigest
+from project_reader.ingest import RepositoryDigest, RepositoryFileProvenance
 
 
+evidence_module = importlib.import_module("project_reader.evidence")
 HEAD = "a" * 40
 SEPARATOR = "=" * 48
 DIGEST_CONTENT = f"""{SEPARATOR}
@@ -36,6 +39,7 @@ print("hello")
 class FakeClient:
     def __init__(self, *, private: bool = False) -> None:
         self.private = private
+        self.calls: list[str] = []
 
     def repository(self, address):
         return {"private": self.private, "default_branch": "main"}
@@ -45,6 +49,7 @@ class FakeClient:
         return {"sha": HEAD}
 
     def open_issues(self, address):
+        self.calls.append("issues")
         return [
             {
                 "number": 3,
@@ -57,6 +62,7 @@ class FakeClient:
         ]
 
     def open_pull_requests(self, address):
+        self.calls.append("pull_requests")
         return [
             {
                 "number": 4,
@@ -72,12 +78,23 @@ class FakeClient:
 
 def fake_reader(source: str, *, token=None, include_patterns=None) -> RepositoryDigest:
     assert source == f"https://github.com/example/project/tree/{HEAD}"
+    assert token is None
     assert ".project/progress.json" in include_patterns
     assert "README.md" in include_patterns
     return RepositoryDigest(
         summary=f"Repository: example/project\nCommit: {HEAD}",
         tree="Directory structure:\n├── README.md\n└── .project/progress.json",
         content=DIGEST_CONTENT,
+        file_provenance=(
+            RepositoryFileProvenance(
+                path=".project/progress.json",
+                collection_method="exact_public_file",
+                source_url=(
+                    f"https://raw.githubusercontent.com/example/project/{HEAD}/"
+                    ".project/progress.json"
+                ),
+            ),
+        ),
     )
 
 
@@ -102,12 +119,23 @@ def test_collect_public_evidence_uses_exact_commit_and_facts() -> None:
         "https://github.com/example/project",
         client=FakeClient(),
         repository_reader=fake_reader,
-        checked_at="2026-07-28T12:00:00Z",
+        token="api-only-token",
     )
     assert bundle.source_commit == HEAD
     assert bundle.source_url.endswith(HEAD)
-    assert bundle.checked_at == "2026-07-28T12:00:00Z"
+    assert bundle.checked_at.endswith("Z")
     assert [item.path for item in bundle.important_files] == [".project/progress.json", "README.md"]
+
+    progress_file = bundle.important_files[0]
+    assert progress_file.collection_method == "exact_public_file"
+    assert progress_file.source_commit == HEAD
+    assert progress_file.source_url.endswith(f"{HEAD}/.project/progress.json")
+
+    readme = bundle.important_files[1]
+    assert readme.collection_method == "gitingest"
+    assert readme.source_commit == HEAD
+    assert readme.source_url == f"https://github.com/example/project/blob/{HEAD}/README.md"
+
     assert bundle.progress_records[0].path == ".project/progress.json"
     assert bundle.progress_records[0].authority_rank == 1
     assert bundle.progress_records[0].valid_json is True
@@ -115,6 +143,24 @@ def test_collect_public_evidence_uses_exact_commit_and_facts() -> None:
     assert bundle.progress_records[0].overall_enabled is False
     assert bundle.open_issues[0].number == 3
     assert bundle.open_pull_requests[0].draft is True
+
+
+def test_checked_at_is_recorded_after_live_queues(monkeypatch) -> None:
+    client = FakeClient()
+
+    class OrderedDateTime:
+        @classmethod
+        def now(cls, tz):
+            assert client.calls == ["issues", "pull_requests"]
+            return RealDateTime(2026, 7, 28, 12, 30, tzinfo=tz)
+
+    monkeypatch.setattr(evidence_module, "datetime", OrderedDateTime)
+    bundle = collect_public_evidence(
+        "example/project",
+        client=client,
+        repository_reader=fake_reader,
+    )
+    assert bundle.checked_at == "2026-07-28T12:30:00Z"
 
 
 def test_collect_public_evidence_rejects_private_repository() -> None:
@@ -126,14 +172,26 @@ def test_collect_public_evidence_rejects_private_repository() -> None:
         )
 
 
+def test_repository_reader_failure_is_controlled() -> None:
+    def failed_reader(*args, **kwargs):
+        raise RuntimeError("network failed")
+
+    with pytest.raises(EvidenceCollectionError, match="Could not read repository content"):
+        collect_public_evidence(
+            "example/project",
+            client=FakeClient(),
+            repository_reader=failed_reader,
+        )
+
+
 def test_bundle_json_is_structured_and_stable() -> None:
     bundle = collect_public_evidence(
         "example/project",
         client=FakeClient(),
         repository_reader=fake_reader,
-        checked_at="2026-07-28T12:00:00Z",
     )
     payload = json.loads(bundle.to_json())
     assert payload["schema_version"] == 1
     assert payload["repository"] == "example/project"
     assert payload["progress_records"][0]["kind"] == "machine_progress"
+    assert payload["important_files"][0]["collection_method"] == "exact_public_file"

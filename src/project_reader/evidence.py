@@ -88,6 +88,9 @@ class WorkItemFact:
 class ImportantFileFact:
     path: str
     role: str
+    collection_method: str
+    source_url: str
+    source_commit: str
     sha256: str
     characters: int
     content: str
@@ -242,12 +245,28 @@ def _file_role(path: str) -> str | None:
     return None
 
 
-def _important_file(path: str, role: str, text: str) -> ImportantFileFact:
+def _file_source_url(address: RepositoryAddress, source_commit: str, path: str) -> str:
+    quoted_path = "/".join(quote(part, safe="") for part in path.split("/"))
+    return f"{address.url}/blob/{source_commit}/{quoted_path}"
+
+
+def _important_file(
+    path: str,
+    role: str,
+    text: str,
+    *,
+    collection_method: str,
+    source_url: str,
+    source_commit: str,
+) -> ImportantFileFact:
     encoded = text.encode("utf-8")
     truncated = len(text) > _MAX_IMPORTANT_FILE_CHARS
     return ImportantFileFact(
         path=path,
         role=role,
+        collection_method=collection_method,
+        source_url=source_url,
+        source_commit=source_commit,
         sha256=hashlib.sha256(encoded).hexdigest(),
         characters=len(text),
         content=text[:_MAX_IMPORTANT_FILE_CHARS],
@@ -318,7 +337,6 @@ def collect_public_evidence(
     client: PublicGitHubClient | None = None,
     repository_reader: Callable[..., RepositoryDigest] = read_repository,
     token: str | None = None,
-    checked_at: str | None = None,
 ) -> PublicEvidenceBundle:
     """Collect facts for one public GitHub repository without interpreting them."""
     address = parse_repository_address(source)
@@ -338,17 +356,39 @@ def collect_public_evidence(
         raise EvidenceCollectionError("GitHub did not return a full source commit")
 
     source_url = f"{address.url}/tree/{source_commit}"
-    digest = repository_reader(
-        source_url,
-        token=token or os.getenv("GITHUB_TOKEN"),
-        include_patterns=_IMPORTANT_PATTERNS,
-    )
+    try:
+        digest = repository_reader(
+            source_url,
+            token=None,
+            include_patterns=_IMPORTANT_PATTERNS,
+        )
+    except EvidenceCollectionError:
+        raise
+    except Exception as error:
+        raise EvidenceCollectionError(
+            f"Could not read repository content at {source_commit}"
+        ) from error
+
     files = extract_gitingest_files(digest.content)
+    recovered = {item.path: item for item in digest.file_provenance}
 
     important = tuple(
         sorted(
             (
-                _important_file(path, role, text)
+                _important_file(
+                    path,
+                    role,
+                    text,
+                    collection_method=(
+                        recovered[path].collection_method if path in recovered else "gitingest"
+                    ),
+                    source_url=(
+                        recovered[path].source_url
+                        if path in recovered
+                        else _file_source_url(address, source_commit, path)
+                    ),
+                    source_commit=source_commit,
+                )
                 for path, text in files.items()
                 if (role := _file_role(path)) is not None
             ),
@@ -362,14 +402,17 @@ def collect_public_evidence(
         )
     )
 
-    timestamp = checked_at or datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    issue_payloads = active_client.open_issues(address)
+    pull_request_payloads = active_client.open_pull_requests(address)
+    timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
     issues = tuple(
         _work_item(item, pull_request=False)
-        for item in sorted(active_client.open_issues(address), key=lambda value: int(value["number"]))
+        for item in sorted(issue_payloads, key=lambda value: int(value["number"]))
     )
     pull_requests = tuple(
         _work_item(item, pull_request=True)
-        for item in sorted(active_client.open_pull_requests(address), key=lambda value: int(value["number"]))
+        for item in sorted(pull_request_payloads, key=lambda value: int(value["number"]))
     )
 
     return PublicEvidenceBundle(
