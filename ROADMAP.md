@@ -10,7 +10,7 @@
 - [x] Add deterministic scoring models and tests
 - [x] Add a static accessible reader proof
 
-## First real proof v0.2 — current
+## First real proof v0.2 — complete
 
 - [x] Read one named public repository
 - [x] Collect README, status, issues, pull requests, releases, milestones, and recent workflow evidence
@@ -19,11 +19,25 @@
 - [x] Produce an evidence-labelled likelihood result
 - [x] Identify done, remaining, and one next step
 - [x] Explain the detected technologies and why they are used
-- [ ] Inspect the page with a non-technical reader lens
-- [ ] Accept the live Gitingest GitHub Actions proof
+- [x] Inspect and correct the page with a non-technical reader lens
+- [x] Accept the live Gitingest GitHub Actions proof
+
+## Automatic Public Evidence Collection v0.3 — current
+
+- [x] Accept one public GitHub repository address
+- [x] Capture the exact default-branch source commit
+- [x] Read important files through Gitingest at that commit
+- [x] Collect all currently open issues and pull requests
+- [x] Detect recognised progress records using fixed precedence
+- [x] Produce a structured JSON evidence bundle
+- [x] Reject private repositories and unsupported hosts
+- [ ] Accept the live collector GitHub Actions proof
+- [ ] Review and merge the bounded collector
 
 ## Blocked until separately authorised
 
+- Automatic interpretation
+- Automatic completion and likelihood scoring from collected evidence
 - Private repository access
 - User accounts
 - Repository writes

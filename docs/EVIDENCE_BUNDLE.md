@@ -1,0 +1,101 @@
+# Public Evidence Bundle v0.3
+
+## Purpose
+
+The collector records inspectable facts about one public GitHub repository. It does not explain the project, calculate completion, forecast delivery, or decide what should happen next.
+
+## Input
+
+One public repository address:
+
+```text
+owner/name
+```
+
+or:
+
+```text
+https://github.com/owner/name
+```
+
+Other hosts and private repositories are rejected.
+
+## Collection sequence
+
+1. Read public repository metadata from GitHub, using an optional token only for GitHub API facts.
+2. Resolve the default branch to one exact 40-character commit.
+3. Run Gitingest anonymously against the exact public commit URL.
+4. Extract important files from Gitingest's file blocks.
+5. Recover only exact named public files that Gitingest omitted.
+6. Collect all currently open issues and pull requests.
+7. Record `checked_at` after both live queues have returned.
+8. Detect recognised progress records.
+9. Write one JSON evidence bundle.
+
+## Progress-record precedence
+
+Detection is deterministic. It does not decide whether a record is truthful.
+
+| Rank | Record |
+|---:|---|
+| 1 | `.project/progress.json` |
+| 2 | `PROJECT_STATUS.md` or `STATUS.md` |
+| 3 | `ROADMAP.md` or `MILESTONES.md` |
+| 4 | status, roadmap, or milestone documents under `docs/` |
+
+`README.md` is retained as a project overview but is not automatically treated as the completion authority.
+
+## Bundle fields
+
+- `schema_version`
+- `checked_at`
+- `repository`
+- `repository_url`
+- `default_branch`
+- `source_commit`
+- `source_url`
+- `gitingest_summary`
+- `important_files`
+- `progress_records`
+- `open_issues`
+- `open_pull_requests`
+
+Each important file records:
+
+- path;
+- detected role;
+- collection method: `gitingest` or `exact_public_file`;
+- exact source URL;
+- exact source commit;
+- SHA-256 hash of the complete collected text;
+- character count;
+- up to 30,000 characters of text;
+- whether the stored text was truncated.
+
+Machine-readable progress JSON also records only structural facts when available:
+
+- valid JSON;
+- schema version;
+- stage count;
+- whether an `overall.enabled` Boolean exists.
+
+## Time boundary
+
+Repository files are pinned to `source_commit`. Open issues and pull requests are live queue facts. `checked_at` is generated immediately after both queues have been fetched and cannot be supplied by the caller. The queues can change after the bundle is written.
+
+## Failure boundary
+
+GitHub API, Gitingest, exact-file and network failures are returned as controlled evidence-collection errors. The command-line tool reports the error without an uncontrolled traceback.
+
+## Explicit exclusions
+
+v0.3 does not include:
+
+- interpretation;
+- completion scoring;
+- likelihood forecasting;
+- technology explanations;
+- private repository access;
+- repository writes;
+- deployment;
+- multi-repository collection.
