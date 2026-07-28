@@ -78,10 +78,11 @@ reading = ProjectReading(
         finish_line_defined=True,
         evidence_strength=EvidenceStrength.CONFIRMED,
         evidence_keys=("completion",),
+        scope_label="of defined stages",
     ),
     likelihood=assess_likelihood(
         LikelihoodSignals(20, 20, 15, 15, 15, 10, 5, 1.0),
-        timeframe="The current authorised v1.1 milestone has already been reached.",
+        timeframe="The current defined work has already been reached; no overall project percentage is authorised.",
         already_complete=True,
         evidence_keys=("completion", "open-issues", "open-prs", "release-commit"),
     ),

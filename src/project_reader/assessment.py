@@ -16,6 +16,7 @@ def assess_completion(
     finish_line_defined: bool,
     evidence_strength: EvidenceStrength,
     evidence_keys: tuple[str, ...] = (),
+    scope_label: str = "complete",
 ) -> CompletionResult:
     """Calculate accepted completion without treating activity as progress."""
     if not finish_line_defined or not work_items:
@@ -23,6 +24,7 @@ def assess_completion(
             percentage=None,
             evidence_strength=EvidenceStrength.UNKNOWN,
             explanation="Completion cannot be measured because the finish line is not defined.",
+            scope_label=scope_label,
             evidence_keys=evidence_keys,
         )
 
@@ -34,6 +36,7 @@ def assess_completion(
         percentage=percentage,
         evidence_strength=evidence_strength,
         explanation=f"{done_weight:g} of {total_weight:g} defined work units are accepted as done.",
+        scope_label=scope_label,
         evidence_keys=evidence_keys,
     )
 

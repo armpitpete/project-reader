@@ -74,6 +74,7 @@ class CompletionResult:
     percentage: int | None
     evidence_strength: EvidenceStrength
     explanation: str
+    scope_label: str = "complete"
     evidence_keys: tuple[str, ...] = ()
 
 

@@ -30,7 +30,7 @@ def _items(values: tuple[Claim, ...], symbol: str, evidence_numbers: dict[str, i
 def render_html(reading: ProjectReading, destination: Path) -> None:
     evidence_numbers = {item.key: index for index, item in enumerate(reading.evidence, start=1)}
     completion = (
-        f"{reading.completion.percentage}% complete"
+        f"{reading.completion.percentage}% {reading.completion.scope_label}"
         if reading.completion.percentage is not None
         else "Completion not yet measurable"
     )
@@ -66,7 +66,7 @@ def render_html(reading: ProjectReading, destination: Path) -> None:
     evidence_section = (
         f"""<details open>
 <summary>Evidence</summary>
-<ol class="evidence-list">{evidence_items}</ol>
+<ol class=\"evidence-list\">{evidence_items}</ol>
 </details>"""
         if reading.evidence
         else ""
