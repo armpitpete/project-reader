@@ -23,7 +23,7 @@ The bundle must identify:
 - the time its live issue and pull-request queues were checked;
 - collected important files with exact-commit provenance;
 - recognised progress records;
-- open issues and pull requests.
+- open issues and pull requests with inspectable repository URLs.
 
 It performs no network requests and does not collect additional evidence.
 
@@ -54,11 +54,20 @@ Open issues, pull requests and recent activity are not treated as completion or 
 
 ## Purpose rule
 
-The interpreter selects the first suitable plain-language paragraph from `README.md`.
+The interpreter examines complete plain-language paragraphs from `README.md` first.
 
-When no usable README purpose exists, it may return the clearest purpose-like paragraph from a recognised project-status record as an `interpretation`.
+Purpose selection is deterministic:
 
-When neither exists, it returns an `unknown` purpose instead of inventing one.
+- paragraphs gain weight for purpose-like action words such as *helps*, *explains*, *collects* or *provides*;
+- paragraphs gain weight for project nouns such as *tool*, *application*, *system*, *repository* or *service*;
+- support appeals, funding notices, legal notices, warnings and contribution notices are penalised;
+- the highest-scoring paragraph is selected;
+- an earlier paragraph wins an equal score;
+- a minimum purpose score is required.
+
+When no usable README purpose exists, the same rule may return the strongest purpose-like paragraph from a recognised project-status record as an `interpretation`.
+
+A truncated file cannot provide a purpose fact or interpretation. When no complete purpose-like paragraph exists, the output returns an `unknown` purpose instead of inventing one.
 
 ## Done and remaining work
 
@@ -83,20 +92,34 @@ The interpreter compares work items with the same normalised label.
 - If equal-ranked authority records disagree, the state is returned as `unknown`.
 - No contradiction is silently discarded.
 
-## Stale and partial evidence
+## Exact provenance rule
 
-A file is excluded from interpretation when:
+A collected file is usable only when all of the following agree with the evidence bundle:
 
-- its `source_commit` differs from the bundle source commit; or
-- its source URL is not anchored to that exact commit.
+- repository owner and name;
+- exact source commit;
+- exact repository path.
 
-The exclusion appears as a `stale_evidence` conflict and remains visible in the evidence index.
+The accepted URL forms are:
 
-Truncated files are explicitly flagged. A truncated authority record is not used to define done or remaining work.
+- an exact GitHub `/blob/<commit>/<path>` URL;
+- an exact `raw.githubusercontent.com/<owner>/<repository>/<commit>/<path>` URL.
+
+Query strings, fragments, different repositories, different commits and different paths are rejected. The exclusion appears as a `stale_evidence` conflict and remains visible in the evidence index.
+
+Truncated files are explicitly flagged. A truncated authority record is not used to define done or remaining work, and a truncated purpose source is not used for the purpose candidate.
+
+## Queue evidence rule
+
+Each open issue and pull request is represented by an evidence reference containing its exact GitHub URL.
+
+When open queues exist, the interpreter may state that the bundle records those entries only when the candidate cites the corresponding queue evidence keys. The statement remains `unknown` for remaining-work purposes because queue state does not prove the owner-authorised finish line.
+
+Malformed, duplicate or cross-repository queue references make the evidence bundle invalid rather than producing an uninspectable claim.
 
 ## Technology rule
 
-Technology candidates require a collected manifest or build file, such as:
+Technology candidates require a collected manifest or build file. Public Evidence Bundle v0.3 collects the following root files when present:
 
 - `pyproject.toml` or `requirements*.txt` for Python;
 - `package.json` for JavaScript, Node.js or TypeScript;
@@ -119,7 +142,7 @@ The JSON output contains:
 - technology candidates;
 - uncertainties;
 - conflicts;
-- an evidence index;
+- file and live-queue evidence references;
 - explicit refusals.
 
 ## Explicit refusals
