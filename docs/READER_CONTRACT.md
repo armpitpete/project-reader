@@ -45,15 +45,19 @@ When recognised authority is missing or contradictory, the reader must show an u
 
 ## Assessment boundary
 
-Completion measures readable owner-authority work items.
+Completion measures readable work items from the selected owner-authority records. When an authority record gives completed and total units, those units remain part of the completion arithmetic instead of being collapsed into a binary item.
 
 Likelihood is a broad evidence-labelled forecast for the current defined milestone. It is not a promise about human behaviour or future events.
 
 When the current defined work is complete, Project Reader says `Already complete` instead of making a future forecast.
 
+When the collected evidence does not prove forecast signals such as recent progress, delivery history, repository health or blocker manageability, Project Reader must show an explicit unknown likelihood rather than converting missing evidence into score points.
+
 ## Contact boundary
 
 The default contact route is the GitHub owner profile for the repository. Project Reader does not store messages, create accounts or send contact requests.
+
+Contact URL overrides are validated before rendering and must use a recognised safe URL scheme.
 
 ## Still excluded
 

@@ -31,6 +31,8 @@ class CandidateStatement:
     basis: str
     evidence_keys: tuple[str, ...] = ()
     owner_authority: bool = False
+    completed_units: float | None = None
+    total_units: float | None = None
 
 @dataclass(frozen=True)
 class AuthorityRecord:
@@ -98,6 +100,8 @@ class _Work:
     rank: int
     path: str
     detail: str
+    completed: float
+    total: float
 
 def _key(path: str) -> str:
     return f'file:{path}'
@@ -324,7 +328,7 @@ def _machine(path: str, raw: dict[str, Any], rank: int) -> tuple[list[_Work], li
         if not isinstance(label, str) or not label.strip() or (not numbers) or (total <= 0) or (completed < 0) or (completed > total):
             unknowns.append(CandidateStatement(key=f'uncertainty:invalid-stage:{path}:{index}', topic='owner_authority', text=f'A stage in {path} has invalid label or count data.', kind=StatementKind.UNKNOWN, basis='Its work state cannot be read safely.', evidence_keys=(_key(path),), owner_authority=True))
             continue
-        work.append(_Work(label=label.strip(), state='done' if completed == total else 'remaining', rank=rank, path=path, detail=f'{completed:g} of {total:g} authorised units are recorded as complete'))
+        work.append(_Work(label=label.strip(), state='done' if completed == total else 'remaining', rank=rank, path=path, detail=f'{completed:g} of {total:g} authorised units are recorded as complete', completed=float(completed), total=float(total)))
     return (work, unknowns)
 
 def _markdown(path: str, content: str, rank: int) -> list[_Work]:
@@ -335,7 +339,8 @@ def _markdown(path: str, content: str, rank: int) -> list[_Work]:
         label = _plain(match.group('label'))
         if label:
             state = 'done' if match.group('mark').lower() == 'x' else 'remaining'
-            result.append(_Work(label, state, rank, path, 'marked complete' if state == 'done' else 'listed as unfinished'))
+            completed = 1.0 if state == 'done' else 0.0
+            result.append(_Work(label, state, rank, path, 'marked complete' if state == 'done' else 'listed as unfinished', completed, 1.0))
     return result
 
 def _work(files: dict[str, dict[str, Any]], authorities: tuple[AuthorityRecord, ...]) -> tuple[tuple[CandidateStatement, ...], tuple[CandidateStatement, ...], list[Conflict], list[CandidateStatement]]:
@@ -362,26 +367,28 @@ def _work(files: dict[str, dict[str, Any]], authorities: tuple[AuthorityRecord, 
     remaining: list[CandidateStatement] = []
     conflicts: list[Conflict] = []
     unresolved = False
+    selected: list[_Work] = []
     for index, label in enumerate(sorted(groups)):
         group = sorted(groups[label], key=lambda item: (item.rank, item.path.casefold()))
         best_rank = group[0].rank
         best = [item for item in group if item.rank == best_rank]
-        best_states = {item.state for item in best}
-        all_states = {item.state for item in group}
+        best_signatures = {(item.state, item.completed, item.total) for item in best}
+        all_signatures = {(item.state, item.completed, item.total) for item in group}
         keys = tuple(dict.fromkeys((_key(item.path) for item in group)))
-        if len(all_states) > 1:
-            conflicts.append(Conflict(f'work-conflict:{index}', 'work_state', f'Owner-authority records disagree about whether {group[0].label!r} is complete.', keys, 'unresolved because equal-ranked records disagree' if len(best_states) > 1 else f'the rank-{best_rank} record is used while the disagreement remains visible'))
-        if len(best_states) > 1:
+        if len(all_signatures) > 1:
+            conflicts.append(Conflict(f'work-conflict:{index}', 'work_state', f'Owner-authority records disagree about whether {group[0].label!r} is complete.', keys, 'unresolved because equal-ranked records disagree' if len(best_signatures) > 1 else f'the rank-{best_rank} record is used while the disagreement remains visible'))
+        if len(best_signatures) > 1:
             unresolved = True
             unknowns.append(CandidateStatement(f'uncertainty:work-conflict:{index}', 'work_state', f'The state of {group[0].label!r} is unknown because equal-ranked authority records disagree.', StatementKind.UNKNOWN, 'Equal-ranked owner-authority records have no deterministic winner.', keys, True))
             continue
         chosen = best[0]
-        candidate = CandidateStatement(f'{chosen.state}:{index}', chosen.state, f"{chosen.label} is recorded as {('complete' if chosen.state == 'done' else 'unfinished')}.", StatementKind.FACT, f'{chosen.detail} in {chosen.path}.', (_key(chosen.path),), True)
+        selected.append(chosen)
+        candidate = CandidateStatement(f'{chosen.state}:{index}', chosen.state, f"{chosen.label} is recorded as {('complete' if chosen.state == 'done' else 'unfinished')}.", StatementKind.FACT, f'{chosen.detail} in {chosen.path}.', (_key(chosen.path),), True, chosen.completed, chosen.total)
         (done if chosen.state == 'done' else remaining).append(candidate)
     if not observations:
         unknowns.append(CandidateStatement('uncertainty:no-work-items', 'work_state', 'The recognised owner-authority records do not contain readable work items.', StatementKind.UNKNOWN, 'No stage counts or Markdown tasks could be interpreted safely.', tuple((_key(item.path) for item in authorities)), True))
-    elif not remaining and (not unresolved) and (not incomplete) and (not any((item.state == 'remaining' for item in observations))):
-        remaining.append(CandidateStatement('remaining:none-listed', 'remaining', 'No unfinished work item is listed in the recognised owner-authority records.', StatementKind.FACT, 'Every readable authority item is recorded as complete.', tuple(dict.fromkeys((_key(item.path) for item in observations))), True))
+    elif not remaining and (not unresolved) and (not incomplete):
+        remaining.append(CandidateStatement('remaining:none-listed', 'remaining', 'No unfinished work item is listed in the selected owner-authority records.', StatementKind.FACT, 'For each readable authority item, the highest-ranked usable record is complete.', tuple(dict.fromkeys((_key(item.path) for item in selected))), True))
     return (tuple(done), tuple(remaining), conflicts, unknowns)
 
 def _technologies(files: dict[str, dict[str, Any]]) -> tuple[tuple[CandidateStatement, ...], list[CandidateStatement]]:

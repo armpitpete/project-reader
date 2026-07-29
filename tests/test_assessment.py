@@ -27,6 +27,17 @@ def test_completion_is_unknown_without_finish_line() -> None:
     assert result.evidence_strength is EvidenceStrength.UNKNOWN
 
 
+def test_completion_is_unknown_with_unresolved_authority() -> None:
+    result = assess_completion(
+        [WorkItem("Something", WorkState.DONE)],
+        finish_line_defined=True,
+        evidence_strength=EvidenceStrength.UNKNOWN,
+    )
+    assert result.percentage is None
+    assert result.evidence_strength is EvidenceStrength.UNKNOWN
+    assert "owner-authority evidence" in result.explanation
+
+
 def test_likelihood_uses_broad_label_and_confidence() -> None:
     result = assess_likelihood(
         LikelihoodSignals(20, 18, 13, 15, 12, 8, 4, 0.85)

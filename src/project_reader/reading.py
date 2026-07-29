@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from urllib.parse import urlparse
 
 from .assessment import assess_completion, assess_likelihood
 from .interpretation import CandidateStatement, InterpretationBundle
@@ -8,6 +9,7 @@ from .models import (
     Claim,
     Evidence,
     EvidenceStrength,
+    LikelihoodResult,
     LikelihoodSignals,
     ProjectReading,
     Technology,
@@ -42,36 +44,21 @@ def _evidence_keys(*statements: CandidateStatement) -> tuple[str, ...]:
 def _technology(statement: CandidateStatement) -> Technology:
     name = statement.text.removeprefix("This repository uses ").removesuffix(".")
     explanations = {
-        "Python": (
-            "A programming language designed to be readable.",
-            "It usually runs collection, interpretation, validation or rendering code.",
-        ),
-        "JavaScript or Node.js": (
-            "A common technology for interactive websites and server tools.",
-            "It usually supports browser code, build scripts or web services.",
-        ),
-        "TypeScript": (
-            "JavaScript with extra type checks.",
-            "It usually helps larger browser or server code stay consistent.",
-        ),
-        "Docker": (
-            "A way to package software with the environment it needs.",
-            "It usually makes setup and deployment more repeatable.",
-        ),
+        "Python": "A programming language designed to be readable.",
+        "JavaScript or Node.js": "A common technology for interactive websites and server tools.",
+        "TypeScript": "JavaScript with extra type checks.",
+        "Docker": "A way to package software with the environment it needs.",
     }
-    simple, use_here = explanations.get(
+    simple = explanations.get(
         name,
-        (
-            "A technology declared by the repository.",
-            "It supports part of the project implementation.",
-        ),
+        "A technology declared by the repository.",
     )
     return Technology(
         name=name,
         simple_explanation=simple,
-        use_here=use_here,
-        reason_used=statement.basis,
-        reason_strength=EvidenceStrength.CONFIRMED,
+        use_here="Project-specific use is unknown from the collected evidence.",
+        reason_used="No collected evidence explains why this technology was chosen.",
+        reason_strength=EvidenceStrength.UNKNOWN,
         location=", ".join(
             key.removeprefix("file:") for key in statement.evidence_keys
         )
@@ -86,6 +73,55 @@ def _open_queue_keys(reading: InterpretationBundle) -> tuple[str, ...]:
         if item.key == "uncertainty:open-queues":
             return item.evidence_keys
     return ()
+
+
+def validate_contact_url(value: str) -> str:
+    candidate = value.strip()
+    parsed = urlparse(candidate)
+    if not candidate or candidate != value or any(ord(char) < 32 for char in candidate):
+        raise ValueError("Contact URL must be a complete http, https or mailto URL.")
+    if parsed.scheme in {"http", "https"} and parsed.netloc:
+        return candidate
+    if parsed.scheme == "mailto" and parsed.path:
+        return candidate
+    raise ValueError("Contact URL must be a complete http, https or mailto URL.")
+
+
+def _authority_unknowns(reading: InterpretationBundle) -> tuple[CandidateStatement, ...]:
+    return tuple(
+        item
+        for item in reading.uncertainties
+        if item.owner_authority
+        or item.topic in {"owner_authority", "work_state"}
+        or item.key in {"uncertainty:done-authority", "uncertainty:remaining-authority"}
+    )
+
+
+def _completion_items(statement: CandidateStatement, fallback_state: WorkState) -> tuple[WorkItem, ...]:
+    title = _statement_label(statement)
+    if statement.completed_units is None or statement.total_units is None:
+        return (WorkItem(title, fallback_state, evidence_keys=statement.evidence_keys),)
+
+    completed = statement.completed_units
+    remaining = statement.total_units - statement.completed_units
+    items: list[WorkItem] = []
+    if completed > 0:
+        items.append(WorkItem(title, WorkState.DONE, completed, statement.evidence_keys))
+    if remaining > 0:
+        items.append(WorkItem(title, WorkState.TODO, remaining, statement.evidence_keys))
+    return tuple(items)
+
+
+def _unknown_likelihood(evidence_keys: tuple[str, ...]) -> LikelihoodResult:
+    return LikelihoodResult(
+        score=0,
+        label="Unknown",
+        range_low=0,
+        range_high=0,
+        confidence="Low",
+        timeframe="Insufficient evidence for an evidence-backed likelihood forecast.",
+        evidence_keys=evidence_keys,
+    )
 
 
 def build_project_reading(
@@ -109,6 +145,16 @@ def build_project_reading(
         for item in interpretation.remaining
         if item.owner_authority and item.key != "remaining:none-listed"
     ]
+    completion_work = [
+        unit
+        for item in interpretation.done
+        if item.owner_authority
+        for unit in _completion_items(item, WorkState.DONE)
+    ] + [
+        unit
+        for item in remaining_authority
+        for unit in _completion_items(item, WorkState.TODO)
+    ]
     remaining_work = [
         WorkItem(
             _statement_label(item),
@@ -128,28 +174,29 @@ def build_project_reading(
     authority_statements = [*interpretation.done, *remaining_authority]
     if no_remaining is not None:
         authority_statements.append(no_remaining)
-    authority_keys = _evidence_keys(*authority_statements)
-    finish_line_defined = bool(done_work or remaining_work or no_remaining)
+    authority_unknowns = _authority_unknowns(interpretation)
+    authority_keys = _evidence_keys(*authority_statements, *authority_unknowns)
+    finish_line_defined = bool(done_work or remaining_work or no_remaining) and not authority_unknowns
     evidence_strength = (
         EvidenceStrength.CONFIRMED
-        if finish_line_defined and not interpretation.conflicts
+        if finish_line_defined
         else EvidenceStrength.UNKNOWN
     )
     completion = assess_completion(
-        [*done_work, *remaining_work],
+        completion_work,
         finish_line_defined=finish_line_defined,
         evidence_strength=evidence_strength,
         evidence_keys=authority_keys,
         scope_label="of readable authority items",
     )
-    complete = bool(done_work) and not remaining_work and no_remaining is not None
+    complete = finish_line_defined and bool(done_work) and not remaining_work and no_remaining is not None
     if complete:
         status = "Complete"
         next_step = Claim(
             "Decide whether to archive the project as complete or define a new milestone before starting more development.",
             authority_keys,
         )
-    elif remaining_work:
+    elif finish_line_defined and remaining_work:
         status = "Active"
         next_step = Claim(
             f"Complete the next owner-authority item: {remaining_work[0].title}.",
@@ -171,22 +218,14 @@ def build_project_reading(
             evidence_keys=authority_keys,
         )
     else:
-        likelihood = assess_likelihood(
-            LikelihoodSignals(
-                finish_line_clarity=20 if finish_line_defined else 5,
-                recent_progress=14 if done_work else 0,
-                bounded_remaining_work=12 if remaining_work else 4,
-                next_step_clarity=15 if remaining_work else 8,
-                manageable_blockers=8 if interpretation.conflicts else 12,
-                delivery_history=6 if done_work else 0,
-                repository_health=3 if interpretation.conflicts else 5,
-                evidence_coverage=0.75 if finish_line_defined else 0.35,
-            ),
-            timeframe="Current defined milestone within 12 months.",
-            evidence_keys=authority_keys or _open_queue_keys(interpretation),
-        )
+        likelihood = _unknown_likelihood(authority_keys or _open_queue_keys(interpretation))
 
     owner = interpretation.repository.split("/", 1)[0]
+    safe_contact_url = (
+        validate_contact_url(contact_url)
+        if contact_url is not None
+        else f"https://github.com/{owner}"
+    )
     evidence = tuple(
         Evidence(
             key=item.key,
@@ -202,7 +241,7 @@ def build_project_reading(
     )
     remaining_empty = (
         Claim(
-            "Nothing currently listed in the recognised owner-authority records.",
+            no_remaining.text,
             no_remaining.evidence_keys,
         )
         if no_remaining is not None
@@ -228,5 +267,5 @@ def build_project_reading(
         assessed_at=interpretation.evidence_checked_at,
         open_work_checked_at=interpretation.evidence_checked_at,
         project_url=interpretation.repository_url,
-        contact_url=contact_url or f"https://github.com/{owner}",
+        contact_url=safe_contact_url,
     )

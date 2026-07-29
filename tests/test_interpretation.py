@@ -148,6 +148,7 @@ def test_no_remaining_authority_items_is_not_overstated():
         )
     )
     assert result.remaining[0].text.startswith("No unfinished work item")
+    assert "selected owner-authority" in result.remaining[0].text
     assert result.remaining[0].owner_authority is True
 
 
