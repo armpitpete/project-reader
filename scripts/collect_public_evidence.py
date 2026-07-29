@@ -31,7 +31,7 @@ def main() -> int:
     try:
         bundle = collect_public_evidence(
             args.repository,
-            token=os.getenv("GITHUB_TOKEN"),
+            token=os.getenv("PROJECT_READER_GITHUB_TOKEN") or os.getenv("GITHUB_TOKEN"),
         )
         write_evidence_bundle(bundle, args.output)
     except (ValueError, EvidenceCollectionError) as error:

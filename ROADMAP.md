@@ -72,7 +72,9 @@ Public proof workflow merged at `3da3d44cf0b0c5a6b69ef59a5009d0fb9f38759e`.
 
 Deployment permission correction merged at `a9c45794927c607317392dc6dbdf471f22489ece`.
 
-Public proof deployed from `a9c45794927c607317392dc6dbdf471f22489ece`:
+Pages OIDC workflow hardening merged at `408629af6a6f2de0d7f2843bd7e4399e4fac8aa8`.
+
+Public proof deployed from `408629af6a6f2de0d7f2843bd7e4399e4fac8aa8`:
 
 https://armpitpete.github.io/project-reader/
 

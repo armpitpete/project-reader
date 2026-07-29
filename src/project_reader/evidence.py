@@ -382,9 +382,12 @@ def collect_public_evidence(
 ) -> PublicEvidenceBundle:
     """Collect facts for one public GitHub repository without interpreting them."""
     address = parse_repository_address(source)
-    active_client = client or GitHubRestClient(
-        token=token or os.getenv("GITHUB_TOKEN")
+    active_token = (
+        token
+        or os.getenv("PROJECT_READER_GITHUB_TOKEN")
+        or os.getenv("GITHUB_TOKEN")
     )
+    active_client = client or GitHubRestClient(token=active_token)
 
     repository = active_client.repository(address)
     if repository.get("private") is not False:

@@ -35,7 +35,7 @@ It reads `armpitpete/project-status-engine` and demonstrates:
 - educational technology cards;
 - direct links to GitHub evidence.
 
-The deployed proof was produced from Project Reader commit `a9c45794927c607317392dc6dbdf471f22489ece`.
+The deployed proof was produced from Project Reader commit `408629af6a6f2de0d7f2843bd7e4399e4fac8aa8`.
 
 ## Collect a public evidence bundle
 
@@ -148,6 +148,6 @@ Project Reader remains read-only. It does not contain:
 
 - **Implemented:** Complete Project Reading v0.5 is implemented.
 - **Tested:** Deterministic tests, static proofs, live public evidence checks and unsafe URL checks pass.
-- **Merged:** v0.5 implementation merged at `f0858c4d114f2c2dacde35822adfd2f37bd59421`; public proof workflow merged at `3da3d44cf0b0c5a6b69ef59a5009d0fb9f38759e`; deployment permission correction merged at `a9c45794927c607317392dc6dbdf471f22489ece`.
-- **Deployed:** Read-only public proof is live at `https://armpitpete.github.io/project-reader/` from deployed commit `a9c45794927c607317392dc6dbdf471f22489ece`.
+- **Merged:** v0.5 implementation merged at `f0858c4d114f2c2dacde35822adfd2f37bd59421`; public proof workflow merged at `3da3d44cf0b0c5a6b69ef59a5009d0fb9f38759e`; deployment permission correction merged at `a9c45794927c607317392dc6dbdf471f22489ece`; Pages OIDC workflow hardening merged at `408629af6a6f2de0d7f2843bd7e4399e4fac8aa8`.
+- **Deployed:** Read-only public proof is live at `https://armpitpete.github.io/project-reader/` from deployed commit `408629af6a6f2de0d7f2843bd7e4399e4fac8aa8`.
 - **External comprehension:** Not yet proven. Issue #5 is the next real-world testing lane.
