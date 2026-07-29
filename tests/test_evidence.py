@@ -85,7 +85,7 @@ class FakeClient:
 
 def fake_reader(source: str, *, token=None, include_patterns=None) -> RepositoryDigest:
     assert source == f"https://github.com/example/project/tree/{HEAD}"
-    assert token in {None, "api-only-token"}
+    assert token is None
     assert ".project/progress.json" in include_patterns
     assert "README.md" in include_patterns
     assert "pyproject.toml" in include_patterns
@@ -181,7 +181,7 @@ def test_collect_public_evidence_uses_exact_commit_and_facts() -> None:
     assert bundle.open_pull_requests[0].draft is True
 
 
-def test_collect_public_evidence_passes_token_to_repository_reader() -> None:
+def test_collect_public_evidence_keeps_repository_reader_unauthenticated() -> None:
     seen: dict[str, str | None] = {}
 
     def token_reader(source: str, *, token=None, include_patterns=None):
@@ -199,7 +199,27 @@ def test_collect_public_evidence_passes_token_to_repository_reader() -> None:
         token="api-only-token",
     )
 
-    assert seen["token"] == "api-only-token"
+    assert seen["token"] is None
+
+
+def test_collect_public_evidence_prefers_project_reader_token_env(monkeypatch) -> None:
+    seen: dict[str, str | None] = {}
+
+    class TokenClient(FakeClient):
+        def __init__(self, *, token: str | None = None) -> None:
+            super().__init__()
+            seen["token"] = token
+
+    monkeypatch.setattr(evidence_module, "GitHubRestClient", TokenClient)
+    monkeypatch.setenv("GITHUB_TOKEN", "github-token")
+    monkeypatch.setenv("PROJECT_READER_GITHUB_TOKEN", "project-reader-token")
+
+    collect_public_evidence(
+        "example/project",
+        repository_reader=fake_reader,
+    )
+
+    assert seen["token"] == "project-reader-token"
 
 
 def test_checked_at_is_recorded_after_live_queues(monkeypatch) -> None:
