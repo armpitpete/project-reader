@@ -28,6 +28,8 @@ jobs:
   live-evidence:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
