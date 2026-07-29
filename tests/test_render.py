@@ -24,3 +24,4 @@ def test_public_proof_renders_citations_and_complete_state(tmp_path: Path) -> No
     assert "d24e979e1747206f0c1ac3c66d3999f479f7ab72" in html
     assert "<details open>" not in html
     assert "How was this made?" in html
+    assert "Why should this assessment be trusted?" in html
