@@ -2,8 +2,21 @@ from __future__ import annotations
 
 from html import escape
 from pathlib import Path
+from urllib.parse import urlparse
 
 from .models import Claim, ProjectReading
+
+
+def _safe_url(value: str) -> str:
+    candidate = value.strip()
+    parsed = urlparse(candidate)
+    if not candidate or candidate != value or any(ord(char) < 32 for char in candidate):
+        raise ValueError("Rendered URLs must be complete http, https or mailto URLs.")
+    if parsed.scheme in {"http", "https"} and parsed.netloc:
+        return candidate
+    if parsed.scheme == "mailto" and parsed.path:
+        return candidate
+    raise ValueError("Rendered URLs must be complete http, https or mailto URLs.")
 
 
 def _citations(keys: tuple[str, ...], evidence_numbers: dict[str, int]) -> str:
@@ -37,6 +50,8 @@ def render_html(reading: ProjectReading, destination: Path) -> None:
     likelihood_range = (
         "The defined finish has been reached."
         if reading.likelihood.label == "Already complete"
+        else "Likelihood is not measurable from the collected evidence."
+        if reading.likelihood.label == "Unknown"
         else f"Estimated range: {reading.likelihood.range_low}–{reading.likelihood.range_high}%"
     )
     technology_cards = "".join(
@@ -56,7 +71,7 @@ def render_html(reading: ProjectReading, destination: Path) -> None:
     evidence_items = "".join(
         f"""
         <li id="evidence-{escape(item.key)}">
-          <a href="{escape(item.source)}">{escape(item.label)}</a>
+          <a href="{escape(_safe_url(item.source))}">{escape(item.label)}</a>
           <span class="evidence-strength">{escape(item.strength.value)}</span>
         </li>
         """
@@ -172,8 +187,8 @@ summary {{ cursor: pointer; font-weight: 800; font-size: 1.15rem; }}
 </section>
 
 <div class="actions">
-  {f'<a class="button" href="{escape(reading.project_url)}">View the project</a>' if reading.project_url else ''}
-  {f'<a class="button" href="{escape(reading.contact_url)}">Contact the project owner</a>' if reading.contact_url else ''}
+  {f'<a class="button" href="{escape(_safe_url(reading.project_url))}">View the project</a>' if reading.project_url else ''}
+  {f'<a class="button" href="{escape(_safe_url(reading.contact_url))}">Contact the project owner</a>' if reading.contact_url else ''}
 </div>
 
 <details>
@@ -182,8 +197,9 @@ summary {{ cursor: pointer; font-weight: 800; font-size: 1.15rem; }}
 </details>
 
 <details>
-<summary>Why these scores?</summary>
-<p>The completion score uses accepted work against a defined finish line. A completed project is marked as already complete rather than given a speculative future probability.</p>
+<summary>Why should this assessment be trusted?</summary>
+<p>The completion score uses selected recognised owner-authority records pinned to the source commit. Open issues, pull requests and activity are shown as evidence, but they do not silently define completion. When the evidence is missing or contradictory, Project Reader must say unknown.</p>
+<p>A completed project is marked as already complete rather than given a speculative future probability. When the collected evidence does not prove forecast signals, Project Reader shows unknown instead of assigning points.</p>
 </details>
 
 {evidence_section}

@@ -27,6 +27,14 @@ def assess_completion(
             scope_label=scope_label,
             evidence_keys=evidence_keys,
         )
+    if evidence_strength is EvidenceStrength.UNKNOWN:
+        return CompletionResult(
+            percentage=None,
+            evidence_strength=EvidenceStrength.UNKNOWN,
+            explanation="Completion cannot be measured because owner-authority evidence is missing or unresolved.",
+            scope_label=scope_label,
+            evidence_keys=evidence_keys,
+        )
 
     total_weight = sum(item.weight for item in work_items)
     done_weight = sum(item.weight for item in work_items if item.state is WorkState.DONE)

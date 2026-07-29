@@ -74,9 +74,33 @@ The interpretation output:
 - identifies explicit owner-authority records;
 - proposes purpose, done, remaining and technology statements only when supported;
 - exposes stale or contradictory evidence;
-- refuses completion percentages, likelihood forecasts and final status judgements.
+- stays separate from the final reader page so evidence can be inspected before assessment.
 
 See `docs/INTERPRETATION_CONTRACT.md` for the exact contract.
+
+## Render a complete project reading
+
+Complete Project Reading v0.5 turns one v0.3 evidence bundle into the ordinary-reader page.
+
+```bash
+python scripts/render_evidence_reading.py evidence.json \
+  --output project-reading.html
+```
+
+The rendered page answers:
+
+- what the project is;
+- what has been completed;
+- what remains;
+- how complete the recognised owner-authority work is;
+- how likely the current defined milestone is to finish;
+- why the assessment should be trusted;
+- how the project was made;
+- how to contact the project owner.
+
+The first screen stays simple. Evidence, technology explanations and scoring detail stay behind optional controls.
+
+See `docs/READER_CONTRACT.md` for the final reader contract.
 
 ## Run the static proofs
 
@@ -112,8 +136,6 @@ Project Reader uses [Gitingest](https://github.com/coderamp-labs/gitingest) to c
 
 Project Reader remains read-only. It does not yet contain:
 
-- automatic completion or likelihood scoring from collected evidence;
-- a final automatic project-status judgement;
 - private repository access;
 - owner accounts;
 - writes to analysed repositories;
@@ -123,6 +145,6 @@ Project Reader remains read-only. It does not yet contain:
 
 ## Working status
 
-- **Status:** Automatic Interpretation Contract v0.4 in draft review
-- **Completion:** Deterministic tests, static proofs and the live public evidence-to-interpretation validation pass
-- **Next:** Review the bounded v0.4 draft before any scoring or final-status lane is authorised
+- **Status:** Complete Project Reading v0.5 in review
+- **Completion:** Deterministic tests, static proofs and the live public evidence-to-reader validation pass
+- **Next:** Review the bounded v0.5 candidate before merge or public deployment

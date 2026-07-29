@@ -36,7 +36,7 @@
 
 Merged to `main` at `d18f29314dc0acecb403c4deb0313a5bb557afd0`.
 
-## Automatic Interpretation Contract v0.4 — current
+## Automatic Interpretation Contract v0.4 — complete
 
 - [x] Accept one Public Evidence Bundle v0.3
 - [x] Identify the strongest explicit project-purpose evidence
@@ -48,15 +48,28 @@ Merged to `main` at `d18f29314dc0acecb403c4deb0313a5bb557afd0`.
 - [x] Refuse unsupported claims
 - [x] Produce structured interpretation JSON
 - [x] Accept the live evidence-to-interpretation GitHub Actions proof
-- [ ] Review and merge the bounded interpretation contract
+- [x] Review and merge the bounded interpretation contract
+
+Merged to `main` at `dd217070be8808ef884edbd6b9b0554dcc559c9f`.
+
+## Complete Project Reading v0.5 — current
+
+- [x] Convert one v0.3 evidence bundle through the v0.4 interpretation layer
+- [x] Build the final `ProjectReading` model from owner-authority evidence
+- [x] Render a simple first screen for ordinary readers
+- [x] Show completion and likelihood without treating activity as progress
+- [x] Show done work, remaining work and the next useful step
+- [x] Keep trust evidence, technology detail and scoring explanation in optional layers
+- [x] Provide a safe GitHub owner contact route
+- [x] Add deterministic tests for the evidence-to-reader path
+- [x] Add a command-line renderer for complete project readings
+- [ ] Review and merge the bounded v0.5 candidate
+- [ ] Select and execute a public release surface
 
 ## Blocked until separately authorised
 
-- Automatic completion and likelihood scoring from collected evidence
-- Final project-status judgement
 - Private repository access
 - User accounts
 - Repository writes
 - Contact-form message storage
 - Multi-repository dashboard
-- Public deployment

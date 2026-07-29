@@ -165,6 +165,29 @@ jobs:
               for key in ("completion_percentage", "likelihood", "status")
           )
           PY
+      - name: Render complete project reading
+        run: |
+          python scripts/render_evidence_reading.py \
+            /tmp/project-status-engine-evidence.json \
+            --output /tmp/project-status-engine-reader.html
+      - name: Validate complete project reading
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          html = Path("/tmp/project-status-engine-reader.html").read_text(
+              encoding="utf-8"
+          )
+          assert "Project Status Engine" in html
+          assert "How complete?" in html
+          assert "Likely to finish?" in html
+          assert "Done" in html
+          assert "Still to do" in html
+          assert "Why should this assessment be trusted?" in html
+          assert "How was this made?" in html
+          assert "Contact the project owner" in html
+          assert "Source commit:" in html
+          PY
       - name: Collect technology-manifest evidence
         run: |
           python scripts/collect_public_evidence.py \
