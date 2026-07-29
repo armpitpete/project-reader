@@ -1,0 +1,70 @@
+name: Deploy Project Reader Public Proof
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build public Pages artifact
+        run: python scripts/build_pages_site.py --commit "$GITHUB_SHA" --output public
+      - name: Verify public artifact boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("public")
+          files = sorted(path.name for path in root.iterdir())
+          assert files == [".nojekyll", "deployment.json", "index.html"]
+
+          metadata = json.loads((root / "deployment.json").read_text(encoding="utf-8"))
+          assert metadata["deployed_commit"] == "${{ github.sha }}"
+          assert metadata["public_files"] == files
+
+          html = (root / "index.html").read_text(encoding="utf-8")
+          assert "Project Status Engine" in html
+          assert "Project Reader deployment commit:" in html
+          assert "${{ github.sha }}" in html
+          blocked = ("I:\\", "C:\\", "GITHUB_TOKEN", "SECRET", "PRIVATE KEY")
+          assert not any(value in html.upper() for value in blocked)
+          PY
+      - name: Configure Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
