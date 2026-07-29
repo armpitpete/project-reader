@@ -4,21 +4,16 @@
 
 Project Reader helps non-technical people, young people, and neurodivergent readers understand a GitHub project quickly.
 
-It answers five questions:
+It answers the ordinary-reader questions:
 
 1. What is this project?
-2. How complete is it?
-3. How likely is it to be finished?
-4. What is done?
-5. What is left to do?
-
-It also offers:
-
-- one clear next step;
-- a simple explanation of the technology used and why;
-- a safe **Contact the project owner** link;
-- named evidence for important claims and scores;
-- honest **unknown** states when the repository does not contain enough information.
+2. What has been completed?
+3. What remains?
+4. How complete is the defined work?
+5. How likely is the current milestone to finish?
+6. Why should the assessment be trusted?
+7. How was the project made?
+8. How can the project owner be contacted?
 
 ## Product rule
 
@@ -26,7 +21,11 @@ The first screen must make sense in under 30 seconds. Technical details stay beh
 
 ## Proven foundation
 
-The first cited reader for `armpitpete/project-status-engine` is complete. It demonstrates:
+The first public Project Reader proof is deployed at:
+
+https://armpitpete.github.io/project-reader/
+
+It reads `armpitpete/project-status-engine` and demonstrates:
 
 - a plain-language purpose;
 - evidence-backed status and defined-stage completion;
@@ -35,6 +34,8 @@ The first cited reader for `armpitpete/project-status-engine` is complete. It de
 - one evidence-backed next decision;
 - educational technology cards;
 - direct links to GitHub evidence.
+
+The deployed proof was produced from Project Reader commit `a9c45794927c607317392dc6dbdf471f22489ece`.
 
 ## Collect a public evidence bundle
 
@@ -134,17 +135,19 @@ Project Reader uses [Gitingest](https://github.com/coderamp-labs/gitingest) to c
 
 ## Current boundaries
 
-Project Reader remains read-only. It does not yet contain:
+Project Reader remains read-only. It does not contain:
 
 - private repository access;
 - owner accounts;
 - writes to analysed repositories;
 - stored contact messages;
 - a multi-repository dashboard;
-- public deployment.
+- external comprehension proof from real readers.
 
 ## Working status
 
-- **Status:** Complete Project Reading v0.5 in review
-- **Completion:** Deterministic tests, static proofs and the live public evidence-to-reader validation pass
-- **Next:** Review the bounded v0.5 candidate before merge or public deployment
+- **Implemented:** Complete Project Reading v0.5 is implemented.
+- **Tested:** Deterministic tests, static proofs, live public evidence checks and unsafe URL checks pass.
+- **Merged:** v0.5 implementation merged at `f0858c4d114f2c2dacde35822adfd2f37bd59421`; public proof workflow merged at `3da3d44cf0b0c5a6b69ef59a5009d0fb9f38759e`; deployment permission correction merged at `a9c45794927c607317392dc6dbdf471f22489ece`.
+- **Deployed:** Read-only public proof is live at `https://armpitpete.github.io/project-reader/` from deployed commit `a9c45794927c607317392dc6dbdf471f22489ece`.
+- **External comprehension:** Not yet proven. Issue #5 is the next real-world testing lane.

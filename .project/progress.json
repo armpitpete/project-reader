@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "authority": "ROADMAP.md",
+  "updated_at": "2026-07-29T20:30:06Z",
+  "release": {
+    "name": "Complete Project Reading v0.5",
+    "implemented": true,
+    "tested": true,
+    "merged": true,
+    "deployed": true,
+    "external_comprehension_proven": false,
+    "implementation_merge_commit": "f0858c4d114f2c2dacde35822adfd2f37bd59421",
+    "release_workflow_merge_commit": "3da3d44cf0b0c5a6b69ef59a5009d0fb9f38759e",
+    "deployment_permission_merge_commit": "a9c45794927c607317392dc6dbdf471f22489ece",
+    "deployed_commit": "a9c45794927c607317392dc6dbdf471f22489ece",
+    "deployment_url": "https://armpitpete.github.io/project-reader/",
+    "deployment_run": "https://github.com/armpitpete/project-reader/actions/runs/30488648657",
+    "next_evidence_lane": "https://github.com/armpitpete/project-reader/issues/5"
+  },
+  "stages": [
+    {
+      "id": "implemented",
+      "label": "Complete Project Reading v0.5 implemented",
+      "completed": 1,
+      "total": 1
+    },
+    {
+      "id": "tested",
+      "label": "Deterministic tests, static proofs and live evidence checks passed",
+      "completed": 1,
+      "total": 1
+    },
+    {
+      "id": "merged",
+      "label": "v0.5 implementation and public proof workflow merged to main",
+      "completed": 1,
+      "total": 1
+    },
+    {
+      "id": "deployed",
+      "label": "Read-only public proof deployed to GitHub Pages",
+      "completed": 1,
+      "total": 1
+    },
+    {
+      "id": "external-comprehension",
+      "label": "External comprehension testing with real readers",
+      "completed": 0,
+      "total": 1
+    }
+  ],
+  "overall": {
+    "enabled": false,
+    "reason": "External comprehension proof is a separate real-world evidence lane tracked by issue #5."
+  }
+}
