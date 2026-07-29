@@ -63,8 +63,28 @@ Merged to `main` at `dd217070be8808ef884edbd6b9b0554dcc559c9f`.
 - [x] Provide a safe GitHub owner contact route
 - [x] Add deterministic tests for the evidence-to-reader path
 - [x] Add a command-line renderer for complete project readings
-- [ ] Review and merge the bounded v0.5 candidate
-- [ ] Select and execute a public release surface
+- [x] Review and merge the bounded v0.5 candidate
+- [x] Select and execute a public release surface
+
+Implemented and merged to `main` at `f0858c4d114f2c2dacde35822adfd2f37bd59421`.
+
+Public proof workflow merged at `3da3d44cf0b0c5a6b69ef59a5009d0fb9f38759e`.
+
+Deployment permission correction merged at `a9c45794927c607317392dc6dbdf471f22489ece`.
+
+Public proof deployed from `a9c45794927c607317392dc6dbdf471f22489ece`:
+
+https://armpitpete.github.io/project-reader/
+
+## External Comprehension and Service Proof v0.6 — next
+
+- [ ] Test the deployed proof with at least five non-technical, young or neurodivergent readers
+- [ ] Record before/after understanding evidence
+- [ ] Test one concrete paid outcome without building accounts first
+- [ ] Record payment or refusal evidence
+- [ ] Decide the next deployment, private-access or account-work step from evidence
+
+Tracked by issue #5. External comprehension success is not yet proven.
 
 ## Blocked until separately authorised
 
