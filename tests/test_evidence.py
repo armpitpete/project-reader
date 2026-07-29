@@ -85,7 +85,7 @@ class FakeClient:
 
 def fake_reader(source: str, *, token=None, include_patterns=None) -> RepositoryDigest:
     assert source == f"https://github.com/example/project/tree/{HEAD}"
-    assert token is None
+    assert token in {None, "api-only-token"}
     assert ".project/progress.json" in include_patterns
     assert "README.md" in include_patterns
     assert "pyproject.toml" in include_patterns
@@ -179,6 +179,27 @@ def test_collect_public_evidence_uses_exact_commit_and_facts() -> None:
     assert bundle.progress_records[0].overall_enabled is False
     assert bundle.open_issues[0].number == 3
     assert bundle.open_pull_requests[0].draft is True
+
+
+def test_collect_public_evidence_passes_token_to_repository_reader() -> None:
+    seen: dict[str, str | None] = {}
+
+    def token_reader(source: str, *, token=None, include_patterns=None):
+        seen["token"] = token
+        return fake_reader(
+            source,
+            token=token,
+            include_patterns=include_patterns,
+        )
+
+    collect_public_evidence(
+        "example/project",
+        client=FakeClient(),
+        repository_reader=token_reader,
+        token="api-only-token",
+    )
+
+    assert seen["token"] == "api-only-token"
 
 
 def test_checked_at_is_recorded_after_live_queues(monkeypatch) -> None:
