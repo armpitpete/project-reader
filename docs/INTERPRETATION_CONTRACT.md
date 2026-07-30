@@ -1,15 +1,16 @@
-# Automatic Interpretation Contract v0.4
+# Automatic Interpretation Contract v0.6
 
 ## Purpose
 
-This contract turns one factual Public Evidence Bundle v0.3 into reviewable candidate statements. It does not publish a final project reading.
+This contract turns one factual Public Evidence Bundle v0.6 into reviewable candidate statements. It does not publish a final project reading.
 
 The output helps a reviewer answer:
 
 - what purpose the repository explicitly states;
 - which records carry owner authority;
 - which work items those records mark done or unfinished;
-- which technologies are directly supported by collected repository files;
+- which repository languages GitHub Linguist reports;
+- which support tools are directly supported by collected repository files;
 - where evidence is absent, partial, stale or contradictory.
 
 ## Input boundary
@@ -22,6 +23,7 @@ The bundle must identify:
 - one exact 40-character source commit;
 - the time its live issue and pull-request queues were checked;
 - collected important files with exact-commit provenance;
+- repository language evidence from GitHub's language API;
 - recognised progress records;
 - open issues and pull requests with inspectable repository URLs.
 
@@ -121,7 +123,17 @@ Malformed, duplicate or cross-repository queue references make the evidence bund
 
 ## Technology rule
 
-Technology candidates require a collected manifest or build file. Public Evidence Bundle v0.3 collects the following root files when present:
+Repository language candidates require current GitHub language API evidence for the same repository and resolved source commit. The language endpoint must be:
+
+```text
+https://api.github.com/repos/<owner>/<repository>/languages
+```
+
+Wrong hosts, query strings, fragments, cross-repository URLs and mismatched source commits are excluded and reported as stale evidence. If GitHub exposes a language in its result, Project Reader preserves it as repository-language evidence rather than deciding whether the files are important, generated or vendored.
+
+Language percentages describe detected repository code volume only. They do not prove architectural importance, difficulty, authorship effort, project-specific purpose or why a language was chosen.
+
+Support-tool candidates require a collected manifest or build file. Public Evidence Bundle v0.6 collects the following root files when present:
 
 - `pyproject.toml` or `requirements*.txt` for Python;
 - `package.json` for JavaScript, Node.js or TypeScript;
@@ -130,7 +142,7 @@ Technology candidates require a collected manifest or build file. Public Evidenc
 - `Gemfile` for Ruby;
 - `Dockerfile` for Docker.
 
-A casual technology mention in prose is not enough. When no recognised supporting file is present, technology remains `unknown`.
+A casual technology mention in prose is not enough. A language percentage or manifest alone is not enough to explain project-specific rationale. When no recognised supporting file or current language evidence is present, the corresponding technical detail remains `unknown`.
 
 ## Structured output
 
@@ -141,6 +153,7 @@ The JSON output contains:
 - explicit owner-authority records;
 - done candidates;
 - remaining candidates;
+- repository language candidates;
 - technology candidates;
 - uncertainties;
 - conflicts;

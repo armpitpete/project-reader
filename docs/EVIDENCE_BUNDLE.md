@@ -1,4 +1,4 @@
-# Public Evidence Bundle v0.3
+# Public Evidence Bundle v0.6
 
 ## Purpose
 
@@ -24,13 +24,14 @@ Other hosts and private repositories are rejected.
 
 1. Read public repository metadata from GitHub, using an optional token only for GitHub API facts.
 2. Resolve the default branch to one exact 40-character commit.
-3. Run Gitingest anonymously against the exact public commit URL.
-4. Extract important files from Gitingest's file blocks.
-5. Recover only exact named public files that Gitingest omitted.
-6. Collect all currently open issues and pull requests.
-7. Record `checked_at` after both live queues have returned.
-8. Detect recognised progress records.
-9. Write one JSON evidence bundle.
+3. Collect GitHub Linguist repository language data for the repository.
+4. Run Gitingest anonymously against the exact public commit URL.
+5. Extract important files from Gitingest's file blocks.
+6. Recover only exact named public files that Gitingest omitted.
+7. Collect all currently open issues and pull requests.
+8. Record `checked_at` after both live queues have returned.
+9. Detect recognised progress records.
+10. Write one JSON evidence bundle.
 
 ## Important-file scope
 
@@ -76,10 +77,19 @@ Detection is deterministic. It does not decide whether a record is truthful.
 - `source_commit`
 - `source_url`
 - `gitingest_summary`
+- `repository_languages`
 - `important_files`
 - `progress_records`
 - `open_issues`
 - `open_pull_requests`
+
+Each repository language records:
+
+- language name;
+- byte count reported by GitHub Linguist;
+- percentage of detected repository code volume;
+- the GitHub language API URL used as evidence;
+- the source commit Project Reader had resolved before collection.
 
 Each important file records:
 
@@ -102,7 +112,7 @@ Machine-readable progress JSON also records only structural facts when available
 
 ## Time boundary
 
-Repository files are pinned to `source_commit`. Open issues and pull requests are live queue facts. `checked_at` is generated immediately after both queues have been fetched and cannot be supplied by the caller. The queues can change after the bundle is written.
+Repository files are pinned to `source_commit`. Repository language percentages are collected from GitHub's language API and recorded with the resolved source commit. Open issues and pull requests are live queue facts. `checked_at` is generated immediately after both queues have been fetched and cannot be supplied by the caller. The queues can change after the bundle is written.
 
 ## Failure boundary
 
@@ -110,12 +120,13 @@ GitHub API, Gitingest, exact-file and network failures are returned as controlle
 
 ## Explicit exclusions
 
-v0.3 does not include:
+v0.6 does not include:
 
 - interpretation;
 - completion scoring;
 - likelihood forecasting;
 - technology explanations;
+- project-specific architecture or language-rationale claims;
 - private repository access;
 - repository writes;
 - deployment;

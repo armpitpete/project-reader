@@ -7,6 +7,7 @@ from project_reader.models import (
     EvidenceStrength,
     LikelihoodResult,
     ProjectReading,
+    RepositoryLanguage,
     WorkItem,
     WorkState,
 )
@@ -15,6 +16,11 @@ from project_reader.models import (
 def test_work_item_requires_positive_weight() -> None:
     with pytest.raises(ValueError):
         WorkItem("Invalid", WorkState.TODO, 0)
+
+
+def test_repository_language_requires_valid_percentage() -> None:
+    with pytest.raises(ValueError, match="between 0 and 100"):
+        RepositoryLanguage("Python", 120.0, 10)
 
 
 def test_project_reading_rejects_unknown_evidence_key() -> None:

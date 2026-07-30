@@ -33,6 +33,9 @@ class CandidateStatement:
     owner_authority: bool = False
     completed_units: float | None = None
     total_units: float | None = None
+    language_name: str | None = None
+    language_bytes: int | None = None
+    language_percentage: float | None = None
 
 @dataclass(frozen=True)
 class AuthorityRecord:
@@ -81,6 +84,7 @@ class InterpretationBundle:
     owner_authority_records: tuple[AuthorityRecord, ...]
     done: tuple[CandidateStatement, ...]
     remaining: tuple[CandidateStatement, ...]
+    repository_languages: tuple[CandidateStatement, ...]
     technologies: tuple[CandidateStatement, ...]
     uncertainties: tuple[CandidateStatement, ...]
     conflicts: tuple[Conflict, ...]
@@ -146,7 +150,7 @@ def _validate(data: dict[str, Any]) -> None:
         raise InterpretationError('The evidence bundle has no exact source commit')
     if not isinstance(data.get('checked_at'), str) or not data['checked_at'].strip():
         raise InterpretationError('The evidence bundle has no live-queue check time')
-    for name in ('important_files', 'progress_records', 'open_issues', 'open_pull_requests'):
+    for name in ('repository_languages', 'important_files', 'progress_records', 'open_issues', 'open_pull_requests'):
         if not isinstance(data.get(name), list):
             raise InterpretationError(f"The evidence bundle has no {name.replace('_', '-')} list")
     _validate_queue(data, 'open_issues', 'issues')
@@ -278,6 +282,72 @@ def _queue_references(data: dict[str, Any]) -> tuple[tuple[EvidenceReference, ..
             keys.append(key)
             references.append(EvidenceReference(key=key, path=f'{segment}/{number}', source_url=item['url'], source_commit='', role=role, authority_rank=None, usable=True))
     return (tuple(references), tuple(keys))
+
+def _language_key(name: str) -> str:
+    normalised = name.casefold().replace('+', ' plus ').replace('#', ' sharp ')
+    slug = re.sub('[^a-z0-9]+', '-', normalised).strip('-')
+    return f'language:{slug or "unknown"}'
+
+def _language_source_url_matches(repository: str, source_url: Any) -> bool:
+    if not isinstance(source_url, str):
+        return False
+    parsed = urlparse(source_url)
+    if parsed.scheme != 'https' or parsed.query or parsed.fragment:
+        return False
+    parts = [unquote(part) for part in parsed.path.strip('/').split('/')]
+    owner, name = repository.split('/', 1)
+    return parsed.hostname == 'api.github.com' and parts == ['repos', owner, name, 'languages']
+
+def _safe_evidence_url(source_url: Any, fallback: str) -> str:
+    if not isinstance(source_url, str):
+        return fallback
+    parsed = urlparse(source_url)
+    if parsed.scheme == 'https' and parsed.netloc and not any(ord(char) < 32 for char in source_url):
+        return source_url
+    return fallback
+
+def _language_references(data: dict[str, Any]) -> tuple[tuple[CandidateStatement, ...], tuple[EvidenceReference, ...], list[Conflict], list[CandidateStatement]]:
+    references: list[EvidenceReference] = []
+    conflicts: list[Conflict] = []
+    candidates: list[CandidateStatement] = []
+    seen: set[str] = set()
+    for index, raw in enumerate(data['repository_languages']):
+        if not isinstance(raw, dict):
+            raise InterpretationError('The evidence bundle contains an invalid repository language item')
+        name = raw.get('name')
+        byte_count = raw.get('bytes')
+        percentage = raw.get('percentage')
+        if (
+            not isinstance(name, str)
+            or not name.strip()
+            or not isinstance(byte_count, int)
+            or isinstance(byte_count, bool)
+            or byte_count < 0
+            or not isinstance(percentage, (int, float))
+            or isinstance(percentage, bool)
+            or not 0 <= float(percentage) <= 100
+        ):
+            raise InterpretationError('The evidence bundle contains an invalid repository language item')
+        key = _language_key(name)
+        if key in seen:
+            key = f'{key}:{index}'
+        seen.add(key)
+        commit = raw.get('source_commit')
+        url = raw.get('source_url')
+        exact = commit == data['source_commit'] and _language_source_url_matches(data['repository'], url)
+        reason = None
+        if commit != data['source_commit']:
+            reason = 'source commit does not match the bundle'
+        elif not _language_source_url_matches(data['repository'], url):
+            reason = 'source URL does not match the bundle repository language endpoint'
+        references.append(EvidenceReference(key=key, path=f'Repository languages: {name.strip()} ({float(percentage):g}%)', source_url=_safe_evidence_url(url, data['repository_url']), source_commit=str(commit or ''), role='repository_language', authority_rank=None, usable=exact, exclusion_reason=reason))
+        if not exact:
+            conflicts.append(Conflict(key=f'stale:{key}', topic='stale_evidence', description=f'{name.strip()} language evidence {reason}.', evidence_keys=(key,), resolution='excluded from interpretation'))
+            continue
+        candidates.append(CandidateStatement(key=key, topic='repository_language', text=f'{name.strip()} is {float(percentage):g}% of detected repository code.', kind=StatementKind.FACT, basis='GitHub Linguist language data reports this byte share for the repository.', evidence_keys=(key,), language_name=name.strip(), language_bytes=byte_count, language_percentage=float(percentage)))
+    if candidates:
+        return (tuple(candidates), tuple(references), conflicts, [])
+    return ((), tuple(references), conflicts, [CandidateStatement('uncertainty:repository-languages', 'technology', 'Repository language evidence is unknown because GitHub returned no usable language data.', StatementKind.UNKNOWN, 'Language percentages are refused unless the GitHub language evidence is present, current and safe.')])
 
 def _purpose(files: dict[str, dict[str, Any]]) -> CandidateStatement:
     order = sorted(files, key=lambda path: (0 if path == 'README.md' else 1, path.casefold()))
@@ -438,17 +508,19 @@ def interpret_evidence_bundle(value: Mapping[str, Any] | Any) -> InterpretationB
     _validate(data)
     files, file_evidence, stale, unknowns = _files(data)
     queue_evidence, queue_keys = _queue_references(data)
+    language_candidates, language_evidence, language_conflicts, language_unknowns = _language_references(data)
     authorities = _authorities(files, data['progress_records'])
     done, remaining, work_conflicts, work_unknowns = _work(files, authorities)
     technologies, technology_unknowns = _technologies(files)
     unknowns.extend(work_unknowns)
+    unknowns.extend(language_unknowns)
     unknowns.extend(technology_unknowns)
     if queue_keys:
         issue_count = len(data['open_issues'])
         pull_count = len(data['open_pull_requests'])
         unknowns.append(CandidateStatement('uncertainty:open-queues', 'remaining', f'The evidence bundle records {issue_count} open issue(s) and {pull_count} open pull request(s), but they are not automatically treated as the project finish line.', StatementKind.UNKNOWN, 'The cited queue entries are inspectable, but queue state does not prove owner-authorised remaining work.', queue_keys))
-    evidence = tuple(sorted((*file_evidence, *queue_evidence), key=lambda item: item.key))
-    return InterpretationBundle(schema_version=1, source_evidence_schema_version=1, repository=data['repository'], repository_url=data['repository_url'], source_commit=data['source_commit'], evidence_checked_at=data['checked_at'], purpose=_purpose(files), owner_authority_records=authorities, done=done, remaining=remaining, technologies=technologies, uncertainties=tuple(sorted(unknowns, key=lambda item: item.key)), conflicts=tuple(sorted(stale + work_conflicts, key=lambda item: item.key)), evidence=evidence, refusals=(Refusal('completion_percentage', 'v0.4 does not calculate completion percentages.'), Refusal('likelihood_assessment', 'v0.4 does not forecast whether the project will be finished.'), Refusal('final_status', 'v0.4 produces candidate statements, not a final project judgement.')))
+    evidence = tuple(sorted((*file_evidence, *queue_evidence, *language_evidence), key=lambda item: item.key))
+    return InterpretationBundle(schema_version=1, source_evidence_schema_version=1, repository=data['repository'], repository_url=data['repository_url'], source_commit=data['source_commit'], evidence_checked_at=data['checked_at'], purpose=_purpose(files), owner_authority_records=authorities, done=done, remaining=remaining, repository_languages=language_candidates, technologies=technologies, uncertainties=tuple(sorted(unknowns, key=lambda item: item.key)), conflicts=tuple(sorted(stale + language_conflicts + work_conflicts, key=lambda item: item.key)), evidence=evidence, refusals=(Refusal('completion_percentage', 'v0.4 does not calculate completion percentages.'), Refusal('likelihood_assessment', 'v0.4 does not forecast whether the project will be finished.'), Refusal('final_status', 'v0.4 produces candidate statements, not a final project judgement.')))
 
 def write_interpretation_bundle(bundle: InterpretationBundle, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)

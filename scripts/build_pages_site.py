@@ -26,8 +26,8 @@ def build_pages_site(
         raise ValueError("Source HTML does not contain the expected main landmark.")
 
     deployment_note = f"""
-<details>
-<summary>Deployment</summary>
+<details class="technical-detail">
+<summary>Technical detail: deployment</summary>
 <p><strong>Project Reader deployment commit:</strong> <code>{escape(commit)}</code></p>
 <p>This static public proof was produced from the Project Reader repository at that exact commit.</p>
 </details>

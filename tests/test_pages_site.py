@@ -33,6 +33,7 @@ def test_pages_site_contains_only_public_proof_files(tmp_path: Path) -> None:
 
     html = (tmp_path / "index.html").read_text(encoding="utf-8")
     assert "Project Status Engine" in html
+    assert "Technical detail: deployment" in html
     assert "Project Reader deployment commit:" in html
     assert HEAD in html
     assert "I:\\" not in html

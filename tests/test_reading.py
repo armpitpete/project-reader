@@ -43,7 +43,17 @@ def authority(stages):
     return json.dumps({"schema_version": 1, "stages": stages})
 
 
-def bundle(*files, progress_records=()):
+def language(name="Python", bytes=100, percentage=100.0):
+    return {
+        "name": name,
+        "bytes": bytes,
+        "percentage": percentage,
+        "source_url": "https://api.github.com/repos/example/project/languages",
+        "source_commit": HEAD,
+    }
+
+
+def bundle(*files, progress_records=(), languages=()):
     return {
         "schema_version": 1,
         "checked_at": "2026-07-29T10:00:00Z",
@@ -53,6 +63,7 @@ def bundle(*files, progress_records=()):
         "source_commit": HEAD,
         "source_url": f"https://github.com/example/project/tree/{HEAD}",
         "gitingest_summary": "summary",
+        "repository_languages": list(languages),
         "important_files": list(files),
         "progress_records": list(progress_records),
         "open_issues": [],
@@ -77,6 +88,7 @@ def test_builds_complete_ordinary_reader_from_authority_records(tmp_path: Path) 
             file(".project/progress.json", "machine_progress", authority_json),
             file("pyproject.toml", "technology_manifest", "[project]\nname='project'\n"),
             progress_records=(progress(),),
+            languages=(language(),),
         )
     )
     reading = build_project_reading(interpretation)
@@ -87,16 +99,18 @@ def test_builds_complete_ordinary_reader_from_authority_records(tmp_path: Path) 
     assert reading.likelihood.label == "Already complete"
     assert reading.remaining_empty is not None
     assert reading.contact_url == "https://github.com/example"
+    assert reading.repository_languages[0].name == "Python"
     assert reading.technologies[0].name == "Python"
 
     destination = tmp_path / "reader.html"
     render_html(reading, destination)
     html = destination.read_text(encoding="utf-8")
-    assert "What is this project?" not in html
-    assert "Why should this assessment be trusted?" in html
-    assert "How was this made?" in html
+    assert "What is this project?" in html
+    assert "How do we know?" in html
+    assert "Technical details" in html
+    assert "Repository languages" in html
     assert "Contact the project owner" in html
-    assert "No unfinished work item is listed in the selected owner-authority records." in html
+    assert "No unfinished work item is listed in the selected progress records." in html
 
 
 def test_builds_active_reader_when_authority_records_remaining_work() -> None:
@@ -270,6 +284,24 @@ def test_manifest_does_not_prove_project_specific_technology_claims() -> None:
     assert "unknown" in technology.use_here
     assert technology.reason_strength is EvidenceStrength.UNKNOWN
     assert technology.evidence_keys == ("file:pyproject.toml",)
+
+
+def test_repository_language_evidence_reaches_reader_model() -> None:
+    interpretation = interpret_evidence_bundle(
+        bundle(
+            languages=(
+                language("Python", 256862, 74.7),
+                language("SourcePawn", 39847, 11.6),
+            )
+        )
+    )
+    reading = build_project_reading(interpretation)
+
+    assert [(item.name, item.percentage) for item in reading.repository_languages] == [
+        ("Python", 74.7),
+        ("SourcePawn", 11.6),
+    ]
+    assert reading.repository_languages[0].evidence_keys == ("language:python",)
 
 
 @pytest.mark.parametrize("contact_url", ["javascript:alert(1)", "data:text/html,<p>x</p>"])

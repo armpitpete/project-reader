@@ -39,7 +39,8 @@ def main() -> int:
 
     print(
         f"Wrote {args.output} for {bundle.repository} at {bundle.source_commit} "
-        f"with {len(bundle.progress_records)} progress record(s), "
+        f"with {len(bundle.repository_languages)} repository language(s), "
+        f"{len(bundle.progress_records)} progress record(s), "
         f"{len(bundle.open_issues)} open issue(s), and "
         f"{len(bundle.open_pull_requests)} open pull request(s)."
     )
