@@ -5,6 +5,7 @@ from project_reader.models import (
     EvidenceStrength,
     LikelihoodSignals,
     ProjectReading,
+    RepositoryLanguage,
     Technology,
     WorkItem,
     WorkState,
@@ -14,6 +15,7 @@ HEAD = "d24e979e1747206f0c1ac3c66d3999f479f7ab72"
 REPO = "https://github.com/armpitpete/project-status-engine"
 README = f"{REPO}/blob/{HEAD}/README.md"
 PROGRESS = f"{REPO}/blob/{HEAD}/.project/progress.json"
+LANGUAGES = f"https://api.github.com/repos/armpitpete/project-status-engine/languages"
 CHECKED_AT = "28 July 2026 at 12:02 BST"
 
 EVIDENCE = (
@@ -53,6 +55,36 @@ EVIDENCE = (
         f"{REPO}/commit/{HEAD}",
     ),
     Evidence(
+        "language:python",
+        "Repository languages: Python (74.7%)",
+        LANGUAGES,
+    ),
+    Evidence(
+        "language:sourcepawn",
+        "Repository languages: SourcePawn (11.6%)",
+        LANGUAGES,
+    ),
+    Evidence(
+        "language:c-plus-plus",
+        "Repository languages: C++ (8.6%)",
+        LANGUAGES,
+    ),
+    Evidence(
+        "language:pawn",
+        "Repository languages: Pawn (2.3%)",
+        LANGUAGES,
+    ),
+    Evidence(
+        "language:shell",
+        "Repository languages: Shell (1.8%)",
+        LANGUAGES,
+    ),
+    Evidence(
+        "language:powershell",
+        "Repository languages: PowerShell (1%)",
+        LANGUAGES,
+    ),
+    Evidence(
         "next-inference",
         "Inference from completed authority and empty open-work queues",
         f"{REPO}/issues",
@@ -70,7 +102,7 @@ stages = [
 reading = ProjectReading(
     name="Project Status Engine",
     explanation=Claim(
-        "An automatic system that reads GitHub activity and owner-approved progress records, then produces public and private project-status views.",
+        "An automatic system that reads GitHub activity and approved progress records, then produces public and private project-status views.",
         ("purpose", "outputs"),
     ),
     status="Complete",
@@ -89,10 +121,10 @@ reading = ProjectReading(
         evidence_keys=("completion", "open-issues", "open-prs", "release-commit"),
     ),
     done=(
-        Claim("It separates recent activity from authority-backed completion.", ("purpose",)),
+        Claim("It separates recent activity from approved completion records.", ("purpose",)),
         Claim("It produces public, private-owner and trusted internal outputs from one scan.", ("outputs",)),
         Claim("It validates generated outputs and protects private repository details.", ("validation",)),
-        Claim("All four authorised project stages are recorded as complete.", ("completion",)),
+        Claim("All four planned parts are recorded as finished.", ("completion",)),
     ),
     remaining=(),
     remaining_empty=Claim("Nothing currently listed.", ("open-issues", "open-prs")),
@@ -100,17 +132,15 @@ reading = ProjectReading(
         "Decide whether to archive the project as complete or define a new milestone before starting more development.",
         ("completion", "open-issues", "open-prs", "next-inference"),
     ),
+    repository_languages=(
+        RepositoryLanguage("Python", 74.7, 256862, ("language:python",)),
+        RepositoryLanguage("SourcePawn", 11.6, 39847, ("language:sourcepawn",)),
+        RepositoryLanguage("C++", 8.6, 29503, ("language:c-plus-plus",)),
+        RepositoryLanguage("Pawn", 2.3, 7835, ("language:pawn",)),
+        RepositoryLanguage("Shell", 1.8, 6272, ("language:shell",)),
+        RepositoryLanguage("PowerShell", 1.0, 3603, ("language:powershell",)),
+    ),
     technologies=(
-        Technology(
-            name="Python",
-            simple_explanation="A programming language designed to be readable.",
-            use_here="It scans repository data, validates outputs and generates reports.",
-            reason_used="The README says validation is implemented once in Python instead of being duplicated in workflow files.",
-            reason_strength=EvidenceStrength.CONFIRMED,
-            location="The scripts folder.",
-            why_it_matters="One clear implementation is easier to test and less likely to drift.",
-            evidence_keys=("validation",),
-        ),
         Technology(
             name="GitHub Actions",
             simple_explanation="GitHub's tool for running automatic jobs.",

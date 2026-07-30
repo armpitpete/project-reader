@@ -125,6 +125,15 @@ class ProgressRecordFact:
 
 
 @dataclass(frozen=True)
+class RepositoryLanguageFact:
+    name: str
+    bytes: int
+    percentage: float
+    source_url: str
+    source_commit: str
+
+
+@dataclass(frozen=True)
 class PublicEvidenceBundle:
     schema_version: int
     checked_at: str
@@ -134,6 +143,7 @@ class PublicEvidenceBundle:
     source_commit: str
     source_url: str
     gitingest_summary: str
+    repository_languages: tuple[RepositoryLanguageFact, ...]
     important_files: tuple[ImportantFileFact, ...]
     progress_records: tuple[ProgressRecordFact, ...]
     open_issues: tuple[WorkItemFact, ...]
@@ -149,6 +159,7 @@ class PublicEvidenceBundle:
 class PublicGitHubClient(Protocol):
     def repository(self, address: RepositoryAddress) -> dict[str, Any]: ...
     def commit(self, address: RepositoryAddress, ref: str) -> dict[str, Any]: ...
+    def languages(self, address: RepositoryAddress) -> dict[str, int]: ...
     def open_issues(self, address: RepositoryAddress) -> list[dict[str, Any]]: ...
     def open_pull_requests(self, address: RepositoryAddress) -> list[dict[str, Any]]: ...
 
@@ -211,6 +222,19 @@ class GitHubRestClient:
         if not isinstance(payload, dict):
             raise EvidenceCollectionError("Commit metadata was not an object")
         return payload
+
+    def languages(self, address: RepositoryAddress) -> dict[str, int]:
+        payload = self._get(f"/repos/{address.full_name}/languages")
+        if not isinstance(payload, dict):
+            raise EvidenceCollectionError("Repository language metadata was not an object")
+        result: dict[str, int] = {}
+        for name, byte_count in payload.items():
+            if not isinstance(name, str) or not isinstance(byte_count, int):
+                raise EvidenceCollectionError(
+                    "Repository language metadata had an unexpected shape"
+                )
+            result[name] = byte_count
+        return result
 
     def open_issues(self, address: RepositoryAddress) -> list[dict[str, Any]]:
         issues = self._all(f"/repos/{address.full_name}/issues?state=open&per_page=100")
@@ -284,6 +308,34 @@ def _file_source_url(
 ) -> str:
     quoted_path = "/".join(quote(part, safe="") for part in path.split("/"))
     return f"{address.url}/blob/{source_commit}/{quoted_path}"
+
+
+def _repository_languages(
+    address: RepositoryAddress,
+    source_commit: str,
+    raw_languages: dict[str, int],
+) -> tuple[RepositoryLanguageFact, ...]:
+    cleaned = {
+        name.strip(): byte_count
+        for name, byte_count in raw_languages.items()
+        if name.strip() and byte_count > 0
+    }
+    total = sum(cleaned.values())
+    if total <= 0:
+        return ()
+    source_url = f"https://api.github.com/repos/{address.full_name}/languages"
+    return tuple(
+        RepositoryLanguageFact(
+            name=name,
+            bytes=byte_count,
+            percentage=round(byte_count * 100 / total, 1),
+            source_url=source_url,
+            source_commit=source_commit,
+        )
+        for name, byte_count in sorted(
+            cleaned.items(), key=lambda item: (-item[1], item[0].casefold())
+        )
+    )
 
 
 def _important_file(
@@ -410,6 +462,9 @@ def collect_public_evidence(
             "GitHub did not return a full source commit"
         )
 
+    language_payload = active_client.languages(address)
+    languages = _repository_languages(address, source_commit, language_payload)
+
     source_url = f"{address.url}/tree/{source_commit}"
     try:
         digest = repository_reader(
@@ -497,6 +552,7 @@ def collect_public_evidence(
         source_commit=source_commit,
         source_url=source_url,
         gitingest_summary=digest.summary,
+        repository_languages=languages,
         important_files=important,
         progress_records=progress,
         open_issues=issues,

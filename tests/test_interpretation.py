@@ -55,7 +55,25 @@ def pull(number=5):
     }
 
 
-def bundle(*files, progress=(), issues=(), pulls=()):
+def language(
+    name,
+    bytes=100,
+    percentage=100.0,
+    *,
+    commit=HEAD,
+    source_url=None,
+):
+    return {
+        "name": name,
+        "bytes": bytes,
+        "percentage": percentage,
+        "source_url": source_url
+        or "https://api.github.com/repos/example/project/languages",
+        "source_commit": commit,
+    }
+
+
+def bundle(*files, progress=(), issues=(), pulls=(), languages=()):
     return {
         "schema_version": 1,
         "checked_at": "2026-07-28T12:00:00Z",
@@ -65,6 +83,7 @@ def bundle(*files, progress=(), issues=(), pulls=()):
         "source_commit": HEAD,
         "source_url": f"https://github.com/example/project/tree/{HEAD}",
         "gitingest_summary": "summary",
+        "repository_languages": list(languages),
         "important_files": list(files),
         "progress_records": list(progress),
         "open_issues": list(issues),
@@ -325,7 +344,8 @@ def test_technologies_require_manifest_evidence():
                 "pyproject.toml",
                 "technology_manifest",
                 '[project]\nname = "example"\nrequires-python = ">=3.12"\n',
-            )
+            ),
+            languages=(language("Python", 120, 100.0),),
         )
     )
     assert result.technologies[0].text == "This repository uses Python."
@@ -333,6 +353,116 @@ def test_technologies_require_manifest_evidence():
     assert not any(
         item.topic == "technology" for item in result.uncertainties
     )
+
+
+def test_interprets_mixed_repository_languages():
+    result = interpret_evidence_bundle(
+        bundle(
+            languages=(
+                language("Python", 256862, 74.7),
+                language("SourcePawn", 39847, 11.6),
+                language("C++", 29503, 8.6),
+                language("Pawn", 7835, 2.3),
+                language("Shell", 6272, 1.8),
+                language("PowerShell", 3603, 1.0),
+            )
+        )
+    )
+
+    assert [item.language_name for item in result.repository_languages] == [
+        "Python",
+        "SourcePawn",
+        "C++",
+        "Pawn",
+        "Shell",
+        "PowerShell",
+    ]
+    assert result.repository_languages[0].text == "Python is 74.7% of detected repository code."
+    assert result.repository_languages[2].key == "language:c-plus-plus"
+    references = {item.key: item for item in result.evidence}
+    assert references["language:python"].source_url == (
+        "https://api.github.com/repos/example/project/languages"
+    )
+
+
+def test_interprets_single_language_repository():
+    result = interpret_evidence_bundle(
+        bundle(languages=(language("Python", 120, 100.0),))
+    )
+
+    assert len(result.repository_languages) == 1
+    assert result.repository_languages[0].language_percentage == 100.0
+    assert result.repository_languages[0].language_bytes == 120
+
+
+def test_empty_language_result_stays_unknown():
+    result = interpret_evidence_bundle(bundle(languages=()))
+
+    assert result.repository_languages == ()
+    assert any(
+        item.key == "uncertainty:repository-languages"
+        for item in result.uncertainties
+    )
+
+
+def test_stale_language_evidence_is_excluded_and_visible():
+    result = interpret_evidence_bundle(
+        bundle(languages=(language("Python", 120, 100.0, commit=OTHER),))
+    )
+
+    assert result.repository_languages == ()
+    assert result.conflicts[0].topic == "stale_evidence"
+    assert result.evidence[0].usable is False
+    assert result.evidence[0].exclusion_reason == "source commit does not match the bundle"
+
+
+def test_manifest_only_evidence_does_not_create_repository_language_claim():
+    result = interpret_evidence_bundle(
+        bundle(
+            file(
+                "pyproject.toml",
+                "technology_manifest",
+                '[project]\nname = "example"\nrequires-python = ">=3.12"\n',
+            ),
+            languages=(),
+        )
+    )
+
+    assert result.technologies[0].text == "This repository uses Python."
+    assert result.repository_languages == ()
+    assert any(
+        item.key == "uncertainty:repository-languages"
+        for item in result.uncertainties
+    )
+
+
+def test_generated_or_vendored_language_result_is_preserved_when_github_exposes_it():
+    result = interpret_evidence_bundle(
+        bundle(languages=(language("HTML", 80, 80.0), language("Python", 20, 20.0)))
+    )
+
+    assert [item.language_name for item in result.repository_languages] == [
+        "HTML",
+        "Python",
+    ]
+
+
+@pytest.mark.parametrize(
+    "source_url",
+    [
+        "javascript:alert(1)",
+        f"https://api.github.com/repos/other/project/languages",
+        f"https://api.github.com/repos/example/project/languages?ref={HEAD}",
+    ],
+)
+def test_unsafe_or_wrong_language_evidence_url_is_excluded(source_url):
+    result = interpret_evidence_bundle(
+        bundle(languages=(language("Python", 120, 100.0, source_url=source_url),))
+    )
+
+    assert result.repository_languages == ()
+    assert result.conflicts[0].topic == "stale_evidence"
+    assert "language endpoint" in result.evidence[0].exclusion_reason
 
 
 def test_missing_manifest_returns_unknown_technology():

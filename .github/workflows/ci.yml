@@ -77,6 +77,23 @@ jobs:
               and record["valid_json"] is True
               for record in payload["progress_records"]
           )
+          languages = {item["name"]: item for item in payload["repository_languages"]}
+          assert set(languages) >= {
+              "Python",
+              "SourcePawn",
+              "C++",
+              "Pawn",
+              "Shell",
+              "PowerShell",
+          }
+          assert languages["Python"]["percentage"] == 74.7
+          assert languages["SourcePawn"]["percentage"] == 11.6
+          assert all(
+              item["source_url"]
+              == "https://api.github.com/repos/armpitpete/project-status-engine/languages"
+              and item["source_commit"] == payload["source_commit"]
+              for item in payload["repository_languages"]
+          )
           assert isinstance(payload["open_issues"], list)
           assert isinstance(payload["open_pull_requests"], list)
           PY
@@ -120,12 +137,24 @@ jobs:
           assert all(item["kind"] == "fact" for item in payload["done"])
           assert payload["remaining"][0]["key"] == "remaining:none-listed"
           assert payload["conflicts"] == []
+          languages = {item["language_name"]: item for item in payload["repository_languages"]}
+          assert set(languages) >= {
+              "Python",
+              "SourcePawn",
+              "C++",
+              "Pawn",
+              "Shell",
+              "PowerShell",
+          }
+          assert languages["Python"]["language_percentage"] == 74.7
+          assert languages["C++"]["key"] == "language:c-plus-plus"
 
           evidence_by_key = {item["key"]: item for item in payload["evidence"]}
           candidate_sections = [
               [payload["purpose"]],
               payload["done"],
               payload["remaining"],
+              payload["repository_languages"],
               payload["technologies"],
               payload["uncertainties"],
           ]
@@ -180,13 +209,26 @@ jobs:
           html = Path("/tmp/project-status-engine-reader.html").read_text(
               encoding="utf-8"
           )
+          primary = html.split('<section class="disclosures"', 1)[0]
           assert "Project Status Engine" in html
-          assert "How complete?" in html
-          assert "Likely to finish?" in html
-          assert "Done" in html
-          assert "Still to do" in html
-          assert "Why should this assessment be trusted?" in html
-          assert "How was this made?" in html
+          assert "What is this project?" in primary
+          assert "What has been finished?" in primary
+          assert "What is still to do?" in primary
+          assert "Will the current plan be finished?" in primary
+          assert "What happens next?" in primary
+          assert "How complete?" not in primary
+          assert "Likely to finish?" not in primary
+          assert "Source commit:" not in primary
+          assert "Repository languages" not in primary
+          assert "authority-backed" not in primary.lower()
+          assert "owner-authority" not in primary.lower()
+          assert "How do we know?" in html
+          assert "Technical details" in html
+          assert "Repository languages" in html
+          assert "SourcePawn" in html
+          assert "PowerShell" in html
+          assert "These percentages describe detected repository code volume" in html
+          assert "details.open = !details.open;" in html
           assert "Contact the project owner" in html
           assert "Source commit:" in html
           PY

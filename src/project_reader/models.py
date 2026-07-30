@@ -70,6 +70,22 @@ class Technology:
 
 
 @dataclass(frozen=True)
+class RepositoryLanguage:
+    name: str
+    percentage: float
+    bytes: int
+    evidence_keys: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if not self.name.strip():
+            raise ValueError("Repository language name must not be empty")
+        if self.bytes < 0:
+            raise ValueError("Repository language bytes must not be negative")
+        if not 0 <= self.percentage <= 100:
+            raise ValueError("Repository language percentage must be between 0 and 100")
+
+
+@dataclass(frozen=True)
 class CompletionResult:
     percentage: int | None
     evidence_strength: EvidenceStrength
@@ -112,6 +128,7 @@ class ProjectReading:
     done: tuple[Claim, ...]
     remaining: tuple[Claim, ...]
     next_step: Claim
+    repository_languages: tuple[RepositoryLanguage, ...] = field(default_factory=tuple)
     technologies: tuple[Technology, ...] = field(default_factory=tuple)
     evidence: tuple[Evidence, ...] = field(default_factory=tuple)
     remaining_empty: Claim | None = None
@@ -137,6 +154,8 @@ class ProjectReading:
             references.extend(claim.evidence_keys)
         if self.remaining_empty:
             references.extend(self.remaining_empty.evidence_keys)
+        for language in self.repository_languages:
+            references.extend(language.evidence_keys)
         for technology in self.technologies:
             references.extend(technology.evidence_keys)
 

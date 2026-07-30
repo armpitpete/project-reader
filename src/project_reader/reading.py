@@ -12,6 +12,7 @@ from .models import (
     LikelihoodResult,
     LikelihoodSignals,
     ProjectReading,
+    RepositoryLanguage,
     Technology,
     WorkItem,
     WorkState,
@@ -32,6 +33,29 @@ def _statement_label(statement: CandidateStatement) -> str:
         if text.endswith(suffix):
             return text[: -len(suffix)]
     return text
+
+
+def _reader_text(text: str) -> str:
+    replacements = (
+        ("selected owner-authority records", "selected progress records"),
+        ("recognised owner-authority records", "recognised progress records"),
+        ("owner-authority progress record", "progress record"),
+        ("Owner-authority progress record", "Progress record"),
+        ("owner-authority records", "progress records"),
+        ("Owner-authority records", "Progress records"),
+        ("owner-authority", "progress"),
+        ("Owner-authority", "Progress"),
+        ("authority-backed", "approved"),
+        ("Authority-backed", "Approved"),
+        ("authorised project stages", "planned parts"),
+        ("Authorised project stages", "Planned parts"),
+        ("authorised units", "planned parts"),
+        ("Authorised units", "Planned parts"),
+    )
+    result = text
+    for old, new in replacements:
+        result = result.replace(old, new)
+    return result
 
 
 def _evidence_keys(*statements: CandidateStatement) -> tuple[str, ...]:
@@ -68,6 +92,21 @@ def _technology(statement: CandidateStatement) -> Technology:
     )
 
 
+def _repository_language(statement: CandidateStatement) -> RepositoryLanguage:
+    if (
+        statement.language_name is None
+        or statement.language_bytes is None
+        or statement.language_percentage is None
+    ):
+        raise ValueError("Repository language statements must carry structured language data")
+    return RepositoryLanguage(
+        name=statement.language_name,
+        percentage=statement.language_percentage,
+        bytes=statement.language_bytes,
+        evidence_keys=statement.evidence_keys,
+    )
+
+
 def _open_queue_keys(reading: InterpretationBundle) -> tuple[str, ...]:
     for item in reading.uncertainties:
         if item.key == "uncertainty:open-queues":
@@ -98,7 +137,7 @@ def _authority_unknowns(reading: InterpretationBundle) -> tuple[CandidateStateme
 
 
 def _completion_items(statement: CandidateStatement, fallback_state: WorkState) -> tuple[WorkItem, ...]:
-    title = _statement_label(statement)
+    title = _reader_text(_statement_label(statement))
     if statement.completed_units is None or statement.total_units is None:
         return (WorkItem(title, fallback_state, evidence_keys=statement.evidence_keys),)
 
@@ -133,7 +172,7 @@ def build_project_reading(
     """Build the ordinary-reader page model from one interpreted evidence bundle."""
     done_work = [
         WorkItem(
-            _statement_label(item),
+            _reader_text(_statement_label(item)),
             WorkState.DONE,
             evidence_keys=item.evidence_keys,
         )
@@ -157,7 +196,7 @@ def build_project_reading(
     ]
     remaining_work = [
         WorkItem(
-            _statement_label(item),
+            _reader_text(_statement_label(item)),
             WorkState.TODO,
             evidence_keys=item.evidence_keys,
         )
@@ -199,14 +238,16 @@ def build_project_reading(
     elif finish_line_defined and remaining_work:
         status = "Active"
         next_step = Claim(
-            f"Complete the next owner-authority item: {remaining_work[0].title}.",
+            _reader_text(f"Complete the next owner-authority item: {remaining_work[0].title}."),
             remaining_work[0].evidence_keys,
         )
     else:
         status = "Unknown"
         queue_keys = _open_queue_keys(interpretation)
         next_step = Claim(
-            "Add or review an owner-authority progress record so completion can be assessed.",
+            _reader_text(
+                "Add or review an owner-authority progress record so completion can be assessed."
+            ),
             queue_keys,
         )
 
@@ -232,6 +273,8 @@ def build_project_reading(
             label=(
                 item.path
                 if item.role.startswith("open_")
+                else item.path
+                if item.role == "repository_language"
                 else f"{item.path} ({item.role.replace('_', ' ')})"
             ),
             source=item.source_url,
@@ -241,7 +284,7 @@ def build_project_reading(
     )
     remaining_empty = (
         Claim(
-            no_remaining.text,
+            _reader_text(no_remaining.text),
             no_remaining.evidence_keys,
         )
         if no_remaining is not None
@@ -250,17 +293,20 @@ def build_project_reading(
     return ProjectReading(
         name=project_name or _project_name(interpretation.repository),
         explanation=Claim(
-            interpretation.purpose.text,
+            _reader_text(interpretation.purpose.text),
             interpretation.purpose.evidence_keys,
         ),
         status=status,  # type: ignore[arg-type]
         status_evidence_keys=authority_keys,
         completion=completion,
         likelihood=likelihood,
-        done=tuple(Claim(item.text, item.evidence_keys) for item in interpretation.done),
-        remaining=tuple(Claim(item.text, item.evidence_keys) for item in remaining_authority),
+        done=tuple(Claim(_reader_text(item.text), item.evidence_keys) for item in interpretation.done),
+        remaining=tuple(Claim(_reader_text(item.text), item.evidence_keys) for item in remaining_authority),
         remaining_empty=remaining_empty,
         next_step=next_step,
+        repository_languages=tuple(
+            _repository_language(item) for item in interpretation.repository_languages
+        ),
         technologies=tuple(_technology(item) for item in interpretation.technologies),
         evidence=evidence,
         source_commit=interpretation.source_commit,

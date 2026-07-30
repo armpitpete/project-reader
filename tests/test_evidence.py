@@ -55,6 +55,17 @@ class FakeClient:
         assert ref == "main"
         return {"sha": HEAD}
 
+    def languages(self, address):
+        self.calls.append("languages")
+        return {
+            "Python": 256862,
+            "SourcePawn": 39847,
+            "C++": 29503,
+            "Pawn": 7835,
+            "Shell": 6272,
+            "PowerShell": 3603,
+        }
+
     def open_issues(self, address):
         self.calls.append("issues")
         return [
@@ -177,6 +188,26 @@ def test_collect_public_evidence_uses_exact_commit_and_facts() -> None:
     assert bundle.progress_records[0].valid_json is True
     assert bundle.progress_records[0].stage_count == 1
     assert bundle.progress_records[0].overall_enabled is False
+    assert [item.name for item in bundle.repository_languages] == [
+        "Python",
+        "SourcePawn",
+        "C++",
+        "Pawn",
+        "Shell",
+        "PowerShell",
+    ]
+    assert [item.percentage for item in bundle.repository_languages] == [
+        74.7,
+        11.6,
+        8.6,
+        2.3,
+        1.8,
+        1.0,
+    ]
+    assert bundle.repository_languages[0].source_url == (
+        "https://api.github.com/repos/example/project/languages"
+    )
+    assert bundle.repository_languages[0].source_commit == HEAD
     assert bundle.open_issues[0].number == 3
     assert bundle.open_pull_requests[0].draft is True
 
@@ -228,7 +259,7 @@ def test_checked_at_is_recorded_after_live_queues(monkeypatch) -> None:
     class OrderedDateTime:
         @classmethod
         def now(cls, tz):
-            assert client.calls == ["issues", "pull_requests"]
+            assert client.calls == ["languages", "issues", "pull_requests"]
             return RealDateTime(2026, 7, 28, 12, 30, tzinfo=tz)
 
     monkeypatch.setattr(evidence_module, "datetime", OrderedDateTime)
@@ -238,6 +269,38 @@ def test_checked_at_is_recorded_after_live_queues(monkeypatch) -> None:
         repository_reader=fake_reader,
     )
     assert bundle.checked_at == "2026-07-28T12:30:00Z"
+
+
+def test_collect_public_evidence_handles_single_language_repository() -> None:
+    class SingleLanguageClient(FakeClient):
+        def languages(self, address):
+            self.calls.append("languages")
+            return {"Python": 120}
+
+    bundle = collect_public_evidence(
+        "example/project",
+        client=SingleLanguageClient(),
+        repository_reader=fake_reader,
+    )
+
+    assert [(item.name, item.bytes, item.percentage) for item in bundle.repository_languages] == [
+        ("Python", 120, 100.0)
+    ]
+
+
+def test_collect_public_evidence_handles_empty_language_result() -> None:
+    class EmptyLanguageClient(FakeClient):
+        def languages(self, address):
+            self.calls.append("languages")
+            return {}
+
+    bundle = collect_public_evidence(
+        "example/project",
+        client=EmptyLanguageClient(),
+        repository_reader=fake_reader,
+    )
+
+    assert bundle.repository_languages == ()
 
 
 def test_collect_public_evidence_rejects_private_repository() -> None:
