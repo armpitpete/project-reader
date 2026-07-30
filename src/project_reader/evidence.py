@@ -74,6 +74,10 @@ class EvidenceCollectionError(RuntimeError):
     """Raised when public evidence cannot be collected safely."""
 
 
+class RepositorySizeLimitError(EvidenceCollectionError):
+    """Raised when a repository is larger than the configured public API limit."""
+
+
 @dataclass(frozen=True)
 class RepositoryAddress:
     owner: str
@@ -150,7 +154,7 @@ class PublicEvidenceBundle:
     open_pull_requests: tuple[WorkItemFact, ...]
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        return json.loads(json.dumps(asdict(self), ensure_ascii=False))
 
     def to_json(self) -> str:
         return json.dumps(self.to_dict(), indent=2, sort_keys=True, ensure_ascii=False) + "\n"
@@ -174,7 +178,7 @@ class GitHubRestClient:
     def _request(self, url: str) -> tuple[Any, dict[str, str]]:
         headers = {
             "Accept": "application/vnd.github+json",
-            "User-Agent": "project-reader-evidence/0.3",
+            "User-Agent": "project-reader-evidence/0.7",
             "X-GitHub-Api-Version": "2022-11-28",
         }
         if self.token:
@@ -431,6 +435,7 @@ def collect_public_evidence(
     client: PublicGitHubClient | None = None,
     repository_reader: Callable[..., RepositoryDigest] = read_repository,
     token: str | None = None,
+    max_repository_size_kb: int | None = None,
 ) -> PublicEvidenceBundle:
     """Collect facts for one public GitHub repository without interpreting them."""
     address = parse_repository_address(source)
@@ -444,8 +449,22 @@ def collect_public_evidence(
     repository = active_client.repository(address)
     if repository.get("private") is not False:
         raise EvidenceCollectionError(
-            "Only public repositories are supported in v0.3"
+            "Only public repositories are supported in v0.7"
         )
+
+    if max_repository_size_kb is not None:
+        if max_repository_size_kb <= 0:
+            raise ValueError("Repository size limit must be greater than zero")
+        size = repository.get("size")
+        if isinstance(size, int) and not isinstance(size, bool):
+            if size > max_repository_size_kb:
+                raise RepositorySizeLimitError(
+                    "Repository exceeds the configured public reading size limit"
+                )
+        elif size is not None:
+            raise EvidenceCollectionError(
+                "GitHub returned an invalid repository size"
+            )
 
     default_branch = repository.get("default_branch")
     if not isinstance(default_branch, str) or not default_branch:

@@ -267,7 +267,7 @@ def _technical_section(reading: ProjectReading) -> str:
 </details>"""
 
 
-def render_html(reading: ProjectReading, destination: Path) -> None:
+def render_html_string(reading: ProjectReading) -> str:
     done_content = (
         f"<ul>{_items(reading.done)}</ul>"
         if reading.done
@@ -512,6 +512,11 @@ for (const summary of document.querySelectorAll("details > summary")) {{
 </script>
 </body>
 </html>"""
-    destination.parent.mkdir(parents=True, exist_ok=True)
     html = "\n".join(line.rstrip() for line in html.splitlines()) + "\n"
+    return html
+
+
+def render_html(reading: ProjectReading, destination: Path) -> None:
+    html = render_html_string(reading)
+    destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(html, encoding="utf-8")

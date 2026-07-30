@@ -1,0 +1,32 @@
+[Unit]
+Description=Project Reader public API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=project-reader
+Group=project-reader
+WorkingDirectory=/opt/project-reader
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONPATH=/opt/project-reader/src
+EnvironmentFile=/opt/project-reader/config/env
+ExecStart=/opt/project-reader/.venv/bin/uvicorn project_reader.api:app --host ${PROJECT_READER_BIND_HOST} --port ${PROJECT_READER_BIND_PORT}
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+ReadWritePaths=/opt/project-reader/.cache
+
+[Install]
+WantedBy=multi-user.target

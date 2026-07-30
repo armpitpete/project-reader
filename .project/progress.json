@@ -1,57 +1,90 @@
 {
   "schema_version": 1,
   "authority": "ROADMAP.md",
-  "updated_at": "2026-07-29T20:43:19Z",
+  "updated_at": "2026-07-30T17:59:01Z",
   "release": {
-    "name": "Complete Project Reading v0.5",
+    "name": "Public Repository Reading v0.7",
     "implemented": true,
     "tested": true,
-    "merged": true,
-    "deployed": true,
+    "merged": false,
+    "deployed": false,
     "external_comprehension_proven": false,
-    "implementation_merge_commit": "f0858c4d114f2c2dacde35822adfd2f37bd59421",
-    "release_workflow_merge_commit": "3da3d44cf0b0c5a6b69ef59a5009d0fb9f38759e",
-    "deployment_permission_merge_commit": "a9c45794927c607317392dc6dbdf471f22489ece",
-    "deployment_oidc_merge_commit": "408629af6a6f2de0d7f2843bd7e4399e4fac8aa8",
-    "deployed_commit": "408629af6a6f2de0d7f2843bd7e4399e4fac8aa8",
-    "deployment_url": "https://armpitpete.github.io/project-reader/",
-    "deployment_run": "https://github.com/armpitpete/project-reader/actions/runs/30489527100",
-    "next_evidence_lane": "https://github.com/armpitpete/project-reader/issues/5"
+    "base_commit": "86d602102766f3048af7091f77810cbc70324c8d",
+    "authoritative_issue": "https://github.com/armpitpete/project-reader/issues/14",
+    "public_frontend_url": "https://armpitpete.github.io/project-reader/",
+    "recommended_api_hostname": "reader-api.merrinworld.uk",
+    "prepared_backend_target": "Merrin Oracle VPS",
+    "local_live_proof_repositories": [
+      {
+        "repository": "armpitpete/project-status-engine",
+        "source_commit": "d24e979e1747206f0c1ac3c66d3999f479f7ab72",
+        "result": "mixed-language repository with recognised completion authority"
+      },
+      {
+        "repository": "armpitpete/over-my-home",
+        "source_commit": "2a24f7a30d9b781df0f702dee0ee3660133d3fa5",
+        "result": "missing authority leaves completion unknown"
+      },
+      {
+        "repository": "armpitpete/sample-hold-lab",
+        "source_commit": "135e6c513d3ab2c9b3a2b75ddda019d5fbf42fa1",
+        "result": "separate public repository rendered through the same reader"
+      }
+    ],
+    "deployment_blocker": "SSH access to Merrin's Oracle VPS is required to install and verify project-reader-api.service and Apache for reader-api.merrinworld.uk."
   },
   "stages": [
     {
-      "id": "implemented",
-      "label": "Complete Project Reading v0.5 implemented",
+      "id": "frontend",
+      "label": "GitHub Pages public repository entry frontend implemented",
       "completed": 1,
       "total": 1
     },
     {
-      "id": "tested",
-      "label": "Deterministic tests, static proofs and live evidence checks passed",
+      "id": "api",
+      "label": "Read-only Python API implemented with existing evidence, interpretation and rendering authority",
+      "completed": 1,
+      "total": 1
+    },
+    {
+      "id": "deployment-rehearsal",
+      "label": "Oracle VPS systemd, Apache and exact-commit deployment rehearsal files prepared",
+      "completed": 1,
+      "total": 1
+    },
+    {
+      "id": "tests",
+      "label": "Deterministic tests and three live public repository proofs passed locally",
       "completed": 1,
       "total": 1
     },
     {
       "id": "merged",
-      "label": "v0.5 implementation and public proof workflow merged to main",
-      "completed": 1,
+      "label": "Issue #14 implementation merged to main",
+      "completed": 0,
       "total": 1
     },
     {
-      "id": "deployed",
-      "label": "Read-only public proof deployed to GitHub Pages",
-      "completed": 1,
+      "id": "backend-deployed",
+      "label": "project-reader-api.service deployed on Merrin's Oracle VPS",
+      "completed": 0,
       "total": 1
     },
     {
-      "id": "external-comprehension",
-      "label": "External comprehension testing with real readers",
+      "id": "frontend-deployed",
+      "label": "GitHub Pages frontend deployed from the v0.7 commit",
+      "completed": 0,
+      "total": 1
+    },
+    {
+      "id": "public-verification",
+      "label": "reader-api.merrinworld.uk and the public Pages frontend verified end to end",
       "completed": 0,
       "total": 1
     }
   ],
   "overall": {
-    "enabled": false,
-    "reason": "External comprehension proof is a separate real-world evidence lane tracked by issue #5."
+    "enabled": true,
+    "reason": "Issue #14 can be completed after merge, Oracle VPS deployment, Pages deployment and public end-to-end verification."
   }
 }

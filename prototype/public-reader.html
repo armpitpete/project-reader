@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; connect-src __PROJECT_READER_API_ORIGIN__; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; frame-src 'self';">
+<title>Project Reader</title>
+<style>
+:root {
+  color-scheme: light;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 18px;
+  line-height: 1.55;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  background: #f8f8f4;
+  color: #18212b;
+}
+main {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+.reader-shell {
+  display: grid;
+  gap: 1.25rem;
+}
+.reader-header {
+  display: grid;
+  gap: .35rem;
+  padding-bottom: .9rem;
+  border-bottom: 1px solid #d7d8d0;
+}
+h1, h2 {
+  color: #101820;
+  line-height: 1.2;
+  letter-spacing: 0;
+  margin: 0;
+}
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.2rem;
+}
+p {
+  margin: 0;
+  max-width: 64ch;
+}
+.reader-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: .75rem;
+  align-items: end;
+}
+.input-group {
+  display: grid;
+  gap: .4rem;
+}
+label {
+  font-weight: 780;
+}
+input {
+  width: 100%;
+  min-height: 2.75rem;
+  border: 2px solid #374151;
+  border-radius: .35rem;
+  background: #fff;
+  color: #101820;
+  font: inherit;
+  padding: .55rem .7rem;
+}
+button {
+  min-height: 2.75rem;
+  border: 2px solid #172033;
+  border-radius: .35rem;
+  background: #172033;
+  color: #fff;
+  font: inherit;
+  font-weight: 780;
+  padding: .55rem .85rem;
+  cursor: pointer;
+}
+button:disabled {
+  cursor: wait;
+  opacity: .72;
+}
+.status-line {
+  min-height: 1.6rem;
+  font-weight: 700;
+}
+.status-line[data-tone="error"] {
+  color: #8a1f11;
+}
+.result-meta {
+  display: none;
+  gap: .3rem;
+  color: #3f4a56;
+  font-size: .95rem;
+}
+.result-meta[data-visible="true"] {
+  display: grid;
+}
+.reader-frame {
+  display: none;
+  width: 100%;
+  min-height: 78vh;
+  border: 1px solid #c9ccc3;
+  background: #fff;
+}
+.reader-frame[data-visible="true"] {
+  display: block;
+}
+details {
+  border-top: 1px solid #d7d8d0;
+  padding: .9rem 0;
+}
+summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+a {
+  color: #1d5d73;
+  text-underline-offset: .18em;
+}
+:focus-visible {
+  outline: 4px solid #0f5132;
+  outline-offset: 4px;
+}
+@media (max-width: 700px) {
+  main {
+    padding: 1rem .85rem 2.5rem;
+  }
+  h1 {
+    font-size: 1.65rem;
+  }
+  .reader-form {
+    grid-template-columns: 1fr;
+  }
+  button {
+    width: 100%;
+  }
+  .reader-frame {
+    min-height: 82vh;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<main>
+<section class="reader-shell" aria-labelledby="project-reader-title">
+  <header class="reader-header">
+    <h1 id="project-reader-title">Project Reader</h1>
+    <p>Plain-language readings from public GitHub evidence.</p>
+  </header>
+
+  <form class="reader-form" id="reader-form">
+    <div class="input-group">
+      <label for="repository">Public GitHub repository</label>
+      <input id="repository" name="repository" autocomplete="off" inputmode="url" placeholder="owner/name" required>
+    </div>
+    <button id="read-button" type="submit">Read this project</button>
+  </form>
+
+  <p class="status-line" id="status-line" role="status" aria-live="polite"></p>
+
+  <section class="result-meta" id="result-meta" aria-label="Reading source" tabindex="-1"></section>
+
+  <iframe class="reader-frame" id="reader-frame" title="Project Reader result" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
+
+  <details>
+    <summary>Privacy and safety</summary>
+    <p>The browser sends the repository address to the Project Reader API. The API reads public GitHub evidence, returns one reading, and does not write to GitHub.</p>
+  </details>
+</section>
+</main>
+<script>
+const READ_ENDPOINT = "__PROJECT_READER_API_BASE__/api/v1/read";
+const form = document.querySelector("#reader-form");
+const input = document.querySelector("#repository");
+const button = document.querySelector("#read-button");
+const statusLine = document.querySelector("#status-line");
+const resultMeta = document.querySelector("#result-meta");
+const frame = document.querySelector("#reader-frame");
+
+function setStatus(message, tone = "") {
+  statusLine.textContent = message;
+  statusLine.dataset.tone = tone;
+}
+
+function setBusy(busy) {
+  button.disabled = busy;
+  input.disabled = busy;
+  button.textContent = busy ? "Reading..." : "Read this project";
+}
+
+function clearResult() {
+  resultMeta.replaceChildren();
+  resultMeta.dataset.visible = "false";
+  frame.removeAttribute("srcdoc");
+  frame.dataset.visible = "false";
+}
+
+function safeMessage(data) {
+  if (data && typeof data.detail === "string" && data.detail.length <= 240) {
+    return data.detail;
+  }
+  return "Project Reader could not produce a reading for that repository.";
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const repository = input.value.trim();
+  clearResult();
+  if (!repository) {
+    setStatus("Enter a public GitHub repository.", "error");
+    input.focus();
+    return;
+  }
+
+  setBusy(true);
+  setStatus("Reading public GitHub evidence...");
+  try {
+    const response = await fetch(READ_ENDPOINT, {
+      method: "POST",
+      headers: {"content-type": "application/json"},
+      body: JSON.stringify({repository})
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok || !data || data.ok !== true || typeof data.result_html !== "string") {
+      throw new Error(safeMessage(data));
+    }
+    frame.srcdoc = data.result_html;
+    frame.dataset.visible = "true";
+    const commit = String(data.source_commit || "").slice(0, 12);
+    const source = document.createElement("p");
+    source.textContent = `${data.repository} read at ${commit || "unknown commit"}.`;
+    const link = document.createElement("a");
+    link.href = data.repository_url;
+    link.rel = "noreferrer";
+    link.textContent = "Open repository evidence";
+    resultMeta.replaceChildren(source, link);
+    resultMeta.dataset.visible = "true";
+    setStatus("Reading complete.");
+    resultMeta.focus({preventScroll: true});
+    resultMeta.scrollIntoView({block: "start"});
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Project Reader could not produce a reading for that repository.";
+    setStatus(message, "error");
+  } finally {
+    setBusy(false);
+  }
+});
+</script>
+</body>
+</html>

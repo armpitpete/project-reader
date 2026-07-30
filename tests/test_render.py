@@ -10,7 +10,7 @@ from project_reader.models import (
     LikelihoodResult,
     ProjectReading,
 )
-from project_reader.render import render_html
+from project_reader.render import render_html, render_html_string
 
 
 def _primary_flow(html: str) -> str:
@@ -47,6 +47,16 @@ def test_public_proof_renders_simple_nd_yp_first_screen(tmp_path: Path) -> None:
     assert "Nothing currently listed." in html
     assert "<span aria-hidden='true'>○</span> Nothing currently listed." not in html
     assert "<details open>" not in html
+
+
+def test_render_html_string_matches_written_document(tmp_path: Path) -> None:
+    namespace = runpy.run_path("examples/project_status_engine.py")
+    destination = tmp_path / "proof.html"
+    render_html(namespace["reading"], destination)
+
+    assert render_html_string(namespace["reading"]) == destination.read_text(
+        encoding="utf-8"
+    )
 
 
 def test_primary_flow_has_no_hashes_timestamps_or_inline_citations(tmp_path: Path) -> None:

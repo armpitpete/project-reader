@@ -27,7 +27,7 @@ jobs:
 
   live-evidence:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     env:
       PROJECT_READER_GITHUB_TOKEN: ${{ github.token }}
     steps:
@@ -272,4 +272,31 @@ jobs:
           references = {item["key"]: item for item in interpretation["evidence"]}
           assert references["file:package.json"]["role"] == "technology_manifest"
           assert references["file:package.json"]["usable"] is True
+          PY
+      - name: Run v0.7 live repository proofs
+        run: |
+          python scripts/live_repository_proofs.py \
+            --output /tmp/project-reader-v0.7-live-proofs.json
+      - name: Validate v0.7 live repository proof file
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(
+              Path("/tmp/project-reader-v0.7-live-proofs.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          proofs = {item["repository"]: item for item in payload["proof_repositories"]}
+          assert set(proofs) == {
+              "armpitpete/project-status-engine",
+              "armpitpete/over-my-home",
+              "armpitpete/sample-hold-lab",
+          }
+          assert len(proofs["armpitpete/project-status-engine"]["language_names"]) >= 3
+          assert proofs["armpitpete/project-status-engine"]["completion_percentage"] is not None
+          assert proofs["armpitpete/over-my-home"]["status"] == "Unknown"
+          assert proofs["armpitpete/over-my-home"]["completion_percentage"] is None
+          assert all(item["html_contains_reader_questions"] for item in proofs.values())
           PY

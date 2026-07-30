@@ -24,18 +24,29 @@ def test_pages_site_contains_only_public_proof_files(tmp_path: Path) -> None:
     metadata = json.loads((tmp_path / "deployment.json").read_text(encoding="utf-8"))
     assert metadata == {
         "schema_version": 1,
-        "project": "Project Reader public proof",
+        "project": "Project Reader public repository reading",
         "repository": "armpitpete/project-reader",
         "deployed_commit": HEAD,
-        "source_html": "prototype/project-status-engine.html",
+        "api_base_url": "https://reader-api.merrinworld.uk",
+        "source_html": "prototype/public-reader.html",
         "public_files": [".nojekyll", "deployment.json", "index.html"],
     }
 
     html = (tmp_path / "index.html").read_text(encoding="utf-8")
-    assert "Project Status Engine" in html
+    assert "Project Reader" in html
+    assert "Public GitHub repository" in html
+    assert "Read this project" in html
+    assert "https://reader-api.merrinworld.uk/api/v1/read" in html
+    assert 'role="status" aria-live="polite"' in html
+    assert 'title="Project Reader result"' in html
+    assert "sandbox=" in html
+    assert "Privacy and safety" in html
+    assert "does not write to GitHub" in html
     assert "Technical detail: deployment" in html
     assert "Project Reader deployment commit:" in html
     assert HEAD in html
+    assert "__PROJECT_READER_API_BASE__" not in html
+    assert "__PROJECT_READER_API_ORIGIN__" not in html
     assert "I:\\" not in html
     assert "C:\\" not in html
     assert "SECRET" not in html.upper()
@@ -44,3 +55,12 @@ def test_pages_site_contains_only_public_proof_files(tmp_path: Path) -> None:
 def test_pages_site_rejects_non_commit_identifier(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="40-character"):
         build_pages_site(commit="main", output=tmp_path)
+
+
+def test_pages_site_rejects_non_https_api_base(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="HTTPS origin"):
+        build_pages_site(
+            commit=HEAD,
+            output=tmp_path,
+            api_base_url="http://reader-api.merrinworld.uk",
+        )
