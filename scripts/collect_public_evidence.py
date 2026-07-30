@@ -26,12 +26,18 @@ def main() -> int:
         required=True,
         help="JSON file to write",
     )
+    parser.add_argument(
+        "--max-repository-size-kb",
+        type=int,
+        help="Optional public repository size limit before repository content is read",
+    )
     args = parser.parse_args()
 
     try:
         bundle = collect_public_evidence(
             args.repository,
             token=os.getenv("PROJECT_READER_GITHUB_TOKEN") or os.getenv("GITHUB_TOKEN"),
+            max_repository_size_kb=args.max_repository_size_kb,
         )
         write_evidence_bundle(bundle, args.output)
     except (ValueError, EvidenceCollectionError) as error:

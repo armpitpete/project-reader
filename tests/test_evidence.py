@@ -6,6 +6,7 @@ import pytest
 
 from project_reader.evidence import (
     EvidenceCollectionError,
+    RepositorySizeLimitError,
     collect_public_evidence,
     extract_gitingest_files,
     parse_repository_address,
@@ -44,12 +45,13 @@ print("hello")
 
 
 class FakeClient:
-    def __init__(self, *, private: bool = False) -> None:
+    def __init__(self, *, private: bool = False, size: int = 120) -> None:
         self.private = private
+        self.size = size
         self.calls: list[str] = []
 
     def repository(self, address):
-        return {"private": self.private, "default_branch": "main"}
+        return {"private": self.private, "default_branch": "main", "size": self.size}
 
     def commit(self, address, ref):
         assert ref == "main"
@@ -312,6 +314,26 @@ def test_collect_public_evidence_rejects_private_repository() -> None:
         )
 
 
+def test_collect_public_evidence_rejects_oversized_repository() -> None:
+    with pytest.raises(RepositorySizeLimitError, match="size limit"):
+        collect_public_evidence(
+            "example/project",
+            client=FakeClient(size=501),
+            repository_reader=fake_reader,
+            max_repository_size_kb=500,
+        )
+
+
+def test_collect_public_evidence_rejects_invalid_size_limit() -> None:
+    with pytest.raises(ValueError, match="size limit"):
+        collect_public_evidence(
+            "example/project",
+            client=FakeClient(),
+            repository_reader=fake_reader,
+            max_repository_size_kb=0,
+        )
+
+
 def test_repository_reader_failure_is_controlled() -> None:
     def failed_reader(*args, **kwargs):
         raise RuntimeError("network failed")
@@ -332,10 +354,13 @@ def test_bundle_json_is_structured_and_stable() -> None:
         client=FakeClient(),
         repository_reader=fake_reader,
     )
-    payload = json.loads(bundle.to_json())
+    payload = bundle.to_dict()
     assert payload["schema_version"] == 1
     assert payload["repository"] == "example/project"
+    assert isinstance(payload["repository_languages"], list)
+    assert isinstance(payload["important_files"], list)
     assert payload["progress_records"][0]["kind"] == "machine_progress"
     files = {item["path"]: item for item in payload["important_files"]}
     assert files[".project/progress.json"]["collection_method"] == "exact_public_file"
     assert files["pyproject.toml"]["role"] == "technology_manifest"
+    assert json.loads(bundle.to_json()) == payload

@@ -37,6 +37,22 @@ It reads `armpitpete/project-status-engine` and demonstrates:
 
 The deployed proof was produced from Project Reader commit `408629af6a6f2de0d7f2843bd7e4399e4fac8aa8`.
 
+## Public repository reading
+
+Public Repository Reading v0.7 lets the GitHub Pages frontend ask a bounded Python API to read a visitor-supplied public GitHub repository.
+
+The public frontend remains:
+
+https://armpitpete.github.io/project-reader/
+
+The authorised API hostname is:
+
+https://reader-api.merrinworld.uk
+
+The API is read-only. It accepts `owner/name` or `https://github.com/owner/name`, rejects unsupported and unsafe inputs, and returns rendered Project Reader HTML produced by the existing evidence, interpretation, reading and rendering package.
+
+See `docs/V0_7_PUBLIC_REPOSITORY_READING.md` for the API, safety limits and Oracle VPS deployment contract.
+
 ## Collect a public evidence bundle
 
 Automatic Public Evidence Collection v0.3 records facts for one public repository without interpreting them.
@@ -127,7 +143,7 @@ python -m pip install -e ".[dev]"
 pytest
 ```
 
-GitHub Actions separately validates the deterministic test suite and a live public evidence-to-interpretation proof against the public proof repository.
+GitHub Actions separately validates the deterministic test suite, static proof rendering, live public evidence-to-interpretation checks, and the v0.7 three-repository live proof set.
 
 ## Dependency
 
@@ -146,8 +162,8 @@ Project Reader remains read-only. It does not contain:
 
 ## Working status
 
-- **Implemented:** Complete Project Reading v0.5 is implemented.
-- **Tested:** Deterministic tests, static proofs, live public evidence checks and unsafe URL checks pass.
-- **Merged:** v0.5 implementation merged at `f0858c4d114f2c2dacde35822adfd2f37bd59421`; public proof workflow merged at `3da3d44cf0b0c5a6b69ef59a5009d0fb9f38759e`; deployment permission correction merged at `a9c45794927c607317392dc6dbdf471f22489ece`; Pages OIDC workflow hardening merged at `408629af6a6f2de0d7f2843bd7e4399e4fac8aa8`.
-- **Deployed:** Read-only public proof is live at `https://armpitpete.github.io/project-reader/` from deployed commit `408629af6a6f2de0d7f2843bd7e4399e4fac8aa8`.
-- **External comprehension:** Not yet proven. Issue #5 is the next real-world testing lane.
+- **Implemented:** Public Repository Reading v0.7 frontend, read-only API and Oracle VPS deployment rehearsal files are implemented.
+- **Tested:** Deterministic tests, static proof rendering and three live public repository proofs pass locally.
+- **Merged:** v0.7 is not merged yet in this checkout. The authoritative base is `86d602102766f3048af7091f77810cbc70324c8d`.
+- **Deployed:** v0.7 is not deployed yet. The intended frontend is `https://armpitpete.github.io/project-reader/`; the intended API host is `https://reader-api.merrinworld.uk`.
+- **External comprehension:** Not yet proven. Issue #5 is a later real-world testing lane, not the v0.7 blocker.

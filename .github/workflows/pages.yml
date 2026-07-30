@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - ".github/workflows/pages.yml"
+      - "prototype/public-reader.html"
       - "prototype/project-status-engine.html"
       - "scripts/build_pages_site.py"
   workflow_dispatch:
@@ -48,9 +49,14 @@ jobs:
           assert metadata["public_files"] == files
 
           html = (root / "index.html").read_text(encoding="utf-8")
-          assert "Project Status Engine" in html
+          assert "Project Reader" in html
+          assert "Public GitHub repository" in html
+          assert "Read this project" in html
+          assert "https://reader-api.merrinworld.uk/api/v1/read" in html
           assert "Project Reader deployment commit:" in html
           assert "${{ github.sha }}" in html
+          assert "__PROJECT_READER_API_BASE__" not in html
+          assert "__PROJECT_READER_API_ORIGIN__" not in html
           blocked = ("I:\\", "C:\\", "GITHUB_TOKEN", "SECRET", "PRIVATE KEY")
           assert not any(value in html.upper() for value in blocked)
           PY
