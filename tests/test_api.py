@@ -123,7 +123,7 @@ def test_status_describes_read_only_authority_pipeline() -> None:
         "project_reader.evidence.collect_public_evidence",
         "project_reader.interpretation.interpret_evidence_bundle",
         "project_reader.reading.build_project_reading",
-        "project_reader.render.render_html_string",
+        "project_reader.render.render_html_fragment",
     ]
 
 

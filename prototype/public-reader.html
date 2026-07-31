@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; connect-src __PROJECT_READER_API_ORIGIN__; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; frame-src 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; connect-src __PROJECT_READER_API_ORIGIN__; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
 <title>Project Reader</title>
 <style>
 :root {
@@ -108,14 +108,13 @@ button:disabled {
 .result-meta[data-visible="true"] {
   display: grid;
 }
-.reader-frame {
+.reader-result {
   display: none;
   width: 100%;
-  min-height: 78vh;
-  border: 1px solid #c9ccc3;
-  background: #fff;
+  min-width: 0;
+  margin-top: .75rem;
 }
-.reader-frame[data-visible="true"] {
+.reader-result[data-visible="true"] {
   display: block;
 }
 details {
@@ -146,9 +145,6 @@ a {
   }
   button {
     width: 100%;
-  }
-  .reader-frame {
-    min-height: 82vh;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -181,7 +177,7 @@ a {
 
   <section class="result-meta" id="result-meta" aria-label="Reading source" tabindex="-1"></section>
 
-  <iframe class="reader-frame" id="reader-frame" title="Project Reader result" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
+  <section class="reader-result" id="reader-result" aria-label="Project Reader result" tabindex="-1"></section>
 
   <details>
     <summary>Privacy and safety</summary>
@@ -196,7 +192,7 @@ const input = document.querySelector("#repository");
 const button = document.querySelector("#read-button");
 const statusLine = document.querySelector("#status-line");
 const resultMeta = document.querySelector("#result-meta");
-const frame = document.querySelector("#reader-frame");
+const result = document.querySelector("#reader-result");
 
 function setStatus(message, tone = "") {
   statusLine.textContent = message;
@@ -212,8 +208,8 @@ function setBusy(busy) {
 function clearResult() {
   resultMeta.replaceChildren();
   resultMeta.dataset.visible = "false";
-  frame.removeAttribute("srcdoc");
-  frame.dataset.visible = "false";
+  result.replaceChildren();
+  result.dataset.visible = "false";
 }
 
 function safeMessage(data) {
@@ -245,20 +241,24 @@ form.addEventListener("submit", async (event) => {
     if (!response.ok || !data || data.ok !== true || typeof data.result_html !== "string") {
       throw new Error(safeMessage(data));
     }
-    frame.srcdoc = data.result_html;
-    frame.dataset.visible = "true";
+    if (/<script[\s>]/i.test(data.result_html) || /<[a-z][^>]*\son[a-z]+\s*=/i.test(data.result_html)) {
+      throw new Error("Project Reader returned a result that could not be displayed safely.");
+    }
+    result.innerHTML = data.result_html;
+    result.dataset.visible = "true";
     const commit = String(data.source_commit || "").slice(0, 12);
     const source = document.createElement("p");
     source.textContent = `${data.repository} read at ${commit || "unknown commit"}.`;
     const link = document.createElement("a");
     link.href = data.repository_url;
-    link.rel = "noreferrer";
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
     link.textContent = "Open repository evidence";
     resultMeta.replaceChildren(source, link);
     resultMeta.dataset.visible = "true";
     setStatus("Reading complete.");
-    resultMeta.focus({preventScroll: true});
-    resultMeta.scrollIntoView({block: "start"});
+    result.focus({preventScroll: true});
+    result.scrollIntoView({block: "start"});
   } catch (error) {
     const message = error instanceof Error ? error.message : "Project Reader could not produce a reading for that repository.";
     setStatus(message, "error");

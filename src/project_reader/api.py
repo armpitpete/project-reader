@@ -20,7 +20,7 @@ from .evidence import (
 )
 from .interpretation import InterpretationError, interpret_evidence_bundle
 from .reading import build_project_reading
-from .render import render_html_string
+from .render import render_html_fragment
 
 DEFAULT_ALLOWED_ORIGINS = ("https://armpitpete.github.io",)
 DEFAULT_API_BASE_URL = "https://reader-api.merrinworld.uk"
@@ -215,7 +215,7 @@ def default_pipeline(repository: str, config: APIConfig) -> dict[str, Any]:
             "open_issue_count": len(evidence.open_issues),
             "open_pull_request_count": len(evidence.open_pull_requests),
         },
-        "result_html": render_html_string(reading),
+        "result_html": render_html_fragment(reading),
         "limitations": [
             "Only public GitHub repositories are supported.",
             "Completion and likelihood stay unknown unless current owner-authority evidence supports them.",
@@ -341,7 +341,7 @@ class ProjectReaderAPI:
                 "project_reader.evidence.collect_public_evidence",
                 "project_reader.interpretation.interpret_evidence_bundle",
                 "project_reader.reading.build_project_reading",
-                "project_reader.render.render_html_string",
+                "project_reader.render.render_html_fragment",
             ],
             "routes": ["/health", "/ready", "/api/v1/status", "/api/v1/read"],
             "allowed_origins": sorted(self.config.allowed_origins),

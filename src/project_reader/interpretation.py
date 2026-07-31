@@ -58,6 +58,8 @@ class EvidenceReference:
     authority_rank: int | None
     usable: bool
     exclusion_reason: str | None = None
+    content: str | None = None
+    truncated: bool = False
 
 @dataclass(frozen=True)
 class Conflict:
@@ -263,7 +265,8 @@ def _files(data: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], tuple[Evide
             reason = 'source commit does not match the bundle'
         elif not _source_url_matches(data['repository'], source_commit, path, url):
             reason = 'source URL does not match the bundle repository, commit, and path'
-        references.append(EvidenceReference(key=_key(path), path=path, source_url=str(url or ''), source_commit=str(commit or ''), role=str(raw.get('role', 'unknown')), authority_rank=ranks.get(path) if isinstance(ranks.get(path), int) else None, usable=exact, exclusion_reason=reason))
+        content = raw.get('content')
+        references.append(EvidenceReference(key=_key(path), path=path, source_url=str(url or ''), source_commit=str(commit or ''), role=str(raw.get('role', 'unknown')), authority_rank=ranks.get(path) if isinstance(ranks.get(path), int) else None, usable=exact, exclusion_reason=reason, content=content if exact and isinstance(content, str) else None, truncated=raw.get('truncated') is True))
         if not exact:
             conflicts.append(Conflict(key=f'stale:{path}', topic='stale_evidence', description=f'{path} {reason}.', evidence_keys=(_key(path),), resolution='excluded from interpretation'))
             continue

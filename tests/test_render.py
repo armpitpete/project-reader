@@ -6,11 +6,13 @@ import pytest
 from project_reader.models import (
     Claim,
     CompletionResult,
+    Evidence,
     EvidenceStrength,
     LikelihoodResult,
     ProjectReading,
+    RepositoryLanguage,
 )
-from project_reader.render import render_html, render_html_string
+from project_reader.render import render_html, render_html_fragment, render_html_string
 
 
 def _primary_flow(html: str) -> str:
@@ -87,7 +89,7 @@ def test_evidence_stays_accessible_through_one_disclosure(tmp_path: Path) -> Non
     assert '<details class="evidence-disclosure">' in html
     assert "<summary>How do we know?</summary>" in html
     assert "Evidence behind the five answers" in html
-    assert "All evidence sources" in html
+    assert "Readable evidence and exact sources" in html
     assert ".project/progress.json" in html
     assert "d24e979e1747206f0c1ac3c66d3999f479f7ab72" in html
     assert "28 July 2026 at 12:02 BST" in html
@@ -147,8 +149,158 @@ def test_disclosure_controls_are_native_and_keyboard_operable(tmp_path: Path) ->
     assert "<details" in html
     assert "<summary>How do we know?</summary>" in html
     assert "<summary>Technical details</summary>" in html
-    assert "details.open = !details.open;" in html
+    assert "<script" not in html
     assert "<button" not in html
+
+
+def test_rendered_fragment_has_no_document_shell_or_script() -> None:
+    namespace = runpy.run_path("examples/project_status_engine.py")
+    fragment = render_html_fragment(namespace["reading"])
+
+    assert fragment.startswith("<style data-project-reader-result-style>")
+    assert "<article class=\"project-reader-result\">" in fragment
+    assert "<!doctype html>" not in fragment
+    assert "<iframe" not in fragment
+    assert "<script" not in fragment
+
+
+def test_markdown_evidence_renders_readably_and_inert() -> None:
+    malicious_markdown = """# Readable README
+
+This evidence has a [safe source link](https://github.com/example/project) and `inline code`.
+
+- a useful list item
+- another useful list item
+
+| Name | Meaning |
+| --- | --- |
+| R01 | A row |
+
+```html
+<script>alert("x")</script>
+<form action="https://example.com"><button>Pay</button></form>
+```
+
+<img src=x onerror=alert(1)>
+"""
+    reading = ProjectReading(
+        name="Project",
+        explanation=Claim("The README says this project helps people.", ("file:README.md",)),
+        status="Unknown",
+        status_evidence_keys=("file:README.md",),
+        completion=CompletionResult(
+            None,
+            EvidenceStrength.UNKNOWN,
+            "Completion cannot be measured.",
+            evidence_keys=("file:README.md",),
+        ),
+        likelihood=LikelihoodResult(
+            0,
+            "Unknown",
+            0,
+            0,
+            "Low",
+            "Insufficient evidence for an evidence-backed likelihood forecast.",
+            evidence_keys=("file:README.md",),
+        ),
+        done=(),
+        remaining=(),
+        next_step=Claim("Review the README evidence.", ("file:README.md",)),
+        evidence=(
+            Evidence(
+                "file:README.md",
+                "README.md (project overview)",
+                "https://github.com/example/project/blob/" + "a" * 40 + "/README.md",
+                content=malicious_markdown,
+                content_format="markdown",
+            ),
+        ),
+        project_url="https://github.com/example/project",
+        contact_url="mailto:owner@example.com",
+    )
+
+    html = render_html_string(reading)
+
+    assert "<h4>Readable README</h4>" in html
+    assert "<li>a useful list item</li>" in html
+    assert "<table>" in html
+    assert '<a href="https://github.com/example/project" target="_blank" rel="noopener noreferrer">safe source link</a>' in html
+    assert "<code>inline code</code>" in html
+    assert "<script>alert" not in html
+    assert "&lt;script&gt;alert" in html
+    assert "<form" not in html
+    assert "onerror=alert" in html
+    assert 'Open original source</a>' in html
+
+
+def test_repository_languages_teach_catalogue_and_generic_fallback() -> None:
+    evidence = (
+        Evidence("language:typescript", "Repository languages: TypeScript (40%)", "https://api.github.com/repos/example/project/languages"),
+        Evidence("language:css", "Repository languages: CSS (30%)", "https://api.github.com/repos/example/project/languages"),
+        Evidence("language:html", "Repository languages: HTML (20%)", "https://api.github.com/repos/example/project/languages"),
+        Evidence("language:mystery", "Repository languages: MysteryLang (10%)", "https://api.github.com/repos/example/project/languages"),
+    )
+    reading = ProjectReading(
+        name="Project",
+        explanation=Claim("The collected evidence does not state a clear purpose."),
+        status="Unknown",
+        status_evidence_keys=(),
+        completion=CompletionResult(None, EvidenceStrength.UNKNOWN, "Completion cannot be measured."),
+        likelihood=LikelihoodResult(0, "Unknown", 0, 0, "Low", "Insufficient evidence."),
+        done=(),
+        remaining=(),
+        next_step=Claim("Review evidence."),
+        repository_languages=(
+            RepositoryLanguage("TypeScript", 40.0, 400, ("language:typescript",)),
+            RepositoryLanguage("CSS", 30.0, 300, ("language:css",)),
+            RepositoryLanguage("HTML", 20.0, 200, ("language:html",)),
+            RepositoryLanguage("MysteryLang", 10.0, 100, ("language:mystery",)),
+        ),
+        evidence=evidence,
+        project_url="https://github.com/example/project",
+        contact_url="https://github.com/example",
+    )
+
+    html = render_html_string(reading)
+
+    assert "TypeScript is JavaScript with extra checks" in html
+    assert "CSS controls how a web page looks" in html
+    assert "HTML gives a web page its structure" in html
+    assert "MysteryLang is a repository language detected by GitHub Linguist." in html
+    assert "The percentage alone is not enough to infer that." in html
+    assert "They do not prove importance" in html
+
+
+def test_project_contact_and_evidence_links_open_outside_result() -> None:
+    reading = ProjectReading(
+        name="Project",
+        explanation=Claim("The README says this project helps people.", ("file:README.md",)),
+        status="Unknown",
+        status_evidence_keys=("file:README.md",),
+        completion=CompletionResult(None, EvidenceStrength.UNKNOWN, "Completion cannot be measured."),
+        likelihood=LikelihoodResult(0, "Unknown", 0, 0, "Low", "Insufficient evidence."),
+        done=(),
+        remaining=(),
+        next_step=Claim("Review evidence.", ("file:README.md",)),
+        evidence=(
+            Evidence(
+                "file:README.md",
+                "README.md (project overview)",
+                "https://github.com/example/project/blob/" + "a" * 40 + "/README.md",
+                content="# Evidence",
+                content_format="markdown",
+            ),
+        ),
+        project_url="https://github.com/example/project",
+        contact_url="https://github.com/example",
+    )
+
+    html = render_html_string(reading)
+
+    assert '<a class="button" href="https://github.com/example/project" target="_blank" rel="noopener noreferrer">View the project</a>' in html
+    assert '<a class="button" href="https://github.com/example" target="_blank" rel="noopener noreferrer">Contact the project owner</a>' in html
+    assert '<a class="source-action" href="https://github.com/example/project/blob/' in html
+    assert 'target="_blank" rel="noopener noreferrer">Open original source</a>' in html
 
 
 def test_unknown_likelihood_does_not_render_numeric_range(tmp_path: Path) -> None:
