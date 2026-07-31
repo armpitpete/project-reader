@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kit_version": "external-comprehension-v0.1",
+  "participant_id": "R04",
+  "record_status": "blank_template",
+  "participant_context": {
+    "self_described_categories": []
+  },
+  "consent": {
+    "anonymous_notes_agreed": null,
+    "may_stop_any_time_confirmed": null,
+    "no_unnecessary_personal_data_confirmed": null
+  },
+  "before_use": {
+    "expected_purpose": null,
+    "github_comfort": null,
+    "trust_or_distrust_factors": null
+  },
+  "observation": {
+    "session_completed": null,
+    "repository_used": null,
+    "task_outcome": null,
+    "help_requested": null,
+    "first_screen_comprehension": null,
+    "disclosure_controls_opened": [],
+    "time_to_first_useful_answer_seconds": null,
+    "hesitation_or_confusion_events": [],
+    "misunderstandings": []
+  },
+  "after_use": {
+    "project_purpose": null,
+    "completed_work": null,
+    "remaining_or_uncertain_work": null,
+    "evidence_recalled": null,
+    "suggested_change": null,
+    "trust_judgement": null,
+    "stuck_or_unsure_moment": null
+  },
+  "paid_outcome": {
+    "locked_offer_id": "owner-ready-report-25-gbp",
+    "offer_made_after_example_and_description": null,
+    "result": null,
+    "participant_words": null,
+    "public_repository_discussed": null,
+    "facilitator_note": null
+  },
+  "facilitator_notes": [],
+  "participant_statements": [],
+  "interpretation_after_session": {
+    "comprehension": null,
+    "usability": null,
+    "trust": null,
+    "decision_signal": null
+  },
+  "do_not_commit_completed_record": true
+}
