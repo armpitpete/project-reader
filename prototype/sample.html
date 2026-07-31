@@ -4,48 +4,69 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Project Reader - Project Reader</title>
-<style>
-:root {
+</head>
+<body>
+<main>
+<style data-project-reader-result-style>
+.project-reader-result {
   color-scheme: light;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 18px;
   line-height: 1.65;
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  margin: 0;
-  background: #faf9f6;
   color: #1f2933;
-}
-main {
+  background: #faf9f6;
   max-width: 42rem;
-  margin: auto;
-  padding: 2rem 1rem 4rem;
 }
-h1, h2, h3 {
+.project-reader-result * {
+  box-sizing: border-box;
+}
+.project-reader-result h1,
+.project-reader-result h2,
+.project-reader-result h3,
+.project-reader-result h4,
+.project-reader-result h5,
+.project-reader-result h6 {
   color: #101820;
   line-height: 1.2;
   letter-spacing: 0;
 }
-h1 {
+.project-reader-result h1 {
   font-size: 2rem;
   margin: 0 0 .7rem;
 }
-h2 {
+.project-reader-result h2 {
   font-size: 1.35rem;
   margin: 0 0 .45rem;
 }
-h3 {
+.project-reader-result h3 {
   font-size: 1.08rem;
   margin-top: 1.5rem;
 }
-h4 {
+.project-reader-result h4 {
   font-size: 1rem;
-  margin: 0 0 .5rem;
+  margin: 1rem 0 .5rem;
 }
-p, li {
+.project-reader-result h5,
+.project-reader-result h6 {
+  font-size: .98rem;
+  margin: .85rem 0 .45rem;
+}
+.project-reader-result p,
+.project-reader-result li {
   max-width: 62ch;
+}
+.project-reader-result a {
+  color: #1b5e7a;
+  text-underline-offset: .18em;
+  overflow-wrap: anywhere;
+}
+.project-reader-result code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.project-reader-result :focus-visible {
+  outline: 4px solid #0f5132;
+  outline-offset: 4px;
 }
 .reader-flow {
   display: grid;
@@ -55,15 +76,17 @@ p, li {
   padding: .25rem 0 1.25rem;
   border-bottom: 1px solid #ded7ca;
 }
-.project-name, .answer {
+.project-name,
+.answer {
   font-size: 1.15rem;
   font-weight: 750;
   margin: .15rem 0 .4rem;
 }
-ul, ol {
+.project-reader-result ul,
+.project-reader-result ol {
   padding-left: 1.25rem;
 }
-li {
+.project-reader-result li {
   margin: .55rem 0;
 }
 .disclosures {
@@ -71,11 +94,11 @@ li {
   gap: .6rem;
   margin-top: 2.5rem;
 }
-details {
+.project-reader-result details {
   border-top: 1px solid #ded7ca;
   padding: 1rem 0;
 }
-summary {
+.project-reader-result summary {
   cursor: pointer;
   font-size: 1.08rem;
   font-weight: 800;
@@ -90,10 +113,61 @@ summary {
   display: grid;
   gap: .25rem;
 }
-.evidence-list, .source-meta {
+.evidence-list,
+.source-meta {
   padding-left: 1.35rem;
 }
-.evidence, .evidence-strength, .source-meta {
+.evidence-list > li {
+  margin: .8rem 0;
+}
+.evidence-source {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+  align-items: baseline;
+  margin: .65rem 0;
+}
+.evidence-source a,
+.source-action {
+  font-weight: 760;
+}
+.evidence-preview {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.evidence-preview pre,
+.evidence-preview code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.evidence-preview pre {
+  border: 1px solid #ded7ca;
+  background: #fff;
+  padding: .85rem;
+  overflow: visible;
+}
+.evidence-preview table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+.evidence-preview th,
+.evidence-preview td {
+  border: 1px solid #ded7ca;
+  padding: .45rem .55rem;
+  text-align: left;
+  vertical-align: top;
+}
+.evidence-preview blockquote {
+  border-left: 4px solid #ded7ca;
+  margin: 1rem 0;
+  padding-left: 1rem;
+  color: #3f4a56;
+}
+.evidence-note,
+.evidence,
+.evidence-strength,
+.source-meta {
   font-size: .95rem;
 }
 .evidence-strength {
@@ -109,12 +183,16 @@ summary {
 }
 .language-list {
   display: grid;
-  gap: .55rem;
-  padding-left: 1.25rem;
+  gap: .85rem;
+  padding-left: 0;
+  list-style: none;
 }
-.language-list li {
-  display: grid;
-  gap: .15rem;
+.language-card {
+  border-top: 1px solid #ded7ca;
+  padding-top: .75rem;
+}
+.language-card p {
+  margin: .35rem 0;
 }
 .evidence-link {
   font-size: .95rem;
@@ -138,25 +216,21 @@ summary {
   text-decoration: none;
   font-weight: 750;
 }
-a {
-  color: #1b5e7a;
-  text-underline-offset: .18em;
-}
-:focus-visible {
-  outline: 4px solid #0f5132;
-  outline-offset: 4px;
-}
 @media (max-width: 700px) {
-  main {
-    max-width: none;
-    padding: 1.25rem 1rem 3rem;
+  .project-reader-result {
+    font-size: 17px;
   }
-  h1 {
+  .project-reader-result h1 {
     font-size: 1.7rem;
+  }
+  .actions {
+    display: grid;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  .project-reader-result *,
+  .project-reader-result *::before,
+  .project-reader-result *::after {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
@@ -164,9 +238,7 @@ a {
   }
 }
 </style>
-</head>
-<body>
-<main>
+<article class="project-reader-result">
 <section class="reader-flow" aria-label="Project reading">
   <section class="reader-question" aria-labelledby="question-project">
     <h1 id="question-project">What is this project?</h1>
@@ -255,20 +327,8 @@ a {
 </details>
 </section>
 
-<nav class="actions" aria-label="Project links"><a class="button" href="https://github.com/armpitpete/project-reader">View the project</a><a class="button" href="https://github.com/armpitpete">Contact the project owner</a></nav>
+<nav class="actions" aria-label="Project links"><a class="button" href="https://github.com/armpitpete/project-reader" target="_blank" rel="noopener noreferrer">View the project</a><a class="button" href="https://github.com/armpitpete" target="_blank" rel="noopener noreferrer">Contact the project owner</a></nav>
+</article>
 </main>
-<script>
-for (const summary of document.querySelectorAll("details > summary")) {
-  summary.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      const details = summary.parentElement;
-      if (details instanceof HTMLDetailsElement) {
-        details.open = !details.open;
-      }
-    }
-  });
-}
-</script>
 </body>
 </html>

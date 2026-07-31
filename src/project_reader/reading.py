@@ -107,6 +107,17 @@ def _repository_language(statement: CandidateStatement) -> RepositoryLanguage:
     )
 
 
+def _evidence_content_format(path: str) -> str:
+    lower = path.casefold()
+    if lower.endswith((".md", ".markdown")):
+        return "markdown"
+    if lower.endswith(".json"):
+        return "json"
+    if lower.endswith((".txt", ".toml", ".yml", ".yaml", ".ini", ".cfg")):
+        return "text"
+    return "text"
+
+
 def _open_queue_keys(reading: InterpretationBundle) -> tuple[str, ...]:
     for item in reading.uncertainties:
         if item.key == "uncertainty:open-queues":
@@ -279,6 +290,9 @@ def build_project_reading(
             ),
             source=item.source_url,
             strength=EvidenceStrength.CONFIRMED if item.usable else EvidenceStrength.UNKNOWN,
+            content=item.content,
+            content_format=_evidence_content_format(item.path) if item.content is not None else "unknown",
+            truncated=item.truncated,
         )
         for item in interpretation.evidence
     )

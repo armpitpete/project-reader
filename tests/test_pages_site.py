@@ -38,8 +38,15 @@ def test_pages_site_contains_only_public_proof_files(tmp_path: Path) -> None:
     assert "Read this project" in html
     assert "https://reader-api.merrinworld.uk/api/v1/read" in html
     assert 'role="status" aria-live="polite"' in html
-    assert 'title="Project Reader result"' in html
-    assert "sandbox=" in html
+    assert 'aria-label="Project Reader result"' in html
+    assert "reader-frame" not in html
+    assert "<iframe" not in html
+    assert "sandbox=" not in html
+    assert "min-height: 78vh" not in html
+    assert "min-height: 82vh" not in html
+    assert "result.innerHTML = data.result_html" in html
+    assert "result.scrollIntoView" in html
+    assert 'link.target = "_blank"' in html
     assert "Privacy and safety" in html
     assert "does not write to GitHub" in html
     assert "Technical detail: deployment" in html

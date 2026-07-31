@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 from dataclasses import dataclass
+import os
+from threading import Lock
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
@@ -9,6 +12,7 @@ from gitingest import ingest
 
 
 _SEPARATOR = "=" * 48
+_GITINGEST_TOKEN_ENV_LOCK = Lock()
 
 
 class RepositoryReadError(RuntimeError):
@@ -99,6 +103,21 @@ def _append_missing_exact_files(
     return result, tuple(provenance)
 
 
+@contextmanager
+def _public_gitingest_token_scope(token: str | None):
+    if token is not None:
+        yield token
+        return
+
+    with _GITINGEST_TOKEN_ENV_LOCK:
+        original = os.environ.pop("GITHUB_TOKEN", None)
+        try:
+            yield None
+        finally:
+            if original is not None:
+                os.environ["GITHUB_TOKEN"] = original
+
+
 def read_repository(
     source: str,
     *,
@@ -110,11 +129,12 @@ def read_repository(
         raise ValueError("A repository URL or local path is required")
 
     try:
-        summary, tree, content = ingest(
-            source,
-            token=token,
-            include_patterns=include_patterns,
-        )
+        with _public_gitingest_token_scope(token) as gitingest_token:
+            summary, tree, content = ingest(
+                source,
+                token=gitingest_token,
+                include_patterns=include_patterns,
+            )
     except Exception as error:
         raise RepositoryReadError("Gitingest could not read repository content") from error
 

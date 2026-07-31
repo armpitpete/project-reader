@@ -25,6 +25,9 @@ class Evidence:
     label: str
     source: str
     strength: EvidenceStrength = EvidenceStrength.CONFIRMED
+    content: str | None = None
+    content_format: Literal["markdown", "text", "json", "unknown"] = "unknown"
+    truncated: bool = False
 
     def __post_init__(self) -> None:
         if not self.key.strip():
@@ -33,6 +36,8 @@ class Evidence:
             raise ValueError("Evidence label must not be empty")
         if not self.source.strip():
             raise ValueError("Evidence source must not be empty")
+        if self.content is not None and self.content_format == "unknown":
+            raise ValueError("Evidence content must declare a readable content format")
 
 
 @dataclass(frozen=True)

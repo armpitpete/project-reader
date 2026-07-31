@@ -1,4 +1,5 @@
 import importlib
+import os
 from urllib.error import URLError
 
 import pytest
@@ -76,6 +77,24 @@ def test_wildcard_patterns_are_left_to_gitingest(monkeypatch) -> None:
 
     assert digest.content == "content"
     assert digest.file_provenance == ()
+
+
+def test_read_repository_does_not_let_gitingest_use_github_token_env(monkeypatch) -> None:
+    seen: dict[str, str | None] = {}
+
+    def fake_ingest(source, token=None, include_patterns=None):
+        seen["token_argument"] = token
+        seen["github_token_env"] = os.getenv("GITHUB_TOKEN")
+        return "summary", "tree", "content"
+
+    monkeypatch.setenv("GITHUB_TOKEN", "secret-token")
+    monkeypatch.setattr(ingest_module, "ingest", fake_ingest)
+
+    digest = read_repository("https://github.com/example/project")
+
+    assert digest.content == "content"
+    assert seen == {"token_argument": None, "github_token_env": None}
+    assert os.getenv("GITHUB_TOKEN") == "secret-token"
 
 
 def test_gitingest_failure_is_controlled(monkeypatch) -> None:

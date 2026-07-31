@@ -228,7 +228,9 @@ jobs:
           assert "SourcePawn" in html
           assert "PowerShell" in html
           assert "These percentages describe detected repository code volume" in html
-          assert "details.open = !details.open;" in html
+          assert "Readable evidence and exact sources" in html
+          assert "The percentage alone is not enough to infer that." in html
+          assert "<script" not in html
           assert "Contact the project owner" in html
           assert "Source commit:" in html
           PY
