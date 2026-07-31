@@ -209,27 +209,31 @@ jobs:
           html = Path("/tmp/project-status-engine-reader.html").read_text(
               encoding="utf-8"
           )
-          primary = html.split('<section class="disclosures"', 1)[0]
+          primary = html.split('<section class="reader-flow simple-reading"', 1)[1].split('<section class="disclosures"', 1)[0]
           assert "Project Status Engine" in html
+          assert "Simple reading" in primary
           assert "What is this project?" in primary
-          assert "What has been finished?" in primary
-          assert "What is still to do?" in primary
-          assert "Will the current plan be finished?" in primary
-          assert "What happens next?" in primary
+          assert "What can someone do with it?" in primary
+          assert "What appears to work or be finished?" in primary
+          assert "What is unfinished or unclear?" in primary
+          assert "What was it made with?" in primary
+          assert "Will the current plan be finished?" not in primary
+          assert "What happens next?" not in primary
           assert "How complete?" not in primary
           assert "Likely to finish?" not in primary
           assert "Source commit:" not in primary
-          assert "Repository languages" not in primary
+          assert "74.7% of detected code" not in primary
+          assert ".project/progress.json" not in primary
           assert "authority-backed" not in primary.lower()
           assert "owner-authority" not in primary.lower()
-          assert "How do we know?" in html
-          assert "Technical details" in html
-          assert "Repository languages" in html
+          assert "Project status and reasons" in html
+          assert "Technical sources and repository details" in html
+          assert "Detected languages and amounts" in html
           assert "SourcePawn" in html
           assert "PowerShell" in html
           assert "These percentages describe detected repository code volume" in html
-          assert "Readable evidence and exact sources" in html
-          assert "The percentage alone is not enough to infer that." in html
+          assert "Original sources and readable previews" in html
+          assert "the amount alone does not show what it does here" in html
           assert "<script" not in html
           assert "Contact the project owner" in html
           assert "Source commit:" in html

@@ -106,9 +106,9 @@ def test_builds_complete_ordinary_reader_from_authority_records(tmp_path: Path) 
     render_html(reading, destination)
     html = destination.read_text(encoding="utf-8")
     assert "What is this project?" in html
-    assert "How do we know?" in html
-    assert "Technical details" in html
-    assert "Repository languages" in html
+    assert "Project status and reasons" in html
+    assert "Technical sources and repository details" in html
+    assert "Detected languages and amounts" in html
     assert "Contact the project owner" in html
     assert "No unfinished work item is listed in the selected progress records." in html
 

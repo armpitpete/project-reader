@@ -219,6 +219,16 @@ function safeMessage(data) {
   return "Project Reader could not produce a reading for that repository.";
 }
 
+function secureResultLinks() {
+  result.querySelectorAll("a[href]").forEach((link) => {
+    const href = link.getAttribute("href") || "";
+    if (/^https?:\/\//i.test(href)) {
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+    }
+  });
+}
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const repository = input.value.trim();
@@ -245,17 +255,10 @@ form.addEventListener("submit", async (event) => {
       throw new Error("Project Reader returned a result that could not be displayed safely.");
     }
     result.innerHTML = data.result_html;
+    secureResultLinks();
     result.dataset.visible = "true";
-    const commit = String(data.source_commit || "").slice(0, 12);
-    const source = document.createElement("p");
-    source.textContent = `${data.repository} read at ${commit || "unknown commit"}.`;
-    const link = document.createElement("a");
-    link.href = data.repository_url;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.textContent = "Open repository evidence";
-    resultMeta.replaceChildren(source, link);
-    resultMeta.dataset.visible = "true";
+    resultMeta.replaceChildren();
+    resultMeta.dataset.visible = "false";
     setStatus("Reading complete.");
     result.focus({preventScroll: true});
     result.scrollIntoView({block: "start"});

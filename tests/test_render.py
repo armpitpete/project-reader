@@ -1,5 +1,6 @@
 from pathlib import Path
 import runpy
+import re
 
 import pytest
 
@@ -16,9 +17,13 @@ from project_reader.render import render_html, render_html_fragment, render_html
 
 
 def _primary_flow(html: str) -> str:
-    _, primary = html.split('<section class="reader-flow"', 1)
+    _, primary = html.split('<section class="reader-flow simple-reading"', 1)
     primary, _ = primary.split('<section class="disclosures"', 1)
     return primary
+
+
+def _visible_text(html: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
 
 
 def test_public_proof_renders_simple_nd_yp_first_screen(tmp_path: Path) -> None:
@@ -29,13 +34,18 @@ def test_public_proof_renders_simple_nd_yp_first_screen(tmp_path: Path) -> None:
     primary = _primary_flow(html)
 
     assert "Project Status Engine" in html
+    assert "Simple reading" in primary
     assert "What is this project?" in primary
-    assert "What has been finished?" in primary
-    assert "What is still to do?" in primary
-    assert "Will the current plan be finished?" in primary
-    assert "What happens next?" in primary
-    assert "100% of planned parts" in primary
-    assert "The current plan is finished" in primary
+    assert "What can someone do with it?" in primary
+    assert "What appears to work or be finished?" in primary
+    assert "What is unfinished or unclear?" in primary
+    assert "What was it made with?" in primary
+    assert "Will the current plan be finished?" not in primary
+    assert "What happens next?" not in primary
+    assert "100% of planned parts" not in primary
+    assert "The current plan is finished" not in primary
+    assert "100% of planned parts" in html
+    assert "The current plan is finished" in html
     assert "Already complete" not in primary
     assert "defined stages" not in primary
     assert "defined work units" not in primary
@@ -73,27 +83,40 @@ def test_primary_flow_has_no_hashes_timestamps_or_inline_citations(tmp_path: Pat
     assert "Reading checked" not in primary
     assert "Issues and pull requests checked" not in primary
     assert "Repository languages" not in primary
-    assert "Python" not in primary
-    assert "SourcePawn" not in primary
+    assert "Python" in primary
+    assert "SourcePawn" in primary
+    assert "74.7% of detected code" not in primary
     assert "28 July 2026" not in primary
     assert "12:02" not in primary
     assert "d24e979e1747206f0c1ac3c66d3999f479f7ab72" not in primary
+    assert "README.md" not in primary
+    assert ".project/progress.json" not in primary
+    assert "package.json" not in primary
+    assert "npm install" not in primary
+    assert ".github/workflows" not in primary
 
 
-def test_evidence_stays_accessible_through_one_disclosure(tmp_path: Path) -> None:
+def test_status_and_technical_sources_are_progressively_disclosed(tmp_path: Path) -> None:
     namespace = runpy.run_path("examples/project_status_engine.py")
     destination = tmp_path / "proof.html"
     render_html(namespace["reading"], destination)
     html = destination.read_text(encoding="utf-8")
 
-    assert '<details class="evidence-disclosure">' in html
-    assert "<summary>How do we know?</summary>" in html
-    assert "Evidence behind the five answers" in html
-    assert "Readable evidence and exact sources" in html
+    assert '<details class="status-detail">' in html
+    assert "<summary>Project status and reasons</summary>" in html
+    assert "Simplified supporting reasons" in html
+    assert "GitHub issues are public discussion pages." in html
+    assert '<details class="technical-sources">' in html
+    assert "<summary>Technical sources and repository details</summary>" in html
+    assert "Exact links behind the answers" in html
+    assert "Original sources and readable previews" in html
     assert ".project/progress.json" in html
     assert "d24e979e1747206f0c1ac3c66d3999f479f7ab72" in html
     assert "28 July 2026 at 12:02 BST" in html
-    assert html.count("<summary>How do we know?</summary>") == 1
+    assert "Readable preview rendered safely by Project Reader." not in html
+    assert html.count("No readable text preview is available for this source.") <= html.count(
+        "<details class=\"evidence-source-detail\">"
+    )
 
 
 def test_technical_detail_is_collapsed_by_default(tmp_path: Path) -> None:
@@ -102,9 +125,9 @@ def test_technical_detail_is_collapsed_by_default(tmp_path: Path) -> None:
     render_html(namespace["reading"], destination)
     html = destination.read_text(encoding="utf-8")
 
-    assert '<details class="technical-detail">' in html
-    assert "<summary>Technical details</summary>" in html
-    assert "Repository languages" in html
+    assert '<details class="technical-sources">' in html
+    assert "<summary>Technical sources and repository details</summary>" in html
+    assert "Detected languages and amounts" in html
     assert "Python" in html
     assert "74.7% of detected code" in html
     assert "SourcePawn" in html
@@ -147,8 +170,8 @@ def test_disclosure_controls_are_native_and_keyboard_operable(tmp_path: Path) ->
     html = destination.read_text(encoding="utf-8")
 
     assert "<details" in html
-    assert "<summary>How do we know?</summary>" in html
-    assert "<summary>Technical details</summary>" in html
+    assert "<summary>Project status and reasons</summary>" in html
+    assert "<summary>Technical sources and repository details</summary>" in html
     assert "<script" not in html
     assert "<button" not in html
 
@@ -263,12 +286,68 @@ def test_repository_languages_teach_catalogue_and_generic_fallback() -> None:
 
     html = render_html_string(reading)
 
-    assert "TypeScript is JavaScript with extra checks" in html
-    assert "CSS controls how a web page looks" in html
-    assert "HTML gives a web page its structure" in html
-    assert "MysteryLang is a repository language detected by GitHub Linguist." in html
-    assert "The percentage alone is not enough to infer that." in html
+    assert "TypeScript is a way of writing instructions for a website or app." in html
+    assert "JavaScript, another coding language used to make pages respond" in html
+    assert "CSS is a set of appearance rules for a web page." in html
+    assert "HTML describes what is on a web page" in html
+    assert "MysteryLang is a kind of project file or coding language detected in this project." in html
+    assert "the amount alone does not show what it does here" in html
     assert "They do not prove importance" in html
+
+
+def test_level_one_forbids_technical_management_noise() -> None:
+    reading = ProjectReading(
+        name="Noisy Project",
+        explanation=Claim("See README.md and issues/58 from aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa."),
+        status="Unknown",
+        status_evidence_keys=("file:README.md",),
+        completion=CompletionResult(
+            None,
+            EvidenceStrength.UNKNOWN,
+            "Completion cannot be measured from package.json.",
+            evidence_keys=("file:README.md",),
+        ),
+        likelihood=LikelihoodResult(
+            0,
+            "Unknown",
+            0,
+            0,
+            "Low",
+            "Insufficient evidence.",
+            evidence_keys=("file:README.md",),
+        ),
+        done=(Claim("npm run build is mentioned in README.md.", ("file:README.md",)),),
+        remaining=(Claim("Follow up #58 in .github/workflows/pages.yml.", ("file:README.md",)),),
+        next_step=Claim("Review package.json.", ("file:README.md",)),
+        evidence=(
+            Evidence(
+                "file:README.md",
+                "README.md (project overview)",
+                "https://github.com/example/project/blob/" + "a" * 40 + "/README.md",
+                content="# Install\n\nRun `npm install` and `npm run build`.",
+                content_format="markdown",
+            ),
+        ),
+        project_url="https://github.com/example/project",
+        contact_url="https://github.com/example",
+    )
+
+    primary = _visible_text(_primary_flow(render_html_string(reading)))
+
+    for forbidden in (
+        "README.md",
+        "issues/58",
+        "#58",
+        "aaaaaaaaaaaa",
+        "package.json",
+        "npm run build",
+        "npm install",
+        ".github/workflows",
+    ):
+        assert forbidden not in primary
+
+    assert "a project file" in primary
+    assert "a GitHub item" in primary or "a numbered GitHub item" in primary
 
 
 def test_project_contact_and_evidence_links_open_outside_result() -> None:
