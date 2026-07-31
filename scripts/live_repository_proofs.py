@@ -59,11 +59,15 @@ def _read(repository: str, *, max_repository_size_kb: int) -> dict[str, Any]:
         "html_contains_reader_questions": all(
             phrase in result_html
             for phrase in (
+                "Simple reading",
                 "What is this project?",
-                "What has been finished?",
-                "What is still to do?",
+                "What can someone do with it?",
+                "What appears to work or be finished?",
+                "What is unfinished or unclear?",
+                "What was it made with?",
+                "Project status and reasons",
                 "Will the current plan be finished?",
-                "What happens next?",
+                "Technical sources and repository details",
             )
         ),
     }

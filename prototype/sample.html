@@ -72,6 +72,9 @@
   display: grid;
   gap: 1.75rem;
 }
+.reader-flow > h1 {
+  margin-bottom: -.35rem;
+}
 .reader-question {
   padding: .25rem 0 1.25rem;
   border-bottom: 1px solid #ded7ca;
@@ -197,6 +200,9 @@
 .evidence-link {
   font-size: .95rem;
 }
+.detail-note {
+  color: #3f4a56;
+}
 .tech-card {
   border-top: 1px solid #ded7ca;
   padding-top: .75rem;
@@ -239,95 +245,98 @@
 }
 </style>
 <article class="project-reader-result">
-<section class="reader-flow" aria-label="Project reading">
+<section class="reader-flow simple-reading" aria-label="Simple reading">
+  <h1>Simple reading</h1>
   <section class="reader-question" aria-labelledby="question-project">
-    <h1 id="question-project">What is this project?</h1>
+    <h2 id="question-project">What is this project?</h2>
     <p class="project-name">Project Reader</p>
     <p>A simple and educational way to understand what a GitHub project is, how far it has progressed, and what remains.</p>
   </section>
 
+  <section class="reader-question" aria-labelledby="question-use">
+    <h2 id="question-use">What can someone do with it?</h2>
+    <p>A simple and educational way to understand what a GitHub project is, how far it has progressed, and what remains.</p>
+  </section>
+
   <section class="reader-question" aria-labelledby="question-finished">
-    <h2 id="question-finished">What has been finished?</h2>
+    <h2 id="question-finished">What appears to work or be finished?</h2>
     <ul><li>The simple first-screen questions are agreed.</li><li>Completion and likelihood are measured separately.</li><li>The educational technology-card format is defined.</li></ul>
   </section>
 
   <section class="reader-question" aria-labelledby="question-remaining">
-    <h2 id="question-remaining">What is still to do?</h2>
+    <h2 id="question-remaining">What is unfinished or unclear?</h2>
     <ul><li>Read a real public repository.</li><li>Connect every important answer to evidence.</li><li>Test the page with a non-technical reader lens.</li></ul>
   </section>
 
-  <section class="reader-question" aria-labelledby="question-plan">
-    <h2 id="question-plan">Will the current plan be finished?</h2>
-    <p class="answer">Likely to be finished</p>
-    <p>46% of planned parts. 6 of 13 planned parts are accepted as finished.</p>
-    <p>Project Reader estimates a broad range of 74-94%.</p>
-  </section>
 
-  <section class="reader-question" aria-labelledby="question-next">
-    <h2 id="question-next">What happens next?</h2>
-    <p>Use one public repository to prove the full five-question reading flow.</p>
-  </section>
+<section class="reader-question" aria-labelledby="question-made-with">
+  <h2 id="question-made-with">What was it made with?</h2>
+  <p>Project Reader does not have current public language evidence for this project.</p>
+</section>
+
+
+  <nav class="actions" aria-label="Project link"><a class="button" href="https://github.com/armpitpete/project-reader" target="_blank" rel="noopener noreferrer">View the project</a></nav>
 </section>
 
 <section class="disclosures" aria-label="More detail">
-<details class="evidence-disclosure">
-<summary>How do we know?</summary>
+<details class="status-detail">
+<summary>Project status and reasons</summary>
+<p class="detail-note">This section explains completion, likelihood and uncertainty. Exact source names and technical details are in the next section.</p>
+<section class="technical-section" aria-labelledby="status-completion">
+  <h2 id="status-completion">Completion</h2>
+  <p class="answer">46% of planned parts</p>
+  <p>6 of 13 planned parts are accepted as finished.</p>
+</section>
+<section class="technical-section" aria-labelledby="status-likelihood">
+  <h2 id="status-likelihood">Will the current plan be finished?</h2>
+  <p class="answer">Likely to be finished</p>
+  <p>Project Reader estimates a broad range of 74-94%.</p>
+</section>
+<section class="technical-section" aria-labelledby="status-uncertainty">
+  <h2 id="status-uncertainty">Uncertainty</h2>
+  <p>Project Reader found a defined set of planned parts for this reading.</p>
+</section>
+<section class="technical-section" aria-labelledby="status-reasons">
+  <h2 id="status-reasons">Simplified supporting reasons</h2>
+  <ul class="evidence-map">
+        <li>
+          <strong>Project description</strong>
+          <span>No direct public evidence was connected to this answer.</span>
+        </li>
+
+        <li>
+          <strong>Finished or working parts</strong>
+          <span>No direct public evidence was connected to this answer.</span>
+        </li>
+
+        <li>
+          <strong>Unfinished or unclear parts</strong>
+          <span>No direct public evidence was connected to this answer.</span>
+        </li>
+
+        <li>
+          <strong>Completion and likelihood</strong>
+          <span>No direct public evidence was connected to this answer.</span>
+        </li>
+
+        <li>
+          <strong>Suggested next step</strong>
+          <span>No direct public evidence was connected to this answer.</span>
+        </li>
+        </ul>
+  <p>GitHub issues are public discussion pages. Pull requests are proposed changes. Project Reader keeps their exact numbers and links in the technical sources section.</p>
+</section>
+<section class="technical-section" aria-labelledby="status-next-step">
+  <h2 id="status-next-step">Useful next step</h2>
+  <p>Use one public repository to prove the full five-question reading flow.</p>
+  <p><a class="button" href="https://github.com/armpitpete" target="_blank" rel="noopener noreferrer">Contact the project owner</a></p>
+</section>
+</details>
+<details class="technical-sources">
+<summary>Technical sources and repository details</summary>
 <p>No source evidence was attached to this reading. Project Reader should show unknowns when evidence is missing.</p>
 </details>
-<details class="technical-detail">
-<summary>Technical details</summary>
-
-<section class="technical-section">
-  <h3>Repository languages</h3>
-  <p>Project Reader does not have current GitHub language evidence for this repository.</p>
 </section>
-
-<section class="technical-section">
-  <h3>Support tools</h3>
-  <div class="tech-grid">
-        <article class="tech-card">
-          <h4>Python</h4>
-          <p><strong>What is it?</strong> A language used to give computers clear instructions.</p>
-          <p><strong>What does it do here?</strong> It calculates project scores and prepares the project reading.</p>
-          <p><strong>Why was it used?</strong> It is readable, widely supported, and works directly with Gitingest.</p>
-          <p class="evidence">Evidence strength: confirmed</p>
-          <p><strong>Where can I see it?</strong> The src/project_reader folder.</p>
-          <p><strong>Why does it matter?</strong> Readable code makes the scoring rules easier to inspect and challenge.</p>
-        </article>
-
-        <article class="tech-card">
-          <h4>Gitingest</h4>
-          <p><strong>What is it?</strong> A tool that gathers useful information from a Git repository.</p>
-          <p><strong>What does it do here?</strong> It collects the repository structure and readable file contents.</p>
-          <p><strong>Why was it used?</strong> It avoids rebuilding reliable repository extraction from scratch.</p>
-          <p class="evidence">Evidence strength: confirmed</p>
-          <p><strong>Where can I see it?</strong> The repository-ingestion layer.</p>
-          <p><strong>Why does it matter?</strong> Project Reader can focus on meaning, evidence, and accessibility.</p>
-        </article>
-        </div>
-</section>
-<section class="technical-section">
-  <h3>Formats and outputs</h3>
-  <div class="tech-grid">
-        <article class="tech-card">
-          <h4>HTML and CSS</h4>
-          <p><strong>What is it?</strong> The standard building blocks for webpage content and appearance.</p>
-          <p><strong>What does it do here?</strong> They display the simple project page.</p>
-          <p><strong>Why was it used?</strong> They create a fast, accessible proof without a large frontend framework.</p>
-          <p class="evidence">Evidence strength: confirmed</p>
-          <p><strong>Where can I see it?</strong> The HTML renderer and generated prototype.</p>
-          <p><strong>Why does it matter?</strong> A small page is easier to load, understand, test, and maintain.</p>
-        </article>
-        </div>
-</section>
-<section class="technical-section">
-  <h3>How Project Reader analysed this</h3>
-  <p>Project Reader collected public GitHub facts, exact repository files, open issue and pull request queues, and GitHub Linguist language data. Project Reader's own implementation is separate from the repository being analysed.</p>
-</section>
-</details>
-</section>
-
-<nav class="actions" aria-label="Project links"><a class="button" href="https://github.com/armpitpete/project-reader" target="_blank" rel="noopener noreferrer">View the project</a><a class="button" href="https://github.com/armpitpete" target="_blank" rel="noopener noreferrer">Contact the project owner</a></nav>
 </article>
 </main>
 </body>

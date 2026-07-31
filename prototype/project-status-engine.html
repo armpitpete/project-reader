@@ -72,6 +72,9 @@
   display: grid;
   gap: 1.75rem;
 }
+.reader-flow > h1 {
+  margin-bottom: -.35rem;
+}
 .reader-question {
   padding: .25rem 0 1.25rem;
   border-bottom: 1px solid #ded7ca;
@@ -197,6 +200,9 @@
 .evidence-link {
   font-size: .95rem;
 }
+.detail-note {
+  color: #3f4a56;
+}
 .tech-card {
   border-top: 1px solid #ded7ca;
   padding-top: .75rem;
@@ -239,41 +245,146 @@
 }
 </style>
 <article class="project-reader-result">
-<section class="reader-flow" aria-label="Project reading">
+<section class="reader-flow simple-reading" aria-label="Simple reading">
+  <h1>Simple reading</h1>
   <section class="reader-question" aria-labelledby="question-project">
-    <h1 id="question-project">What is this project?</h1>
+    <h2 id="question-project">What is this project?</h2>
     <p class="project-name">Project Status Engine</p>
     <p>An automatic system that reads GitHub activity and approved progress records, then produces public and private project-status views.</p>
   </section>
 
+  <section class="reader-question" aria-labelledby="question-use">
+    <h2 id="question-use">What can someone do with it?</h2>
+    <p>An automatic system that reads GitHub activity and approved progress records, then produces public and private project-status views.</p>
+  </section>
+
   <section class="reader-question" aria-labelledby="question-finished">
-    <h2 id="question-finished">What has been finished?</h2>
+    <h2 id="question-finished">What appears to work or be finished?</h2>
     <ul><li>It separates recent activity from approved completion records.</li><li>It produces public, private-owner and trusted internal outputs from one scan.</li><li>It validates generated outputs and protects private repository details.</li><li>All four planned parts are recorded as finished.</li></ul>
   </section>
 
   <section class="reader-question" aria-labelledby="question-remaining">
-    <h2 id="question-remaining">What is still to do?</h2>
+    <h2 id="question-remaining">What is unfinished or unclear?</h2>
     <p>Nothing currently listed.</p>
   </section>
 
-  <section class="reader-question" aria-labelledby="question-plan">
-    <h2 id="question-plan">Will the current plan be finished?</h2>
-    <p class="answer">The current plan is finished</p>
-    <p>100% of planned parts. 4 of 4 planned parts are accepted as finished.</p>
-    <p>The evidence says the current planned work has been reached.</p>
-  </section>
 
-  <section class="reader-question" aria-labelledby="question-next">
-    <h2 id="question-next">What happens next?</h2>
-    <p>Decide whether to archive the project as complete or define a new milestone before starting more development.</p>
-  </section>
+<section class="reader-question" aria-labelledby="question-made-with">
+  <h2 id="question-made-with">What was it made with?</h2>
+  <p>Project Reader found these kinds of files. This is not the same as proving what each one is used for.</p>
+  <ul class="language-list">
+        <li class="language-card">
+          <h3>Python</h3>
+          <p><strong>What is it?</strong> Python is a coding language written to be comparatively easy for people to read.</p>
+          <p><strong>What can it help make happen?</strong> It can help sort information, check files, make reports, answer requests, or repeat tasks.</p>
+          <p><strong>Why might a project use it?</strong> A project might use it when the makers want clear instructions that are practical to maintain.</p>
+          <p><strong>What does it do in this project?</strong> Project Reader found this kind of file in the project, but the amount alone does not show what it does here.</p>
+        </li>
+
+        <li class="language-card">
+          <h3>SourcePawn</h3>
+          <p><strong>What is it?</strong> SourcePawn is a coding language used to change how some shared online games behave.</p>
+          <p><strong>What can it help make happen?</strong> It can add game rules, player messages, controls or small custom features.</p>
+          <p><strong>Why might a project use it?</strong> A project might use it when the project is about custom behaviour for those games.</p>
+          <p><strong>What does it do in this project?</strong> Project Reader found this kind of file in the project, but the amount alone does not show what it does here.</p>
+        </li>
+
+        <li class="language-card">
+          <h3>C++</h3>
+          <p><strong>What is it?</strong> C++ is a coding language often used for programs that need careful control over speed and computer memory.</p>
+          <p><strong>What can it help make happen?</strong> It can help make games, audio tools, desktop programs or parts of a program that must respond quickly.</p>
+          <p><strong>Why might a project use it?</strong> A project might use it when speed and detailed control matter.</p>
+          <p><strong>What does it do in this project?</strong> Project Reader found this kind of file in the project, but the amount alone does not show what it does here.</p>
+        </li>
+
+        <li class="language-card">
+          <h3>Pawn</h3>
+          <p><strong>What is it?</strong> Pawn is a small coding language used inside some games and tools.</p>
+          <p><strong>What can it help make happen?</strong> It can add custom rules or actions to a larger project.</p>
+          <p><strong>Why might a project use it?</strong> A project might use it when it needs small instructions inside another program.</p>
+          <p><strong>What does it do in this project?</strong> Project Reader found this kind of file in the project, but the amount alone does not show what it does here.</p>
+        </li>
+
+        <li class="language-card">
+          <h3>Shell</h3>
+          <p><strong>What is it?</strong> A shell script is a saved list of computer instructions that a person could otherwise type one by one.</p>
+          <p><strong>What can it help make happen?</strong> It can help repeat setup chores, checks or file tasks.</p>
+          <p><strong>Why might a project use it?</strong> A project might use it so people do not have to remember a long set of steps.</p>
+          <p><strong>What does it do in this project?</strong> Project Reader found this kind of file in the project, but the amount alone does not show what it does here.</p>
+        </li>
+
+        <li class="language-card">
+          <h3>PowerShell</h3>
+          <p><strong>What is it?</strong> PowerShell is a way to write repeatable computer instructions, especially on Windows.</p>
+          <p><strong>What can it help make happen?</strong> It can help set up files, check a project, or repeat maintenance tasks.</p>
+          <p><strong>Why might a project use it?</strong> A project might use it to make Windows tasks easier to repeat.</p>
+          <p><strong>What does it do in this project?</strong> Project Reader found this kind of file in the project, but the amount alone does not show what it does here.</p>
+        </li>
+        </ul>
+</section>
+
+
+  <nav class="actions" aria-label="Project link"><a class="button" href="https://github.com/armpitpete/project-status-engine" target="_blank" rel="noopener noreferrer">View the project</a></nav>
 </section>
 
 <section class="disclosures" aria-label="More detail">
-<details class="evidence-disclosure">
-<summary>How do we know?</summary>
-<p>Every important answer above is connected to collected evidence. If evidence is missing, stale or contradictory, Project Reader must say that the answer is unknown.</p>
-<h3>Evidence behind the five answers</h3>
+<details class="status-detail">
+<summary>Project status and reasons</summary>
+<p class="detail-note">This section explains completion, likelihood and uncertainty. Exact source names and technical details are in the next section.</p>
+<section class="technical-section" aria-labelledby="status-completion">
+  <h2 id="status-completion">Completion</h2>
+  <p class="answer">100% of planned parts</p>
+  <p>4 of 4 planned parts are accepted as finished.</p>
+</section>
+<section class="technical-section" aria-labelledby="status-likelihood">
+  <h2 id="status-likelihood">Will the current plan be finished?</h2>
+  <p class="answer">The current plan is finished</p>
+  <p>The evidence says the current planned work has been reached.</p>
+</section>
+<section class="technical-section" aria-labelledby="status-uncertainty">
+  <h2 id="status-uncertainty">Uncertainty</h2>
+  <p>Project Reader found a defined set of planned parts for this reading. The current planned work appears finished in the collected evidence.</p>
+</section>
+<section class="technical-section" aria-labelledby="status-reasons">
+  <h2 id="status-reasons">Simplified supporting reasons</h2>
+  <ul class="evidence-map">
+        <li>
+          <strong>Project description</strong>
+          <span>2 collected public evidence items support this answer.</span>
+        </li>
+
+        <li>
+          <strong>Finished or working parts</strong>
+          <span>4 collected public evidence items support this answer.</span>
+        </li>
+
+        <li>
+          <strong>Unfinished or unclear parts</strong>
+          <span>2 collected public evidence items support this answer.</span>
+        </li>
+
+        <li>
+          <strong>Completion and likelihood</strong>
+          <span>4 collected public evidence items support this answer.</span>
+        </li>
+
+        <li>
+          <strong>Suggested next step</strong>
+          <span>4 collected public evidence items support this answer.</span>
+        </li>
+        </ul>
+  <p>GitHub issues are public discussion pages. Pull requests are proposed changes. Project Reader keeps their exact numbers and links in the technical sources section.</p>
+</section>
+<section class="technical-section" aria-labelledby="status-next-step">
+  <h2 id="status-next-step">Useful next step</h2>
+  <p>Decide whether to archive the project as complete or define a new milestone before starting more development.</p>
+  <p><a class="button" href="https://github.com/armpitpete" target="_blank" rel="noopener noreferrer">Contact the project owner</a></p>
+</section>
+</details>
+<details class="technical-sources">
+<summary>Technical sources and repository details</summary>
+<p>This section keeps the exact issue and pull-request identifiers, file paths, package manifests, README technical sections, commands, workflows, deployment details, commits, hashes, timestamps and original source links.</p>
+<h3>Exact links behind the answers</h3>
 <ul class="evidence-map">
         <li>
           <strong>What is this project?</strong>
@@ -281,12 +392,12 @@
         </li>
 
         <li>
-          <strong>What has been finished?</strong>
+          <strong>What appears to work or be finished?</strong>
           <span><a href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/README.md#L3-L18" target="_blank" rel="noopener noreferrer">README: purpose, source-of-truth rules and completion authority</a>, <a href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/README.md#L49-L100" target="_blank" rel="noopener noreferrer">README: public, private and trusted outputs</a>, <a href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/README.md#L124-L155" target="_blank" rel="noopener noreferrer">README: automated validation, privacy and synchronisation</a>, <a href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/.project/progress.json" target="_blank" rel="noopener noreferrer">.project/progress.json: four authorised stages complete; overall percentage disabled</a></span>
         </li>
 
         <li>
-          <strong>What is still to do?</strong>
+          <strong>What is unfinished or unclear?</strong>
           <span><a href="https://github.com/armpitpete/project-status-engine/issues?q=is%3Aissue+is%3Aopen" target="_blank" rel="noopener noreferrer">GitHub issue search checked 28 July 2026 at 12:02 BST: no open issues</a>, <a href="https://github.com/armpitpete/project-status-engine/pulls?q=is%3Apr+is%3Aopen" target="_blank" rel="noopener noreferrer">GitHub pull request search checked 28 July 2026 at 12:02 BST: no open pull requests</a></span>
         </li>
 
@@ -300,216 +411,207 @@
           <span><a href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/.project/progress.json" target="_blank" rel="noopener noreferrer">.project/progress.json: four authorised stages complete; overall percentage disabled</a>, <a href="https://github.com/armpitpete/project-status-engine/issues?q=is%3Aissue+is%3Aopen" target="_blank" rel="noopener noreferrer">GitHub issue search checked 28 July 2026 at 12:02 BST: no open issues</a>, <a href="https://github.com/armpitpete/project-status-engine/pulls?q=is%3Apr+is%3Aopen" target="_blank" rel="noopener noreferrer">GitHub pull request search checked 28 July 2026 at 12:02 BST: no open pull requests</a>, <a href="https://github.com/armpitpete/project-status-engine/issues" target="_blank" rel="noopener noreferrer">Inference from completed authority and empty open-work queues</a></span>
         </li>
         </ul>
-<h3>Readable evidence and exact sources</h3>
+<h3>Original sources and readable previews</h3>
 <ol class="evidence-list">
         <li id="evidence-purpose">
           <details class="evidence-source-detail">
-            <summary>README: purpose, source-of-truth rules and completion authority <span class="evidence-strength">confirmed</span></summary>
+            <summary>README: purpose, source-of-truth rules and completion authority</summary>
             <div class="evidence-source">
               <a class="source-action" href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/README.md#L3-L18" target="_blank" rel="noopener noreferrer">Open original source</a>
-              <span class="evidence-note">Readable preview rendered safely by Project Reader.</span>
+              <span class="evidence-note">No readable preview is available.</span>
             </div>
-            <div class="evidence-preview"><p class="evidence-note">Project Reader has an exact source link for this evidence, but no readable inline text preview is available.</p></div>
+            <div class="evidence-preview"><p class="evidence-note">No readable text preview is available for this source.</p></div>
           </details>
         </li>
 
         <li id="evidence-outputs">
           <details class="evidence-source-detail">
-            <summary>README: public, private and trusted outputs <span class="evidence-strength">confirmed</span></summary>
+            <summary>README: public, private and trusted outputs</summary>
             <div class="evidence-source">
               <a class="source-action" href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/README.md#L49-L100" target="_blank" rel="noopener noreferrer">Open original source</a>
-              <span class="evidence-note">Readable preview rendered safely by Project Reader.</span>
+              <span class="evidence-note">No readable preview is available.</span>
             </div>
-            <div class="evidence-preview"><p class="evidence-note">Project Reader has an exact source link for this evidence, but no readable inline text preview is available.</p></div>
+            <div class="evidence-preview"><p class="evidence-note">No readable text preview is available for this source.</p></div>
           </details>
         </li>
 
         <li id="evidence-validation">
           <details class="evidence-source-detail">
-            <summary>README: automated validation, privacy and synchronisation <span class="evidence-strength">confirmed</span></summary>
+            <summary>README: automated validation, privacy and synchronisation</summary>
             <div class="evidence-source">
               <a class="source-action" href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/README.md#L124-L155" target="_blank" rel="noopener noreferrer">Open original source</a>
-              <span class="evidence-note">Readable preview rendered safely by Project Reader.</span>
+              <span class="evidence-note">No readable preview is available.</span>
             </div>
-            <div class="evidence-preview"><p class="evidence-note">Project Reader has an exact source link for this evidence, but no readable inline text preview is available.</p></div>
+            <div class="evidence-preview"><p class="evidence-note">No readable text preview is available for this source.</p></div>
           </details>
         </li>
 
         <li id="evidence-completion">
           <details class="evidence-source-detail">
-            <summary>.project/progress.json: four authorised stages complete; overall percentage disabled <span class="evidence-strength">confirmed</span></summary>
+            <summary>.project/progress.json: four authorised stages complete; overall percentage disabled</summary>
             <div class="evidence-source">
               <a class="source-action" href="https://github.com/armpitpete/project-status-engine/blob/d24e979e1747206f0c1ac3c66d3999f479f7ab72/.project/progress.json" target="_blank" rel="noopener noreferrer">Open original source</a>
-              <span class="evidence-note">Readable preview rendered safely by Project Reader.</span>
+              <span class="evidence-note">No readable preview is available.</span>
             </div>
-            <div class="evidence-preview"><p class="evidence-note">Project Reader has an exact source link for this evidence, but no readable inline text preview is available.</p></div>
+            <div class="evidence-preview"><p class="evidence-note">No readable text preview is available for this source.</p></div>
           </details>
         </li>
 
         <li id="evidence-open-issues">
           <details class="evidence-source-detail">
-            <summary>GitHub issue search checked 28 July 2026 at 12:02 BST: no open issues <span class="evidence-strength">confirmed</span></summary>
+            <summary>GitHub issue search checked 28 July 2026 at 12:02 BST: no open issues</summary>
             <div class="evidence-source">
               <a class="source-action" href="https://github.com/armpitpete/project-status-engine/issues?q=is%3Aissue+is%3Aopen" target="_blank" rel="noopener noreferrer">Open original source</a>
-              <span class="evidence-note">Readable preview rendered safely by Project Reader.</span>
+              <span class="evidence-note">No readable preview is available.</span>
             </div>
-            <div class="evidence-preview"><p class="evidence-note">Project Reader has an exact source link for this evidence, but no readable inline text preview is available.</p></div>
+            <div class="evidence-preview"><p class="evidence-note">No readable text preview is available for this source.</p></div>
           </details>
         </li>
 
         <li id="evidence-open-prs">
           <details class="evidence-source-detail">
-            <summary>GitHub pull request search checked 28 July 2026 at 12:02 BST: no open pull requests <span class="evidence-strength">confirmed</span></summary>
+            <summary>GitHub pull request search checked 28 July 2026 at 12:02 BST: no open pull requests</summary>
             <div class="evidence-source">
               <a class="source-action" href="https://github.com/armpitpete/project-status-engine/pulls?q=is%3Apr+is%3Aopen" target="_blank" rel="noopener noreferrer">Open original source</a>
-              <span class="evidence-note">Readable preview rendered safely by Project Reader.</span>
+              <span class="evidence-note">No readable preview is available.</span>
             </div>
-            <div class="evidence-preview"><p class="evidence-note">Project Reader has an exact source link for this evidence, but no readable inline text preview is available.</p></div>
+            <div class="evidence-preview"><p class="evidence-note">No readable text preview is available for this source.</p></div>
           </details>
         </li>
 
         <li id="evidence-release-commit">
           <details class="evidence-source-detail">
-            <summary>Source commit used for this reading: consolidated v1.1 status engine and owner dashboard <span class="evidence-strength">confirmed</span></summary>
+            <summary>Source commit used for this reading: consolidated v1.1 status engine and owner dashboard</summary>
             <div class="evidence-source">
               <a class="source-action" href="https://github.com/armpitpete/project-status-engine/commit/d24e979e1747206f0c1ac3c66d3999f479f7ab72" target="_blank" rel="noopener noreferrer">Open original source</a>
-              <span class="evidence-note">Readable preview rendered safely by Project Reader.</span>
+              <span class="evidence-note">No readable preview is available.</span>
             </div>
-            <div class="evidence-preview"><p class="evidence-note">Project Reader has an exact source link for this evidence, but no readable inline text preview is available.</p></div>
+            <div class="evidence-preview"><p class="evidence-note">No readable text preview is available for this source.</p></div>
           </details>
         </li>
 
         <li id="evidence-language:python">
           <details class="evidence-source-detail">
-            <summary>Repository languages: Python (74.7%) <span class="evidence-strength">confirmed</span></summary>
+            <summary>Repository languages: Python (74.7%)</summary>
             <div class="evidence-source">
               <a class="source-action" href="https://api.github.com/repos/armpitpete/project-status-engine/languages" target="_blank" rel="noopener noreferrer">Open original source</a>
-              <span class="evidence-note">Readable preview rendered safely by Project Reader.</span>
+              <span class="evidence-note">No readable preview is available.</span>
             </div>
-            <div class="evidence-preview"><p class="evidence-note">Project Reader has an exact source link for this evidence, but no readable inline text preview is available.</p></div>
+            <div class="evidence-preview"><p class="evidence-note">No readable text preview is available for this source.</p></div>
           </details>
         </li>
 
         <li id="evidence-language:sourcepawn">
           <details class="evidence-source-detail">
-            <summary>Repository languages: SourcePawn (11.6%) <span class="evidence-strength">confirmed</span></summary>
+            <summary>Repository languages: SourcePawn (11.6%)</summary>
             <div class="evidence-source">
               <a class="source-action" href="https://api.github.com/repos/armpitpete/project-status-engine/languages" target="_blank" rel="noopener noreferrer">Open original source</a>
-              <span class="evidence-note">Readable preview rendered safely by Project Reader.</span>
+              <span class="evidence-note">No readable preview is available.</span>
             </div>
-            <div class="evidence-preview"><p class="evidence-note">Project Reader has an exact source link for this evidence, but no readable inline text preview is available.</p></div>
+            <div class="evidence-preview"><p class="evidence-note">No readable text preview is available for this source.</p></div>
           </details>
         </li>
 
         <li id="evidence-language:c-plus-plus">
           <details class="evidence-source-detail">
-            <summary>Repository languages: C++ (8.6%) <span class="evidence-strength">confirmed</span></summary>
+            <summary>Repository languages: C++ (8.6%)</summary>
             <div class="evidence-source">
               <a class="source-action" href="https://api.github.com/repos/armpitpete/project-status-engine/languages" target="_blank" rel="noopener noreferrer">Open original source</a>
-              <span class="evidence-note">Readable preview rendered safely by Project Reader.</span>
+              <span class="evidence-note">No readable preview is available.</span>
             </div>
-            <div class="evidence-preview"><p class="evidence-note">Project Reader has an exact source link for this evidence, but no readable inline text preview is available.</p></div>
+            <div class="evidence-preview"><p class="evidence-note">No readable text preview is available for this source.</p></div>
           </details>
         </li>
 
         <li id="evidence-language:pawn">
           <details class="evidence-source-detail">
-            <summary>Repository languages: Pawn (2.3%) <span class="evidence-strength">confirmed</span></summary>
+            <summary>Repository languages: Pawn (2.3%)</summary>
             <div class="evidence-source">
               <a class="source-action" href="https://api.github.com/repos/armpitpete/project-status-engine/languages" target="_blank" rel="noopener noreferrer">Open original source</a>
-              <span class="evidence-note">Readable preview rendered safely by Project Reader.</span>
+              <span class="evidence-note">No readable preview is available.</span>
             </div>
-            <div class="evidence-preview"><p class="evidence-note">Project Reader has an exact source link for this evidence, but no readable inline text preview is available.</p></div>
+            <div class="evidence-preview"><p class="evidence-note">No readable text preview is available for this source.</p></div>
           </details>
         </li>
 
         <li id="evidence-language:shell">
           <details class="evidence-source-detail">
-            <summary>Repository languages: Shell (1.8%) <span class="evidence-strength">confirmed</span></summary>
+            <summary>Repository languages: Shell (1.8%)</summary>
             <div class="evidence-source">
               <a class="source-action" href="https://api.github.com/repos/armpitpete/project-status-engine/languages" target="_blank" rel="noopener noreferrer">Open original source</a>
-              <span class="evidence-note">Readable preview rendered safely by Project Reader.</span>
+              <span class="evidence-note">No readable preview is available.</span>
             </div>
-            <div class="evidence-preview"><p class="evidence-note">Project Reader has an exact source link for this evidence, but no readable inline text preview is available.</p></div>
+            <div class="evidence-preview"><p class="evidence-note">No readable text preview is available for this source.</p></div>
           </details>
         </li>
 
         <li id="evidence-language:powershell">
           <details class="evidence-source-detail">
-            <summary>Repository languages: PowerShell (1%) <span class="evidence-strength">confirmed</span></summary>
+            <summary>Repository languages: PowerShell (1%)</summary>
             <div class="evidence-source">
               <a class="source-action" href="https://api.github.com/repos/armpitpete/project-status-engine/languages" target="_blank" rel="noopener noreferrer">Open original source</a>
-              <span class="evidence-note">Readable preview rendered safely by Project Reader.</span>
+              <span class="evidence-note">No readable preview is available.</span>
             </div>
-            <div class="evidence-preview"><p class="evidence-note">Project Reader has an exact source link for this evidence, but no readable inline text preview is available.</p></div>
+            <div class="evidence-preview"><p class="evidence-note">No readable text preview is available for this source.</p></div>
           </details>
         </li>
 
         <li id="evidence-next-inference">
           <details class="evidence-source-detail">
-            <summary>Inference from completed authority and empty open-work queues <span class="evidence-strength">estimated</span></summary>
+            <summary>Inference from completed authority and empty open-work queues</summary>
             <div class="evidence-source">
               <a class="source-action" href="https://github.com/armpitpete/project-status-engine/issues" target="_blank" rel="noopener noreferrer">Open original source</a>
-              <span class="evidence-note">Readable preview rendered safely by Project Reader.</span>
+              <span class="evidence-note">No readable preview is available.</span>
             </div>
-            <div class="evidence-preview"><p class="evidence-note">Project Reader has an exact source link for this evidence, but no readable inline text preview is available.</p></div>
+            <div class="evidence-preview"><p class="evidence-note">No readable text preview is available for this source.</p></div>
           </details>
         </li>
         </ol>
-<ul class="source-meta"><li><strong>Source commit:</strong> <code>d24e979e1747206f0c1ac3c66d3999f479f7ab72</code></li><li><strong>Reading checked:</strong> 28 July 2026 at 12:02 BST</li><li><strong>Issues and pull requests checked:</strong> 28 July 2026 at 12:02 BST</li></ul>
-</details>
-<details class="technical-detail">
-<summary>Technical details</summary>
+
 
 <section class="technical-section">
-  <h3>Repository languages</h3>
-  <p>These percentages describe detected repository code volume. They do not prove importance, difficulty, authorship effort, why a language was chosen or what it does in this specific project.</p>
+  <h3>Detected languages and amounts</h3>
+  <p>These percentages describe detected repository code volume measured by GitHub Linguist. They do not prove importance, difficulty, authorship effort, why a language was chosen or what it does in this specific project.</p>
   <ul class="language-list">
         <li class="language-card">
           <h4>Python</h4>
-          <p><strong>What is it?</strong> Python is a programming language designed to be readable and practical.</p>
-          <p><strong>What does it usually do?</strong> It is usually used for scripts, web services, data work, automation and tests.</p>
-          <p><strong>What does it do in this project?</strong> Project Reader has not collected project-specific evidence explaining this language's role here. The percentage alone is not enough to infer that.</p>
+          <p><strong>Beginner explanation:</strong> Python is a coding language written to be comparatively easy for people to read.</p>
+          <p><strong>Project-specific role:</strong> Project Reader found this kind of file in the project, but the amount alone does not show what it does here.</p>
           <p><strong>Detected amount:</strong> 74.7% of detected code.  <a class="evidence-link" href="#evidence-language:python">Evidence</a></p>
         </li>
 
         <li class="language-card">
           <h4>SourcePawn</h4>
-          <p><strong>What is it?</strong> SourcePawn is a scripting language used for Source engine game server plugins.</p>
-          <p><strong>What does it usually do?</strong> It is usually used to customise game server behaviour, commands and rules.</p>
-          <p><strong>What does it do in this project?</strong> Project Reader has not collected project-specific evidence explaining this language's role here. The percentage alone is not enough to infer that.</p>
+          <p><strong>Beginner explanation:</strong> SourcePawn is a coding language used to change how some shared online games behave.</p>
+          <p><strong>Project-specific role:</strong> Project Reader found this kind of file in the project, but the amount alone does not show what it does here.</p>
           <p><strong>Detected amount:</strong> 11.6% of detected code.  <a class="evidence-link" href="#evidence-language:sourcepawn">Evidence</a></p>
         </li>
 
         <li class="language-card">
           <h4>C++</h4>
-          <p><strong>What is it?</strong> C++ is a programming language used when software needs close control over speed and memory.</p>
-          <p><strong>What does it usually do?</strong> It is usually used for engines, desktop apps, games, audio tools and performance-sensitive systems.</p>
-          <p><strong>What does it do in this project?</strong> Project Reader has not collected project-specific evidence explaining this language's role here. The percentage alone is not enough to infer that.</p>
+          <p><strong>Beginner explanation:</strong> C++ is a coding language often used for programs that need careful control over speed and computer memory.</p>
+          <p><strong>Project-specific role:</strong> Project Reader found this kind of file in the project, but the amount alone does not show what it does here.</p>
           <p><strong>Detected amount:</strong> 8.6% of detected code.  <a class="evidence-link" href="#evidence-language:c-plus-plus">Evidence</a></p>
         </li>
 
         <li class="language-card">
           <h4>Pawn</h4>
-          <p><strong>What is it?</strong> Pawn is a small scripting language used to embed custom logic in other systems.</p>
-          <p><strong>What does it usually do?</strong> It is usually used for plugins, game servers and constrained scripting environments.</p>
-          <p><strong>What does it do in this project?</strong> Project Reader has not collected project-specific evidence explaining this language's role here. The percentage alone is not enough to infer that.</p>
+          <p><strong>Beginner explanation:</strong> Pawn is a small coding language used inside some games and tools.</p>
+          <p><strong>Project-specific role:</strong> Project Reader found this kind of file in the project, but the amount alone does not show what it does here.</p>
           <p><strong>Detected amount:</strong> 2.3% of detected code.  <a class="evidence-link" href="#evidence-language:pawn">Evidence</a></p>
         </li>
 
         <li class="language-card">
           <h4>Shell</h4>
-          <p><strong>What is it?</strong> Shell scripts are command-line instructions saved in files.</p>
-          <p><strong>What does it usually do?</strong> They are usually used to automate setup, deployment, tests and maintenance tasks.</p>
-          <p><strong>What does it do in this project?</strong> Project Reader has not collected project-specific evidence explaining this language's role here. The percentage alone is not enough to infer that.</p>
+          <p><strong>Beginner explanation:</strong> A shell script is a saved list of computer instructions that a person could otherwise type one by one.</p>
+          <p><strong>Project-specific role:</strong> Project Reader found this kind of file in the project, but the amount alone does not show what it does here.</p>
           <p><strong>Detected amount:</strong> 1.8% of detected code.  <a class="evidence-link" href="#evidence-language:shell">Evidence</a></p>
         </li>
 
         <li class="language-card">
           <h4>PowerShell</h4>
-          <p><strong>What is it?</strong> PowerShell is a command and scripting language often used on Windows and servers.</p>
-          <p><strong>What does it usually do?</strong> It is usually used for automation, administration, setup scripts and deployment tasks.</p>
-          <p><strong>What does it do in this project?</strong> Project Reader has not collected project-specific evidence explaining this language's role here. The percentage alone is not enough to infer that.</p>
+          <p><strong>Beginner explanation:</strong> PowerShell is a way to write repeatable computer instructions, especially on Windows.</p>
+          <p><strong>Project-specific role:</strong> Project Reader found this kind of file in the project, but the amount alone does not show what it does here.</p>
           <p><strong>Detected amount:</strong> 1% of detected code.  <a class="evidence-link" href="#evidence-language:powershell">Evidence</a></p>
         </li>
         </ul>
@@ -523,7 +625,6 @@
           <p><strong>What is it?</strong> GitHub&#x27;s tool for running automatic jobs.</p>
           <p><strong>What does it do here?</strong> It refreshes status outputs, validates changes and runs the daily synchroniser.</p>
           <p><strong>Why was it used?</strong> The project needs status information to update automatically rather than by hand.</p>
-          <p class="evidence">Evidence strength: confirmed</p>
           <p><strong>Where can I see it?</strong> The .github/workflows folder.</p>
           <p><strong>Why does it matter?</strong> The owner does not have to maintain a second manual dashboard.</p>
         </article>
@@ -537,7 +638,6 @@
           <p><strong>What is it?</strong> Three common formats for webpages, structured data and readable documents.</p>
           <p><strong>What does it do here?</strong> They provide a visual dashboard, machine-readable records and plain reports.</p>
           <p><strong>Why was it used?</strong> Different readers and tools need different views of the same verified information.</p>
-          <p class="evidence">Evidence strength: confirmed</p>
           <p><strong>Where can I see it?</strong> The generated public, private-build and internal-build folders.</p>
           <p><strong>Why does it matter?</strong> People can read the project while other systems can reuse the same data.</p>
         </article>
@@ -547,10 +647,10 @@
   <h3>How Project Reader analysed this</h3>
   <p>Project Reader collected public GitHub facts, exact repository files, open issue and pull request queues, and GitHub Linguist language data. Project Reader's own implementation is separate from the repository being analysed.</p>
 </section>
+
+<ul class="source-meta"><li><strong>Source commit:</strong> <code>d24e979e1747206f0c1ac3c66d3999f479f7ab72</code></li><li><strong>Reading checked:</strong> 28 July 2026 at 12:02 BST</li><li><strong>Issues and pull requests checked:</strong> 28 July 2026 at 12:02 BST</li></ul>
 </details>
 </section>
-
-<nav class="actions" aria-label="Project links"><a class="button" href="https://github.com/armpitpete/project-status-engine" target="_blank" rel="noopener noreferrer">View the project</a><a class="button" href="https://github.com/armpitpete" target="_blank" rel="noopener noreferrer">Contact the project owner</a></nav>
 </article>
 </main>
 </body>
