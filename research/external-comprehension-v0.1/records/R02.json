@@ -1,24 +1,47 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "kit_version": "external-comprehension-v0.1",
   "participant_id": "R02",
   "record_status": "blank_template",
+  "comprehension_repository": {
+    "owner_repo": "armpitpete/sample-hold-lab",
+    "github_url": "https://github.com/armpitpete/sample-hold-lab",
+    "project_reader_input": "armpitpete/sample-hold-lab",
+    "locked_for_sessions": true
+  },
   "participant_context": {
     "self_described_categories": []
+  },
+  "context_questions": {
+    "github_comfort": null,
+    "general_tool_trust_or_distrust_factors": null
   },
   "consent": {
     "anonymous_notes_agreed": null,
     "may_stop_any_time_confirmed": null,
     "no_unnecessary_personal_data_confirmed": null
   },
-  "before_use": {
-    "expected_purpose": null,
-    "github_comfort": null,
-    "trust_or_distrust_factors": null
+  "baseline_github_inspection": {
+    "repository_page_url": "https://github.com/armpitpete/sample-hold-lab",
+    "maximum_inspection_seconds": 180,
+    "time_used_seconds": null,
+    "help_requested": null,
+    "help_given": null
   },
-  "observation": {
+  "before_project_reader": {
+    "project_purpose": null,
+    "completed_work": null,
+    "remaining_or_uncertain_work": null,
+    "perceived_completion_state": null,
+    "perceived_likelihood_of_finishing": null,
+    "evidence_trust_basis": null,
+    "ability_to_answer": null,
+    "confidence_if_expressed": null
+  },
+  "project_reader_use": {
+    "project_reader_url": "https://armpitpete.github.io/project-reader/",
+    "repository_used": "armpitpete/sample-hold-lab",
     "session_completed": null,
-    "repository_used": null,
     "task_outcome": null,
     "help_requested": null,
     "first_screen_comprehension": null,
@@ -27,13 +50,19 @@
     "hesitation_or_confusion_events": [],
     "misunderstandings": []
   },
-  "after_use": {
+  "after_project_reader": {
     "project_purpose": null,
     "completed_work": null,
     "remaining_or_uncertain_work": null,
-    "evidence_recalled": null,
+    "perceived_completion_state": null,
+    "perceived_likelihood_of_finishing": null,
+    "evidence_trust_basis": null,
+    "ability_to_answer": null,
+    "confidence_if_expressed": null
+  },
+  "usability_follow_up": {
     "suggested_change": null,
-    "trust_judgement": null,
+    "use_again_trust_judgement": null,
     "stuck_or_unsure_moment": null
   },
   "paid_outcome": {
@@ -46,6 +75,14 @@
   },
   "facilitator_notes": [],
   "participant_statements": [],
+  "matched_comparison_after_session": {
+    "understanding_change": null,
+    "corrected_misunderstanding": null,
+    "new_unsupported_certainty": null,
+    "trust_change": null,
+    "project_reader_enabled_answer": null,
+    "facilitator_interpretation_basis": null
+  },
   "interpretation_after_session": {
     "comprehension": null,
     "usability": null,

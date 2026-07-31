@@ -9,22 +9,43 @@
     "kit_version",
     "participant_id",
     "record_status",
+    "comprehension_repository",
     "participant_context",
+    "context_questions",
     "consent",
-    "before_use",
-    "observation",
-    "after_use",
+    "baseline_github_inspection",
+    "before_project_reader",
+    "project_reader_use",
+    "after_project_reader",
+    "usability_follow_up",
     "paid_outcome",
     "facilitator_notes",
     "participant_statements",
+    "matched_comparison_after_session",
     "interpretation_after_session",
     "do_not_commit_completed_record"
   ],
   "properties": {
-    "schema_version": { "const": 1 },
+    "schema_version": { "const": 2 },
     "kit_version": { "const": "external-comprehension-v0.1" },
     "participant_id": { "enum": ["R01", "R02", "R03", "R04", "R05"] },
     "record_status": { "enum": ["blank_template", "completed_off_git"] },
+    "comprehension_repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner_repo",
+        "github_url",
+        "project_reader_input",
+        "locked_for_sessions"
+      ],
+      "properties": {
+        "owner_repo": { "const": "armpitpete/sample-hold-lab" },
+        "github_url": { "const": "https://github.com/armpitpete/sample-hold-lab" },
+        "project_reader_input": { "const": "armpitpete/sample-hold-lab" },
+        "locked_for_sessions": { "const": true }
+      }
+    },
     "participant_context": {
       "type": "object",
       "additionalProperties": false,
@@ -44,6 +65,18 @@
         }
       }
     },
+    "context_questions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "github_comfort",
+        "general_tool_trust_or_distrust_factors"
+      ],
+      "properties": {
+        "github_comfort": { "type": ["string", "null"] },
+        "general_tool_trust_or_distrust_factors": { "type": ["string", "null"] }
+      }
+    },
     "consent": {
       "type": "object",
       "additionalProperties": false,
@@ -58,26 +91,32 @@
         "no_unnecessary_personal_data_confirmed": { "type": ["boolean", "null"] }
       }
     },
-    "before_use": {
+    "baseline_github_inspection": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "expected_purpose",
-        "github_comfort",
-        "trust_or_distrust_factors"
+        "repository_page_url",
+        "maximum_inspection_seconds",
+        "time_used_seconds",
+        "help_requested",
+        "help_given"
       ],
       "properties": {
-        "expected_purpose": { "type": ["string", "null"] },
-        "github_comfort": { "type": ["string", "null"] },
-        "trust_or_distrust_factors": { "type": ["string", "null"] }
+        "repository_page_url": { "const": "https://github.com/armpitpete/sample-hold-lab" },
+        "maximum_inspection_seconds": { "const": 180 },
+        "time_used_seconds": { "type": ["integer", "null"], "minimum": 0, "maximum": 180 },
+        "help_requested": { "type": ["string", "null"] },
+        "help_given": { "type": ["string", "null"] }
       }
     },
-    "observation": {
+    "before_project_reader": { "$ref": "#/$defs/matched_answers" },
+    "project_reader_use": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "session_completed",
+        "project_reader_url",
         "repository_used",
+        "session_completed",
         "task_outcome",
         "help_requested",
         "first_screen_comprehension",
@@ -87,8 +126,9 @@
         "misunderstandings"
       ],
       "properties": {
+        "project_reader_url": { "const": "https://armpitpete.github.io/project-reader/" },
+        "repository_used": { "const": "armpitpete/sample-hold-lab" },
         "session_completed": { "type": ["boolean", "null"] },
-        "repository_used": { "type": ["string", "null"] },
         "task_outcome": {
           "enum": ["successful", "partial", "not_successful", "stopped_by_participant", null]
         },
@@ -116,25 +156,18 @@
         }
       }
     },
-    "after_use": {
+    "after_project_reader": { "$ref": "#/$defs/matched_answers" },
+    "usability_follow_up": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "project_purpose",
-        "completed_work",
-        "remaining_or_uncertain_work",
-        "evidence_recalled",
         "suggested_change",
-        "trust_judgement",
+        "use_again_trust_judgement",
         "stuck_or_unsure_moment"
       ],
       "properties": {
-        "project_purpose": { "type": ["string", "null"] },
-        "completed_work": { "type": ["string", "null"] },
-        "remaining_or_uncertain_work": { "type": ["string", "null"] },
-        "evidence_recalled": { "type": ["string", "null"] },
         "suggested_change": { "type": ["string", "null"] },
-        "trust_judgement": { "type": ["string", "null"] },
+        "use_again_trust_judgement": { "type": ["string", "null"] },
         "stuck_or_unsure_moment": { "type": ["string", "null"] }
       }
     },
@@ -168,6 +201,26 @@
       "type": "array",
       "items": { "type": "string" }
     },
+    "matched_comparison_after_session": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "understanding_change",
+        "corrected_misunderstanding",
+        "new_unsupported_certainty",
+        "trust_change",
+        "project_reader_enabled_answer",
+        "facilitator_interpretation_basis"
+      ],
+      "properties": {
+        "understanding_change": { "enum": ["clearer", "unchanged", "less_clear", "incomparable", null] },
+        "corrected_misunderstanding": { "enum": ["yes", "no", "not_observed", "incomparable", null] },
+        "new_unsupported_certainty": { "enum": ["yes", "no", "unclear", "incomparable", null] },
+        "trust_change": { "enum": ["improved", "unchanged", "reduced", "incomparable", null] },
+        "project_reader_enabled_answer": { "enum": ["yes", "no", "unclear", "incomparable", null] },
+        "facilitator_interpretation_basis": { "type": ["string", "null"] }
+      }
+    },
     "interpretation_after_session": {
       "type": "object",
       "additionalProperties": false,
@@ -185,5 +238,31 @@
       }
     },
     "do_not_commit_completed_record": { "const": true }
+  },
+  "$defs": {
+    "matched_answers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_purpose",
+        "completed_work",
+        "remaining_or_uncertain_work",
+        "perceived_completion_state",
+        "perceived_likelihood_of_finishing",
+        "evidence_trust_basis",
+        "ability_to_answer",
+        "confidence_if_expressed"
+      ],
+      "properties": {
+        "project_purpose": { "type": ["string", "null"] },
+        "completed_work": { "type": ["string", "null"] },
+        "remaining_or_uncertain_work": { "type": ["string", "null"] },
+        "perceived_completion_state": { "type": ["string", "null"] },
+        "perceived_likelihood_of_finishing": { "type": ["string", "null"] },
+        "evidence_trust_basis": { "type": ["string", "null"] },
+        "ability_to_answer": { "enum": ["answered", "partly_answered", "could_not_answer", "skipped", null] },
+        "confidence_if_expressed": { "type": ["string", "null"] }
+      }
+    }
   }
 }
