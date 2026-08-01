@@ -80,6 +80,7 @@ jobs:
     permissions:
       pages: write
       id-token: write
+      issues: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -87,3 +88,63 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify exact public deployment
+        env:
+          DEPLOYMENT_URL: ${{ steps.deployment.outputs.page_url }}
+          EXPECTED_COMMIT: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import time
+          from urllib.error import HTTPError, URLError
+          from urllib.request import Request, urlopen
+
+          base = os.environ["DEPLOYMENT_URL"].rstrip("/")
+          expected = os.environ["EXPECTED_COMMIT"]
+          url = f"{base}/deployment.json"
+          last_error = "no response"
+
+          for attempt in range(1, 31):
+              request = Request(
+                  f"{url}?verification={expected}-{attempt}",
+                  headers={"Cache-Control": "no-cache", "Pragma": "no-cache"},
+              )
+              try:
+                  with urlopen(request, timeout=20) as response:
+                      payload = json.load(response)
+                  if (
+                      payload.get("deployed_commit") == expected
+                      and payload.get("runtime") == "browser-only"
+                      and payload.get("public_data_origin") == "https://api.github.com"
+                  ):
+                      print(f"verified-url={url}")
+                      print(f"verified-commit={expected}")
+                      break
+                  last_error = f"unexpected deployment metadata: {payload!r}"
+              except (HTTPError, URLError, TimeoutError, json.JSONDecodeError) as error:
+                  last_error = f"{type(error).__name__}: {error}"
+              time.sleep(5)
+          else:
+              raise SystemExit(f"public deployment verification failed: {last_error}")
+          PY
+      - name: Record exact deployment evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPLOYMENT_URL: ${{ steps.deployment.outputs.page_url }}
+          DEPLOYED_COMMIT: ${{ github.sha }}
+        run: |
+          cat > /tmp/project-reader-deployment.md <<EOF
+          ## Public deployment verified
+
+          GitHub Pages deployed and publicly returned the exact release metadata.
+
+          - deployed commit: \`$DEPLOYED_COMMIT\`
+          - public reader: $DEPLOYMENT_URL
+          - verification file: ${DEPLOYMENT_URL%/}/deployment.json
+          - runtime: browser-only
+          - public data origin: \`https://api.github.com\`
+
+          The Oracle VPS API is not part of the public runtime. This satisfies the final deployment and public-verification gates in issue #25.
+          EOF
+          gh issue comment 25 --repo "$GITHUB_REPOSITORY" --body-file /tmp/project-reader-deployment.md
