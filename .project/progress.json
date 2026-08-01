@@ -1,79 +1,93 @@
 {
   "schema_version": 1,
   "authority": "ROADMAP.md",
-  "updated_at": "2026-08-01T20:56:00+01:00",
+  "updated_at": "2026-08-01T21:08:00+01:00",
   "release": {
-    "name": "README Comprehension Repair v1.1",
+    "name": "Network-service and Rate-limit Resilience Repair v1.2",
     "implemented": true,
-    "tested": true,
-    "reviewed": true,
-    "merged": true,
-    "deployed": true,
-    "publicly_verified": true,
-    "complete": true,
+    "tested": false,
+    "reviewed": false,
+    "merged": false,
+    "deployed": false,
+    "publicly_verified": false,
+    "complete": false,
     "external_comprehension_proven": false,
     "commercial_validation_proven": false,
-    "authoritative_issue": "https://github.com/armpitpete/project-reader/issues/33",
-    "accepted_head": "6d79145e981ef6d553a4f682db70b73381231cc8",
-    "implementation_merge_commit": "4a140dad75f1b14819f41162380ce5ace10025cc",
-    "deployment_evidence": "https://github.com/armpitpete/project-reader/issues/33#issuecomment-5153152571",
+    "authoritative_issue": "https://github.com/armpitpete/project-reader/issues/36",
+    "authoritative_base": "f110d11249f47dd63136a2ef34565b898faed595",
     "public_url": "https://armpitpete.github.io/project-reader/",
     "runtime": "browser-only",
-    "public_data_origin": "https://api.github.com",
-    "product_classification": "finished public prototype"
+    "public_data_origins": [
+      "https://api.github.com",
+      "https://raw.githubusercontent.com"
+    ],
+    "rate_limit_fallback": "public README without account or token",
+    "product_classification": "active acceptance repair; not complete"
   },
   "stages": [
     {
-      "id": "comprehension-layer",
-      "label": "Deterministic README comprehension layer implemented",
+      "id": "failure-evidence",
+      "label": "Cloudflared classification and API-exhaustion failures recorded",
       "completed": 1,
       "total": 1
     },
     {
-      "id": "acceptance-fixtures",
-      "label": "Synth One, AI For Beginners and unknown-project fixtures implemented",
+      "id": "network-classification",
+      "label": "Command-line network client and service correction implemented",
       "completed": 1,
       "total": 1
     },
     {
-      "id": "live-contracts",
-      "label": "Live repository and browser proof contracts implemented",
+      "id": "action-ranking",
+      "label": "Network-service action ranking and noise removal implemented",
+      "completed": 1,
+      "total": 1
+    },
+    {
+      "id": "readme-fallback",
+      "label": "Account-free public README fallback implemented",
+      "completed": 1,
+      "total": 1
+    },
+    {
+      "id": "acceptance-contracts",
+      "label": "Cloudflared and forced-fallback acceptance contracts implemented",
       "completed": 1,
       "total": 1
     },
     {
       "id": "tests",
-      "label": "Exact-head deterministic and live checks passed",
-      "completed": 1,
+      "label": "Exact-head deterministic, live and browser checks passed",
+      "completed": 0,
       "total": 1
     },
     {
       "id": "review",
       "label": "Exact-head protected review accepted",
-      "completed": 1,
+      "completed": 0,
       "total": 1
     },
     {
       "id": "merged",
-      "label": "Accepted v1.1 candidate merged to main",
-      "completed": 1,
+      "label": "Accepted v1.2 candidate merged to main",
+      "completed": 0,
       "total": 1
     },
     {
       "id": "deployed",
       "label": "GitHub Pages deployed from the accepted merge commit",
-      "completed": 1,
+      "completed": 0,
       "total": 1
     },
     {
       "id": "public-verification",
-      "label": "Public deployment and both acceptance readings verified",
-      "completed": 1,
+      "label": "Normal cloudflared and API-fallback public readings verified",
+      "completed": 0,
       "total": 1
     }
   ],
   "overall": {
     "enabled": true,
-    "reason": "All eight bounded issue #33 release stages are complete."
+    "reason": "The issue #36 repair is implemented but has not yet passed validation, review, merge, deployment and public verification."
   }
 }
