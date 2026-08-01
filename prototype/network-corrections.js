@@ -133,7 +133,7 @@ function networkActions(repo, readme) {
     actions.push({ label: "Open the source repository", url: repoUrl, source: "Repository" });
   }
 
-  return unique(actions, action => `${action.label}|${action.url}`).slice(0, 4);
+  return unique(actions, action => action.label).slice(0, 4);
 }
 
 function networkPurpose(repo, readme) {
