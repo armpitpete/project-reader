@@ -1,140 +1,79 @@
 # Project Reader
 
-**GitHub projects explained simply.**
+**Public GitHub projects explained simply.**
 
-Project Reader helps non-technical people, young people, and neurodivergent readers understand a GitHub project quickly.
+Project Reader helps non-technical people, young people and neurodivergent readers understand what a public GitHub project says about itself.
 
-It answers the ordinary-reader questions:
+Public reader:
+
+https://armpitpete.github.io/project-reader/
+
+## What the reader answers
+
+The simple reading starts with:
 
 1. What is this project?
-2. What has been completed?
-3. What remains?
-4. How complete is the defined work?
-5. How likely is the current milestone to finish?
-6. Why should the assessment be trusted?
-7. How was the project made?
-8. How can the project owner be contacted?
+2. What can someone do with it?
+3. What appears to work or be finished?
+4. What is unfinished or unclear?
+5. What was it made with?
+6. Where can I see it?
 
-## Product rule
+Completion, likelihood, evidence links and technical details remain available behind closed optional sections.
 
-The first screen must make sense in under 30 seconds. Technical details stay behind optional controls.
+## Browser-only public reading
 
-## Proven foundation
+Project Reader v1.0 runs entirely in the visitor's browser. It requests public repository information directly from GitHub's REST API.
 
-The first public Project Reader proof is deployed at:
+It may read:
 
-https://armpitpete.github.io/project-reader/
+- public repository metadata;
+- the README;
+- `.project/progress.json` when present and valid;
+- GitHub's repository-language totals.
 
-It reads `armpitpete/project-status-engine` and demonstrates:
+It never receives a GitHub token and has no repository write path. It does not send the repository address to a Project Reader server.
 
-- a plain-language purpose;
-- evidence-backed status and defined-stage completion;
-- **Already complete** instead of a misleading future forecast;
-- completed and remaining outcomes;
-- one evidence-backed next decision;
-- educational technology cards;
-- direct links to GitHub evidence.
+## Evidence rules
 
-The deployed proof was produced from Project Reader commit `408629af6a6f2de0d7f2843bd7e4399e4fac8aa8`.
+Project Reader:
 
-## Public repository reading
+- calculates defined-stage completion only from valid numeric stages in `.project/progress.json`;
+- respects an owner record that disables an overall percentage;
+- reports unknown when completion or likelihood is unsupported;
+- does not treat activity, open issues, repository age or code volume as completion evidence;
+- does not claim that browser reading proves external comprehension or commercial demand.
 
-Public Repository Reading v0.7 lets the GitHub Pages frontend ask a bounded Python API to read a visitor-supplied public GitHub repository.
+## Input and limits
 
-The public frontend remains:
+Accepted input:
 
-https://armpitpete.github.io/project-reader/
+- `owner/name`;
+- a root `https://github.com/owner/name` address.
 
-The authorised API hostname is:
+Only public repositories are supported. GitHub applies an unauthenticated public API rate limit.
 
-https://reader-api.merrinworld.uk
+## Python evidence toolkit
 
-The API is read-only. It accepts `owner/name` or `https://github.com/owner/name`, rejects unsupported and unsafe inputs, and returns rendered Project Reader HTML produced by the existing evidence, interpretation, reading and rendering package.
+The repository retains the earlier Python evidence, interpretation and rendering packages as a tested reference implementation and command-line toolkit.
 
-See `docs/V0_7_PUBLIC_REPOSITORY_READING.md` for the API, safety limits and Oracle VPS deployment contract.
-
-## Collect a public evidence bundle
-
-Automatic Public Evidence Collection v0.3 records facts for one public repository without interpreting them.
+Examples:
 
 ```bash
 python scripts/collect_public_evidence.py \
   https://github.com/armpitpete/project-status-engine \
   --output evidence.json
-```
 
-The JSON bundle contains:
-
-- the exact source commit;
-- important files read through Gitingest;
-- recognised progress records;
-- currently open issues;
-- currently open pull requests;
-- the time the live queues were checked.
-
-Gitingest remains the primary repository reader. When it omits an exact public file inside a dot-directory, Project Reader retrieves that named file directly from the same exact commit.
-
-See `docs/EVIDENCE_BUNDLE.md` for the collection contract and authority precedence.
-
-## Interpret an evidence bundle
-
-Automatic Interpretation Contract v0.4 turns one v0.3 bundle into evidence-linked candidate statements for human review.
-
-```bash
 python scripts/interpret_evidence.py evidence.json \
   --output interpretation.json
-```
 
-The interpretation output:
-
-- labels statements as `fact`, `interpretation` or `unknown`;
-- identifies explicit owner-authority records;
-- proposes purpose, done, remaining and technology statements only when supported;
-- exposes stale or contradictory evidence;
-- stays separate from the final reader page so evidence can be inspected before assessment.
-
-See `docs/INTERPRETATION_CONTRACT.md` for the exact contract.
-
-## Render a complete project reading
-
-Complete Project Reading v0.5 turns one v0.3 evidence bundle into the ordinary-reader page.
-
-```bash
 python scripts/render_evidence_reading.py evidence.json \
   --output project-reading.html
 ```
 
-The rendered page answers:
-
-- what the project is;
-- what has been completed;
-- what remains;
-- how complete the recognised owner-authority work is;
-- how likely the current defined milestone is to finish;
-- why the assessment should be trusted;
-- how the project was made;
-- how to contact the project owner.
-
-The first screen stays simple. Evidence, technology explanations and scoring detail stay behind optional controls.
-
-See `docs/READER_CONTRACT.md` for the final reader contract.
-
-## Run the static proofs
-
-Requires Python 3.12 or newer. Package installation is not needed to render the checked-in examples.
-
-```bash
-python scripts/render_sample.py
-python scripts/render_project_status_engine.py
-python -m http.server 8000 --directory prototype
-```
-
-Open:
-
-- `http://localhost:8000/sample.html`
-- `http://localhost:8000/project-status-engine.html`
-
 ## Develop and test
+
+Requires Python 3.12 or newer.
 
 ```bash
 python -m venv .venv
@@ -143,27 +82,29 @@ python -m pip install -e ".[dev]"
 pytest
 ```
 
-GitHub Actions separately validates the deterministic test suite, static proof rendering, live public evidence-to-interpretation checks, and the v0.7 three-repository live proof set.
+Static proofs:
 
-## Dependency
+```bash
+python scripts/render_sample.py
+python scripts/render_project_status_engine.py
+python -m http.server 8000 --directory prototype
+```
 
-Project Reader uses [Gitingest](https://github.com/coderamp-labs/gitingest) to collect a structured digest of repository files. Gitingest is MIT-licensed. Project Reader adds its own evidence contract, interpretation, assessment, education and accessible presentation layers.
+## Boundaries
 
-## Current boundaries
-
-Project Reader remains read-only. It does not contain:
+Project Reader remains read-only. It does not provide:
 
 - private repository access;
-- owner accounts;
+- user accounts;
 - writes to analysed repositories;
 - stored contact messages;
 - a multi-repository dashboard;
-- external comprehension proof from real readers.
+- external comprehension or commercial validation.
 
 ## Working status
 
-- **Implemented:** Public Repository Reading v0.7 frontend, read-only API and Oracle VPS deployment rehearsal files are implemented.
-- **Tested:** Deterministic tests, static proof rendering and three live public repository proofs pass locally.
-- **Merged:** v0.7 is not merged yet in this checkout. The authoritative base is `86d602102766f3048af7091f77810cbc70324c8d`.
-- **Deployed:** v0.7 is not deployed yet. The intended frontend is `https://armpitpete.github.io/project-reader/`; the intended API host is `https://reader-api.merrinworld.uk`.
-- **External comprehension:** Not yet proven. Issue #5 is a later real-world testing lane, not the v0.7 blocker.
+- **Implementation:** v1.0 browser-only completion candidate is implemented on issue #25.
+- **Testing:** awaiting exact-head GitHub Actions validation.
+- **Merge:** awaiting protected review and guarded merge.
+- **Deployment:** awaiting GitHub Pages deployment from the accepted merge commit.
+- **Product classification:** finished public prototype after those mechanical release gates pass; not an externally validated commercial service.
