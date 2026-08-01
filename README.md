@@ -61,7 +61,7 @@ Examples:
 
 ```bash
 python scripts/collect_public_evidence.py \
-  https://github.com/armpitpete/project-status-engine \
+  https://github.com/armpitpete/over-my-home \
   --output evidence.json
 
 python scripts/interpret_evidence.py evidence.json \
@@ -101,10 +101,12 @@ Project Reader remains read-only. It does not provide:
 - a multi-repository dashboard;
 - external comprehension or commercial validation.
 
-## Working status
+## Completion status
 
-- **Implementation:** v1.0 browser-only completion candidate is implemented on issue #25.
-- **Testing:** awaiting exact-head GitHub Actions validation.
-- **Merge:** awaiting protected review and guarded merge.
-- **Deployment:** awaiting GitHub Pages deployment from the accepted merge commit.
-- **Product classification:** finished public prototype after those mechanical release gates pass; not an externally validated commercial service.
+**Project Reader v1.0 is complete as a finished public prototype.**
+
+- **Implemented:** browser-only public reader merged at `49827b54022fe31a3645946be364d8830329a541`.
+- **Tested:** all deterministic, static, browser-artifact and live-public-reference gates passed.
+- **Deployed and verified:** GitHub Pages publicly reported exact deployed commit `9c6301699f2598dde3bf698e3d69823132a30f9f`.
+- **Runtime:** browser-only; the Oracle VPS API is not required.
+- **External validation:** not claimed. Reader interviews and commercial testing would be separate future research, not unfinished software work.
