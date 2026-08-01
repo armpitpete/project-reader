@@ -29,21 +29,22 @@ capture() {
   local repository=$2
   local width=$3
   local height=$4
-  local url="http://127.0.0.1:${PORT}/?repo=${repository}&autorun=1"
+  local extra=${5:-}
+  local url="http://127.0.0.1:${PORT}/?repo=${repository}&autorun=1${extra}"
   "$browser" \
     --headless=new \
     --no-sandbox \
     --disable-dev-shm-usage \
     --hide-scrollbars \
     --window-size="${width},${height}" \
-    --virtual-time-budget=15000 \
+    --virtual-time-budget=20000 \
     --screenshot="$OUTPUT_DIR/${slug}.png" \
     "$url" >/dev/null 2>&1
   "$browser" \
     --headless=new \
     --no-sandbox \
     --disable-dev-shm-usage \
-    --virtual-time-budget=15000 \
+    --virtual-time-budget=20000 \
     --dump-dom \
     "$url" >"$OUTPUT_DIR/${slug}.html" 2>/dev/null
   test -s "$OUTPUT_DIR/${slug}.png"
@@ -54,6 +55,10 @@ capture synth-desktop AudioKit/AudioKitSynthOne 1440 1800
 capture synth-mobile AudioKit/AudioKitSynthOne 390 1600
 capture course-desktop microsoft/AI-For-Beginners 1440 1800
 capture course-mobile microsoft/AI-For-Beginners 390 1600
+capture cloudflared-desktop cloudflare/cloudflared 1440 1900
+capture cloudflared-mobile cloudflare/cloudflared 390 1700
+capture fallback-desktop cloudflare/cloudflared 1440 1900 "&fallback=1"
+capture fallback-mobile cloudflare/cloudflared 390 1700 "&fallback=1"
 
 grep -F "playable open-source synthesizer app" "$OUTPUT_DIR/synth-desktop.html"
 grep -F "musicians" "$OUTPUT_DIR/synth-desktop.html"
@@ -71,6 +76,21 @@ grep -F "Browse the course lessons" "$OUTPUT_DIR/course-desktop.html"
 grep -F "business uses of AI" "$OUTPUT_DIR/course-desktop.html"
 grep -F "deeper mathematics of deep learning" "$OUTPUT_DIR/course-desktop.html"
 ! grep -Eqi "@girlie|Machine Learning for Beginners Curriculum|:---:" "$OUTPUT_DIR/course-desktop.html"
+
+for proof in cloudflared-desktop cloudflared-mobile fallback-desktop fallback-mobile; do
+  grep -F "Command-line network client or service" "$OUTPUT_DIR/${proof}.html"
+  grep -F "command-line client and background service for Cloudflare Tunnel" "$OUTPUT_DIR/${proof}.html"
+  grep -F "outbound connections" "$OUTPUT_DIR/${proof}.html"
+  grep -F "Install or download the command-line client" "$OUTPUT_DIR/${proof}.html"
+  grep -F "Read the Cloudflare Tunnel documentation" "$OUTPUT_DIR/${proof}.html"
+  grep -F "implemented Cloudflare Tunnel client and daemon" "$OUTPUT_DIR/${proof}.html"
+  ! grep -Eqi "Website or web application|Deprecated versions|Cap.?n Proto" "$OUTPUT_DIR/${proof}.html"
+done
+
+grep -F "README fallback mode was deliberately used" "$OUTPUT_DIR/fallback-desktop.html"
+grep -F "README-only reading" "$OUTPUT_DIR/fallback-desktop.html"
+grep -F "Reading complete using the public README fallback" "$OUTPUT_DIR/fallback-desktop.html"
+! grep -Fq "GitHub's public request limit has been reached" "$OUTPUT_DIR/fallback-desktop.html"
 
 for proof in "$OUTPUT_DIR"/*.html; do
   ! grep -Fq "coding or markup language" "$proof"
