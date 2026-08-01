@@ -8,16 +8,17 @@ https://armpitpete.github.io/project-reader/
 
 ## Status
 
-Project Reader is under active v1.2 acceptance repair and is **not complete**.
+Project Reader v1.2 is complete as a finished public prototype.
 
-Issue #36 records two owner-supplied failures found after the v1.1 closure:
+- Accepted implementation head: `2d180ea00652979301c1a971026f62ebea041781`
+- Implementation and deployed product commit: `ad84160424e86ba88b02444d1b242419e1cb0dee`
+- Public deployment evidence: issue #36 comment `5153255602`
+- Runtime: browser-only and read-only
+- Public data origins: `https://api.github.com`, `https://raw.githubusercontent.com`
+- GitHub account or token required: no
+- Hosted artificial-intelligence service: none
 
-- `cloudflare/cloudflared` was wrongly classified as a website instead of a command-line tunnel client and daemon;
-- the reader stopped completely when GitHub's anonymous public API allowance was exhausted.
-
-Authoritative repair base: `f110d11249f47dd63136a2ef34565b898faed595`.
-
-The live v1.1 site remains available while the correction is validated. It must not be treated as the final accepted product.
+The v1.2 repair followed owner-supplied screenshots showing a false website classification for `cloudflare/cloudflared` and a complete stop when GitHub's anonymous metadata API allowance was exhausted. Both failures are corrected and protected by deterministic, live-repository and browser acceptance tests.
 
 ## What the reader answers
 
@@ -55,38 +56,35 @@ A bounded correction and polish layer removes irrelevant social, localisation, d
 
 No hosted artificial-intelligence service is used.
 
-## v1.2 acceptance targets
+## Acceptance evidence
 
 ### Cloudflare cloudflared
 
-The reader must explain that `cloudflared` is:
+The reader now explains that `cloudflared` is:
 
 - the command-line client and background service for Cloudflare Tunnel;
 - used to create outbound connections between a local service or origin and Cloudflare's network;
 - for people who run or develop networked services;
 - an implemented tunnel client and daemon, not a website;
-- accessible through useful installation, documentation, usage, container and source actions.
+- accessible through installation, official documentation, tunnel setup and container actions.
 
-Deprecated versions, Cap'n Proto requirements and other incidental links must not occupy the primary action list.
+Deprecated-version and incidental development-dependency links do not occupy the primary action list.
 
-### Anonymous API exhaustion
+### GitHub metadata API unavailable
 
-A first-time visitor must still receive a useful reduced reading when `api.github.com` is unavailable or rate-limited.
+Chromium acceptance deliberately blocked `api.github.com`. The normal application path automatically recovered through the public README at `raw.githubusercontent.com` and still produced the complete cloudflared plain reading on desktop and narrow width.
 
-The fallback:
+The reduced reading:
 
-- fetches the public README from `raw.githubusercontent.com`;
 - requires no account or GitHub token;
-- labels unavailable licence, branch, language and owner-progress metadata;
+- labels unavailable licence, default-branch, language and owner-progress metadata;
 - preserves HTTPS-only links and read-only operation;
-- does not replace the whole answer with “open GitHub”.
+- does not replace the explanation with “open GitHub”.
 
-## Retained acceptance evidence
+### Retained regression examples
 
-The v1.1 Synth One and AI For Beginners contracts remain active regression gates:
-
-- Synth One must be understood as a playable iPhone/iPad synthesizer and open-source codebase for musicians and developers.
-- AI For Beginners must be understood as a beginner curriculum with lessons, quizzes, labs, translations and clear course starting actions.
+- Synth One remains understood as a playable iPhone/iPad synthesizer and open-source codebase for musicians and developers.
+- AI For Beginners remains understood as a beginner curriculum with lessons, quizzes, labs, translations and clear course starting actions.
 
 For repositories without recognised owner-defined completion authority, overall completion remains unknown.
 
@@ -99,7 +97,7 @@ When available, Project Reader may read:
 - `.project/progress.json` when present and valid;
 - GitHub's repository-language totals.
 
-When the metadata API is unavailable, the reader uses only the public README and submitted repository identity. Missing metadata is stated rather than guessed.
+When the metadata API is unavailable, the reader uses the public README and submitted repository identity. Missing metadata is stated rather than guessed.
 
 The browser receives no GitHub token and has no repository write path. It does not send the repository address to a Project Reader server.
 
