@@ -15,7 +15,7 @@ build_pages_site = build_pages_site_module.build_pages_site
 HEAD = "f" * 40
 
 
-def test_pages_site_contains_only_public_proof_files(tmp_path: Path) -> None:
+def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
     build_pages_site(commit=HEAD, output=tmp_path)
 
     public_files = sorted(path.name for path in tmp_path.iterdir())
@@ -23,11 +23,12 @@ def test_pages_site_contains_only_public_proof_files(tmp_path: Path) -> None:
 
     metadata = json.loads((tmp_path / "deployment.json").read_text(encoding="utf-8"))
     assert metadata == {
-        "schema_version": 1,
-        "project": "Project Reader public repository reading",
+        "schema_version": 2,
+        "project": "Project Reader self-contained public repository reading",
         "repository": "armpitpete/project-reader",
         "deployed_commit": HEAD,
-        "api_base_url": "https://reader-api.merrinworld.uk",
+        "runtime": "browser-only",
+        "public_data_origin": "https://api.github.com",
         "source_html": "prototype/public-reader.html",
         "public_files": [".nojekyll", "deployment.json", "index.html"],
     }
@@ -36,24 +37,23 @@ def test_pages_site_contains_only_public_proof_files(tmp_path: Path) -> None:
     assert "Project Reader" in html
     assert "Public GitHub repository" in html
     assert "Read this project" in html
-    assert "https://reader-api.merrinworld.uk/api/v1/read" in html
+    assert "https://api.github.com" in html
+    assert "reader-api.merrinworld.uk" not in html
     assert 'role="status" aria-live="polite"' in html
     assert 'aria-label="Project Reader result"' in html
-    assert "reader-frame" not in html
-    assert "<iframe" not in html
-    assert "sandbox=" not in html
-    assert "min-height: 78vh" not in html
-    assert "min-height: 82vh" not in html
-    assert "result.innerHTML = data.result_html" in html
-    assert "result.scrollIntoView" in html
-    assert 'link.target = "_blank"' in html
-    assert "Privacy and safety" in html
-    assert "does not write to GitHub" in html
+    assert "Project status and why Project Reader says this" in html
+    assert "Technical sources and repository details" in html
+    assert "Simple reading" in html
+    assert "function safePublicUrl" in html
+    assert 'url.protocol==="https:"' in html
+    assert "innerHTML" not in html
+    assert 'method: "POST"' not in html
+    assert "GITHUB_TOKEN" not in html
+    assert "PRIVATE KEY" not in html.upper()
+    assert "write anything" in html
     assert "Technical detail: deployment" in html
     assert "Project Reader deployment commit:" in html
     assert HEAD in html
-    assert "__PROJECT_READER_API_BASE__" not in html
-    assert "__PROJECT_READER_API_ORIGIN__" not in html
     assert "I:\\" not in html
     assert "C:\\" not in html
     assert "SECRET" not in html.upper()
@@ -62,12 +62,3 @@ def test_pages_site_contains_only_public_proof_files(tmp_path: Path) -> None:
 def test_pages_site_rejects_non_commit_identifier(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="40-character"):
         build_pages_site(commit="main", output=tmp_path)
-
-
-def test_pages_site_rejects_non_https_api_base(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="HTTPS origin"):
-        build_pages_site(
-            commit=HEAD,
-            output=tmp_path,
-            api_base_url="http://reader-api.merrinworld.uk",
-        )

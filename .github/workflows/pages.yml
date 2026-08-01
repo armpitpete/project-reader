@@ -45,19 +45,23 @@ jobs:
           assert files == [".nojekyll", "deployment.json", "index.html"]
 
           metadata = json.loads((root / "deployment.json").read_text(encoding="utf-8"))
+          assert metadata["schema_version"] == 2
           assert metadata["deployed_commit"] == "${{ github.sha }}"
+          assert metadata["runtime"] == "browser-only"
+          assert metadata["public_data_origin"] == "https://api.github.com"
           assert metadata["public_files"] == files
 
           html = (root / "index.html").read_text(encoding="utf-8")
           assert "Project Reader" in html
           assert "Public GitHub repository" in html
           assert "Read this project" in html
-          assert "https://reader-api.merrinworld.uk/api/v1/read" in html
+          assert "https://api.github.com" in html
+          assert "reader-api.merrinworld.uk" not in html
           assert "Project Reader deployment commit:" in html
           assert "${{ github.sha }}" in html
-          assert "__PROJECT_READER_API_BASE__" not in html
-          assert "__PROJECT_READER_API_ORIGIN__" not in html
-          blocked = ("I:\\", "C:\\", "GITHUB_TOKEN", "SECRET", "PRIVATE KEY")
+          assert "innerHTML" not in html
+          assert "GITHUB_TOKEN" not in html
+          blocked = ("I:\\", "C:\\", "SECRET", "PRIVATE KEY")
           assert not any(value in html.upper() for value in blocked)
           PY
       - name: Configure Pages

@@ -1,90 +1,68 @@
 {
   "schema_version": 1,
   "authority": "ROADMAP.md",
-  "updated_at": "2026-07-30T17:59:01Z",
+  "updated_at": "2026-08-01T18:42:00Z",
   "release": {
-    "name": "Public Repository Reading v0.7",
+    "name": "Self-contained Public Reader v1.0",
     "implemented": true,
-    "tested": true,
+    "tested": false,
     "merged": false,
     "deployed": false,
+    "publicly_verified": false,
     "external_comprehension_proven": false,
-    "base_commit": "86d602102766f3048af7091f77810cbc70324c8d",
-    "authoritative_issue": "https://github.com/armpitpete/project-reader/issues/14",
-    "public_frontend_url": "https://armpitpete.github.io/project-reader/",
-    "recommended_api_hostname": "reader-api.merrinworld.uk",
-    "prepared_backend_target": "Merrin Oracle VPS",
-    "local_live_proof_repositories": [
-      {
-        "repository": "armpitpete/project-status-engine",
-        "source_commit": "d24e979e1747206f0c1ac3c66d3999f479f7ab72",
-        "result": "mixed-language repository with recognised completion authority"
-      },
-      {
-        "repository": "armpitpete/over-my-home",
-        "source_commit": "2a24f7a30d9b781df0f702dee0ee3660133d3fa5",
-        "result": "missing authority leaves completion unknown"
-      },
-      {
-        "repository": "armpitpete/sample-hold-lab",
-        "source_commit": "135e6c513d3ab2c9b3a2b75ddda019d5fbf42fa1",
-        "result": "separate public repository rendered through the same reader"
-      }
-    ],
-    "deployment_blocker": "SSH access to Merrin's Oracle VPS is required to install and verify project-reader-api.service and Apache for reader-api.merrinworld.uk."
+    "commercial_validation_proven": false,
+    "authoritative_issue": "https://github.com/armpitpete/project-reader/issues/25",
+    "public_url": "https://armpitpete.github.io/project-reader/",
+    "runtime": "browser-only",
+    "public_data_origin": "https://api.github.com",
+    "product_classification": "finished public prototype after mechanical release gates"
   },
   "stages": [
     {
-      "id": "frontend",
-      "label": "GitHub Pages public repository entry frontend implemented",
+      "id": "browser-reader",
+      "label": "Self-contained browser reader implemented",
       "completed": 1,
       "total": 1
     },
     {
-      "id": "api",
-      "label": "Read-only Python API implemented with existing evidence, interpretation and rendering authority",
+      "id": "evidence-rules",
+      "label": "Owner-defined completion and honest unknown rules preserved",
       "completed": 1,
       "total": 1
     },
     {
-      "id": "deployment-rehearsal",
-      "label": "Oracle VPS systemd, Apache and exact-commit deployment rehearsal files prepared",
+      "id": "runtime-independence",
+      "label": "Oracle VPS removed from the required public runtime",
       "completed": 1,
       "total": 1
     },
     {
       "id": "tests",
-      "label": "Deterministic tests and three live public repository proofs passed locally",
-      "completed": 1,
+      "label": "Exact-head deterministic and Pages checks passed",
+      "completed": 0,
       "total": 1
     },
     {
       "id": "merged",
-      "label": "Issue #14 implementation merged to main",
+      "label": "v1.0 candidate merged to main",
       "completed": 0,
       "total": 1
     },
     {
-      "id": "backend-deployed",
-      "label": "project-reader-api.service deployed on Merrin's Oracle VPS",
-      "completed": 0,
-      "total": 1
-    },
-    {
-      "id": "frontend-deployed",
-      "label": "GitHub Pages frontend deployed from the v0.7 commit",
+      "id": "deployed",
+      "label": "GitHub Pages deployed from the accepted merge commit",
       "completed": 0,
       "total": 1
     },
     {
       "id": "public-verification",
-      "label": "reader-api.merrinworld.uk and the public Pages frontend verified end to end",
+      "label": "Public deployment metadata verified against the accepted commit",
       "completed": 0,
       "total": 1
     }
   ],
   "overall": {
     "enabled": true,
-    "reason": "Issue #14 can be completed after merge, Oracle VPS deployment, Pages deployment and public end-to-end verification."
+    "reason": "The bounded v1.0 completion release has seven equally weighted mechanical stages."
   }
 }
