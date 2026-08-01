@@ -8,15 +8,16 @@ https://armpitpete.github.io/project-reader/
 
 ## Status
 
-Project Reader v1.1 is complete as a finished public prototype.
+Project Reader is under active v1.2 acceptance repair and is **not complete**.
 
-- Accepted implementation head: `6d79145e981ef6d553a4f682db70b73381231cc8`
-- Implementation and deployment commit: `4a140dad75f1b14819f41162380ce5ace10025cc`
-- Public deployment evidence: issue #33 comment `5153152571`
-- Runtime: browser-only and read-only
-- Hosted artificial-intelligence service: none
+Issue #36 records two owner-supplied failures found after the v1.1 closure:
 
-The v1.1 repair followed owner-supplied screenshots showing that the earlier release mostly repeated repository descriptions and language totals. The corrected reader now interprets bounded README evidence and produces materially different explanations for different kinds of project.
+- `cloudflare/cloudflared` was wrongly classified as a website instead of a command-line tunnel client and daemon;
+- the reader stopped completely when GitHub's anonymous public API allowance was exhausted.
+
+Authoritative repair base: `f110d11249f47dd63136a2ef34565b898faed595`.
+
+The live v1.1 site remains available while the correction is validated. It must not be treated as the final accepted product.
 
 ## What the reader answers
 
@@ -33,14 +34,15 @@ Completion and likelihood remain separate optional questions. They stay unknown 
 
 ## Deterministic README comprehension
 
-The public reader runs entirely in the visitor's browser. It requests public repository information directly from GitHub and applies bounded deterministic rules to the README and repository metadata.
+The public reader runs entirely in the visitor's browser. It applies bounded deterministic rules to public README evidence and available repository metadata.
 
-It can distinguish common project forms including:
+It distinguishes common project forms including:
 
 - applications and products;
 - learning courses and curricula;
 - libraries and frameworks;
 - command-line tools;
+- command-line network clients and background services;
 - websites and web applications;
 - documentation collections;
 - templates and starter projects;
@@ -49,46 +51,57 @@ It can distinguish common project forms including:
 
 It extracts evidence-backed purpose, audience, useful actions, visible capabilities, explicit limitations and planned work. Short supporting README passages remain available for inspection.
 
-A final bounded polish layer removes irrelevant social, localisation and software-development-kit links from primary actions, improves raw README wording and prioritises the most useful starting action.
+A bounded correction and polish layer removes irrelevant social, localisation, deprecated-version and incidental dependency links from primary actions, improves raw README wording and prioritises the most useful starting action.
 
 No hosted artificial-intelligence service is used.
 
-## Acceptance evidence
+## v1.2 acceptance targets
 
-The release was tested against the two repositories that exposed the earlier failure.
+### Cloudflare cloudflared
 
-### AudioKit Synth One
+The reader must explain that `cloudflared` is:
 
-The reader now explains that Synth One is:
+- the command-line client and background service for Cloudflare Tunnel;
+- used to create outbound connections between a local service or origin and Cloudflare's network;
+- for people who run or develop networked services;
+- an implemented tunnel client and daemon, not a website;
+- accessible through useful installation, documentation, usage, container and source actions.
 
-- a playable open-source synthesizer app for iPhone and iPad;
-- for musicians using the app and developers studying or contributing to the code;
-- built from synthesizer parts such as oscillators, filters, reverbs and effects;
-- accompanied by completed work, planned updates and contribution ideas;
-- available through useful app, feature, source-code and contribution actions.
+Deprecated versions, Cap'n Proto requirements and other incidental links must not occupy the primary action list.
 
-### AI For Beginners
+### Anonymous API exhaustion
 
-The reader now explains that AI For Beginners is:
+A first-time visitor must still receive a useful reduced reading when `api.github.com` is unavailable or rate-limited.
 
-- a beginner curriculum for learning artificial intelligence;
-- organised as 24 lessons over roughly 12 weeks;
-- supported by quizzes, practical labs, notebooks and translations;
-- a course rather than a software application;
-- accessible through course setup, lesson-list, resource and source-repository actions.
+The fallback:
 
-For both repositories, overall completion remains unknown because no recognised owner-defined completion measure is available.
+- fetches the public README from `raw.githubusercontent.com`;
+- requires no account or GitHub token;
+- labels unavailable licence, branch, language and owner-progress metadata;
+- preserves HTTPS-only links and read-only operation;
+- does not replace the whole answer with “open GitHub”.
+
+## Retained acceptance evidence
+
+The v1.1 Synth One and AI For Beginners contracts remain active regression gates:
+
+- Synth One must be understood as a playable iPhone/iPad synthesizer and open-source codebase for musicians and developers.
+- AI For Beginners must be understood as a beginner curriculum with lessons, quizzes, labs, translations and clear course starting actions.
+
+For repositories without recognised owner-defined completion authority, overall completion remains unknown.
 
 ## Browser-only public reading
 
-Project Reader may read:
+When available, Project Reader may read:
 
 - public repository metadata;
 - the README;
 - `.project/progress.json` when present and valid;
 - GitHub's repository-language totals.
 
-It receives no GitHub token in the public browser and has no repository write path. It does not send the repository address to a Project Reader server.
+When the metadata API is unavailable, the reader uses only the public README and submitted repository identity. Missing metadata is stated rather than guessed.
+
+The browser receives no GitHub token and has no repository write path. It does not send the repository address to a Project Reader server.
 
 ## Evidence rules
 
@@ -96,6 +109,7 @@ Project Reader:
 
 - lets richer README evidence outrank a short repository slogan;
 - does not infer purpose or completion from stars, age, activity or language volume;
+- does not classify a project as a website merely because it handles HTTP, origins, proxies or web servers;
 - calculates defined-stage completion only from valid numeric stages in `.project/progress.json`;
 - respects an owner record that disables an overall percentage;
 - reports unknown when completion or likelihood is unsupported;
@@ -111,7 +125,7 @@ Accepted input:
 - `owner/name`;
 - a root `https://github.com/owner/name` address.
 
-Only public repositories are supported. GitHub applies an unauthenticated public API rate limit. Unusual or badly structured READMEs can still be misunderstood, so the evidence view remains part of the product.
+Only public repositories are supported. Unusual or badly structured READMEs can still be misunderstood, so the evidence view remains part of the product.
 
 ## Develop and test
 
@@ -123,6 +137,7 @@ python -m venv .venv
 python -m pip install -e ".[dev]"
 pytest
 node tests/browser_comprehension_contract.mjs
+node tests/network_and_fallback_contract.mjs
 ```
 
 Live acceptance:
