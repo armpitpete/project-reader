@@ -1,20 +1,23 @@
 {
   "schema_version": 1,
   "authority": "ROADMAP.md",
-  "updated_at": "2026-08-01T21:08:00+01:00",
+  "updated_at": "2026-08-01T21:24:00+01:00",
   "release": {
     "name": "Network-service and Rate-limit Resilience Repair v1.2",
     "implemented": true,
-    "tested": false,
-    "reviewed": false,
-    "merged": false,
-    "deployed": false,
-    "publicly_verified": false,
-    "complete": false,
+    "tested": true,
+    "reviewed": true,
+    "merged": true,
+    "deployed": true,
+    "publicly_verified": true,
+    "complete": true,
     "external_comprehension_proven": false,
     "commercial_validation_proven": false,
     "authoritative_issue": "https://github.com/armpitpete/project-reader/issues/36",
     "authoritative_base": "f110d11249f47dd63136a2ef34565b898faed595",
+    "accepted_head": "2d180ea00652979301c1a971026f62ebea041781",
+    "implementation_merge_commit": "ad84160424e86ba88b02444d1b242419e1cb0dee",
+    "deployment_evidence": "https://github.com/armpitpete/project-reader/issues/36#issuecomment-5153255602",
     "public_url": "https://armpitpete.github.io/project-reader/",
     "runtime": "browser-only",
     "public_data_origins": [
@@ -22,7 +25,7 @@
       "https://raw.githubusercontent.com"
     ],
     "rate_limit_fallback": "public README without account or token",
-    "product_classification": "active acceptance repair; not complete"
+    "product_classification": "finished public prototype"
   },
   "stages": [
     {
@@ -51,43 +54,43 @@
     },
     {
       "id": "acceptance-contracts",
-      "label": "Cloudflared and forced-fallback acceptance contracts implemented",
+      "label": "Cloudflared and API-blocked fallback acceptance contracts implemented",
       "completed": 1,
       "total": 1
     },
     {
       "id": "tests",
       "label": "Exact-head deterministic, live and browser checks passed",
-      "completed": 0,
+      "completed": 1,
       "total": 1
     },
     {
       "id": "review",
       "label": "Exact-head protected review accepted",
-      "completed": 0,
+      "completed": 1,
       "total": 1
     },
     {
       "id": "merged",
       "label": "Accepted v1.2 candidate merged to main",
-      "completed": 0,
+      "completed": 1,
       "total": 1
     },
     {
       "id": "deployed",
       "label": "GitHub Pages deployed from the accepted merge commit",
-      "completed": 0,
+      "completed": 1,
       "total": 1
     },
     {
       "id": "public-verification",
-      "label": "Normal cloudflared and API-fallback public readings verified",
-      "completed": 0,
+      "label": "Normal cloudflared and automatic API-fallback public readings verified",
+      "completed": 1,
       "total": 1
     }
   ],
   "overall": {
     "enabled": true,
-    "reason": "The issue #36 repair is implemented but has not yet passed validation, review, merge, deployment and public verification."
+    "reason": "All ten bounded issue #36 release stages are complete."
   }
 }
