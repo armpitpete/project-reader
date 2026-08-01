@@ -9,18 +9,16 @@ function corpusFor(repo, readme) {
 
 export function isCommandLineNetworkService(repo, readme) {
   const corpus = corpusFor(repo, readme);
-  const strong = NETWORK_SERVICE_SIGNAL.test(corpus);
-  if (!strong) return false;
+  if (!NETWORK_SERVICE_SIGNAL.test(corpus)) return false;
   if (/\b(?:command[- ]line client|tunnell?ing daemon|cloudflare tunnel)\b/i.test(corpus)) return true;
   return !BROWSER_PRODUCT_SIGNAL.test(corpus);
 }
 
 function firstUsefulParagraph(readme) {
-  const text = String(readme || "")
+  const paragraphs = String(readme || "")
     .replace(/\r\n?/g, "\n")
     .replace(/\[!\[[^\]]*\]\([^)]*\)\]\([^)]*\)/g, " ")
-    .replace(/```[\s\S]*?```/g, " ");
-  const paragraphs = text
+    .replace(/```[\s\S]*?```/g, " ")
     .split(/\n\s*\n/)
     .map(cleanMarkdown)
     .filter(item => item.length >= 45)
@@ -29,8 +27,7 @@ function firstUsefulParagraph(readme) {
 }
 
 function sectionBefore(readme, index) {
-  const before = String(readme || "").slice(0, index);
-  const headings = [...before.matchAll(/^\s{0,3}#{1,6}\s+(.+?)\s*#*\s*$/gm)];
+  const headings = [...String(readme || "").slice(0, index).matchAll(/^\s{0,3}#{1,6}\s+(.+?)\s*#*\s*$/gm)];
   return headings.length ? cleanMarkdown(headings.at(-1)[1]) : "README overview";
 }
 
@@ -41,10 +38,8 @@ function resolveLink(repo, href) {
       if (url.protocol === "http:") url.protocol = "https:";
       return safePublicUrl(url.href);
     }
-    if (href.startsWith("#")) {
-      const base = safePublicUrl(repo?.html_url);
-      return base ? `${base.replace(/\/$/, "")}${href}` : null;
-    }
+    const repository = safePublicUrl(repo?.html_url);
+    if (href.startsWith("#")) return repository ? `${repository.replace(/\/$/, "")}${href}` : null;
     if (href.startsWith("/")) return safePublicUrl(`https://github.com${href}`);
     if (!repo?.full_name || !repo?.default_branch) return null;
     return safePublicUrl(new URL(
@@ -64,36 +59,18 @@ function readmeLinks(repo, readme) {
   while ((match = pattern.exec(text)) && links.length < 260) {
     const label = cleanMarkdown(match[1]);
     const url = resolveLink(repo, match[2].trim().replace(/^<|>$/g, ""));
-    if (!label || !url) continue;
-    links.push({ label, url, source: sectionBefore(text, match.index) });
+    if (label && url) links.push({ label, url, source: sectionBefore(text, match.index) });
   }
   return links;
 }
 
 function badPrimaryAction(link) {
   const text = `${link.label} ${link.source} ${link.url}`.toLowerCase();
-  return /deprecated|cap(?:'n|n) proto|requirements?|optional sdk|badge|twitter|discord|locali[sz]ation|sign up|status page/.test(text);
+  return /deprecated|previous-versions|update-cloudflared|cap(?:'n|n)p|capnproto|requirements?|optional sdk|badge|twitter|discord|locali[sz]ation|sign up|status page/.test(text);
 }
 
-function scoreNetworkAction(link) {
-  const text = `${link.label} ${link.source} ${link.url}`.toLowerCase();
-  if (badPrimaryAction(link)) return -100;
-  if (/releases\/latest|download|installing|installation|package manager/.test(text)) return 125;
-  if (/getting started|quick start|usage|run cloudflared|configure.*tunnel/.test(text)) return 118;
-  if (/developers\.cloudflare\.com.*cloudflare-tunnel|user documentation|documentation|\bdocs\b|guide/.test(text)) return 112;
-  if (/hub\.docker\.com|dockerhub|container image/.test(text)) return 95;
-  if (/contribut|source repository/.test(text)) return 65;
-  return 10;
-}
-
-function labelNetworkAction(link) {
-  const text = `${link.label} ${link.url}`.toLowerCase();
-  if (/releases\/latest|download|installing|installation/.test(text)) return "Install or download the command-line client";
-  if (/developers\.cloudflare\.com.*cloudflare-tunnel|user documentation|documentation|\bdocs\b/.test(text)) return "Read the Cloudflare Tunnel documentation";
-  if (/getting started|quick start|usage|configure.*tunnel/.test(text)) return "Read the setup and usage guide";
-  if (/hub\.docker\.com|dockerhub|container image/.test(text)) return "Get the container image";
-  if (/contribut/.test(text)) return "See how to contribute";
-  return cleanMarkdown(link.label);
+function firstLink(links, predicate) {
+  return links.find(link => !badPrimaryAction(link) && predicate(`${link.label} ${link.source} ${link.url}`.toLowerCase(), link)) || null;
 }
 
 function unique(items, key) {
@@ -107,30 +84,65 @@ function unique(items, key) {
 }
 
 function networkActions(repo, readme) {
+  const links = readmeLinks(repo, readme);
   const corpus = corpusFor(repo, readme);
-  let actions = readmeLinks(repo, readme)
-    .map(link => ({ ...link, score: scoreNetworkAction(link) }))
-    .filter(link => link.score >= 60)
-    .sort((a, b) => b.score - a.score || a.label.localeCompare(b.label))
-    .map(link => ({ label: labelNetworkAction(link), url: link.url, source: link.source }));
+  const repository = safePublicUrl(repo?.html_url);
+  const actions = [];
 
-  const repoUrl = safePublicUrl(repo?.html_url);
-  if (repoUrl && /\b(?:installing|installation|download|release)\b/i.test(corpus)) {
-    actions.unshift({
-      label: "Install or download the command-line client",
-      url: `${repoUrl.replace(/\/$/, "")}/releases/latest`,
-      source: "GitHub releases"
-    });
-  }
-  if (repoUrl && /^cloudflared$/i.test(String(repo?.name || ""))) {
+  if (repository && /\b(?:installing|installation|downloads?|standalone binaries|packages?|releases?)\b/i.test(corpus)) {
     actions.push({
-      label: "Read the setup and usage guide",
-      url: `${repoUrl.replace(/\/$/, "")}#usage`,
-      source: "README usage section"
+      label: "Install or download the command-line client",
+      url: `${repository.replace(/\/$/, "")}/releases/latest`,
+      source: "README installation section"
     });
   }
-  if (repoUrl) {
-    actions.push({ label: "Open the source repository", url: repoUrl, source: "Repository" });
+
+  const documentation = firstLink(links, text =>
+    /developers\.cloudflare\.com\/cloudflare-one\/networks\/connectors\/cloudflare-tunnel\/?(?:\s|$)/.test(text) ||
+    /cloudflare tunnel (?:section|documentation)|user documentation for cloudflare tunnel/.test(text)
+  );
+  if (documentation) {
+    actions.push({
+      label: "Read the Cloudflare Tunnel documentation",
+      url: documentation.url,
+      source: documentation.source
+    });
+  }
+
+  const setup = firstLink(links, text =>
+    /get-started\/create-remote-tunnel|create a tunnel|trycloudflare|getting started|quick start/.test(text)
+  );
+  if (setup) {
+    actions.push({
+      label: "Configure and run a tunnel",
+      url: setup.url,
+      source: setup.source
+    });
+  } else if (repository && /^cloudflared$/i.test(String(repo?.name || ""))) {
+    actions.push({
+      label: "Read the setup and command guide",
+      url: `${repository.replace(/\/$/, "")}#creating-tunnels-and-routing-traffic`,
+      source: "README setup section"
+    });
+  }
+
+  const container = firstLink(links, text => /hub\.docker\.com|dockerhub|container image|docker image/.test(text));
+  if (container) {
+    actions.push({
+      label: "Get the container image",
+      url: container.url,
+      source: container.source
+    });
+  }
+
+  if (repository) actions.push({ label: "Open the source repository", url: repository, source: "Repository" });
+
+  if (actions.length < 3) {
+    const fallbackLinks = links
+      .filter(link => !badPrimaryAction(link))
+      .filter(link => /install|download|documentation|\bdocs\b|usage|guide|contribut/i.test(`${link.label} ${link.source}`))
+      .map(link => ({ label: cleanMarkdown(link.label), url: link.url, source: link.source }));
+    actions.push(...fallbackLinks);
   }
 
   return unique(actions, action => action.label).slice(0, 4);
@@ -171,7 +183,7 @@ function networkCapabilities(repo, readme) {
   if (/dockerhub|container image|docker image/i.test(corpus)) {
     items.push("The README links to a container image for running the client in a container environment.");
   }
-  if (/\b(?:installing|installation|package manager|binary releases?)\b/i.test(corpus)) {
+  if (/\b(?:installing|installation|package manager|binary releases?|standalone binaries)\b/i.test(corpus)) {
     items.push("The project provides installation or release routes for running the command-line client.");
   }
   if (!items.length) {
@@ -180,20 +192,12 @@ function networkCapabilities(repo, readme) {
   return unique(items, item => item).slice(0, 5);
 }
 
-function networkEvidence(repo, readme, reading) {
+function networkEvidence(readme, reading) {
   const excerpt = firstUsefulParagraph(readme);
   if (!excerpt) return reading.evidence;
   const records = [
-    {
-      statement: reading.purpose,
-      source: "README overview",
-      excerpt: excerpt.slice(0, 320)
-    },
-    {
-      statement: reading.audience,
-      source: "README overview and installation guidance",
-      excerpt: excerpt.slice(0, 320)
-    }
+    { statement: reading.purpose, source: "README overview", excerpt: excerpt.slice(0, 320) },
+    { statement: reading.audience, source: "README overview and installation guidance", excerpt: excerpt.slice(0, 320) }
   ];
   return unique([...records, ...(reading.evidence || [])], record => `${record.statement}|${record.excerpt}`).slice(0, 10);
 }
@@ -204,8 +208,7 @@ export function correctNetworkServiceReading(reading, repo, readme) {
   const actions = networkActions(repo, readme);
   const purpose = networkPurpose(repo, readme);
   const audience = networkAudience(repo, readme);
-  const genericUnfinished = /README does not provide a complete plan of remaining work/i;
-  let unfinished = (reading.unfinished || []).filter(item => !genericUnfinished.test(item));
+  let unfinished = (reading.unfinished || []).filter(item => !/README does not provide a complete plan of remaining work/i.test(item));
   if (!unfinished.some(item => /completion remains unknown/i.test(item))) {
     unfinished.push("Overall completion remains unknown because no recognised owner-defined completion measure is available.");
   }
@@ -228,6 +231,6 @@ export function correctNetworkServiceReading(reading, repo, readme) {
     unfinished: unique(unfinished, item => item).slice(0, 5),
     start: actions[0] || reading.start
   };
-  corrected.evidence = networkEvidence(repo, readme, corrected);
+  corrected.evidence = networkEvidence(readme, corrected);
   return corrected;
 }
