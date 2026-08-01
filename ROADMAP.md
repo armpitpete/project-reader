@@ -22,30 +22,41 @@
 - [x] Deploy an API-backed public reader
 - [x] Identify the archive-deployment mismatch that made the VPS a continuing release dependency
 
-The Python API and evidence packages remain in the repository as tested reference and command-line tooling. The VPS API is no longer required by the public product.
+The Python API and evidence packages remain as tested reference and command-line tooling. The VPS API is not part of the completed public product.
 
-## Self-contained public reader v1.0 — current completion release
+## Self-contained public reader v1.0 — complete
 
-Tracked by issue #25.
+Tracked and accepted through issue #25.
 
 - [x] Read public repository metadata directly through GitHub's REST API in the browser
 - [x] Read README, `.project/progress.json` and language totals where available
 - [x] Preserve simple reading, project-status detail and technical-source detail
 - [x] Calculate only owner-defined stage completion and preserve honest unknowns
 - [x] Remove the Oracle VPS API from the required runtime and release path
-- [x] Prevent token use, repository writes and external HTML injection
+- [x] Prevent token use, repository writes, unsafe external links and external HTML injection
 - [x] Update Pages metadata, tests, workflow assertions and project authority records
-- [ ] Pass exact-head GitHub Actions
-- [ ] Guarded squash merge
-- [ ] Deploy GitHub Pages from the exact merge commit
-- [ ] Verify public deployment metadata
-- [ ] Close superseded implementation, research and pilot issues
+- [x] Pass exact-head deterministic, static, browser-artifact and live-public-reference checks
+- [x] Guarded squash-merge the implementation
+- [x] Deploy GitHub Pages from the exact release commit
+- [x] Verify public deployment metadata against that exact commit
+- [x] Resolve all remaining implementation, research and pilot issues
+- [x] Adopt Threadkeeper's canonical repository-write policy pointer
+
+Implementation merge: `49827b54022fe31a3645946be364d8830329a541`.
+
+Deployment-verification commit: `9c6301699f2598dde3bf698e3d69823132a30f9f`.
+
+Repository-policy commit: `d06bfbaf9f83d59476ce74166022703d202fcfde`.
+
+Public reader:
+
+https://armpitpete.github.io/project-reader/
 
 ## Completion boundary
 
-Project Reader is complete when the v1.0 browser reader is deployed and publicly verified.
+Project Reader is complete as a finished public prototype.
 
-It is accepted as a finished public prototype. External comprehension interviews and a paid-outcome test would be separate product research, not unfinished software work. No external success is claimed.
+External comprehension interviews and a paid-outcome test would be separate product research. No external comprehension or commercial success is claimed.
 
 ## Not included
 
