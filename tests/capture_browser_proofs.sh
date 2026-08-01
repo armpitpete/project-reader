@@ -29,13 +29,20 @@ capture() {
   local repository=$2
   local width=$3
   local height=$4
-  local extra=${5:-}
-  local url="http://127.0.0.1:${PORT}/?repo=${repository}&autorun=1${extra}"
+  local extra_query=${5:-}
+  local network_mode=${6:-normal}
+  local url="http://127.0.0.1:${PORT}/?repo=${repository}&autorun=1${extra_query}"
+  local -a network_args=()
+  if [[ "$network_mode" == "block-api" ]]; then
+    network_args+=("--host-resolver-rules=MAP api.github.com 127.0.0.1")
+  fi
+
   "$browser" \
     --headless=new \
     --no-sandbox \
     --disable-dev-shm-usage \
     --hide-scrollbars \
+    "${network_args[@]}" \
     --window-size="${width},${height}" \
     --virtual-time-budget=20000 \
     --screenshot="$OUTPUT_DIR/${slug}.png" \
@@ -44,6 +51,7 @@ capture() {
     --headless=new \
     --no-sandbox \
     --disable-dev-shm-usage \
+    "${network_args[@]}" \
     --virtual-time-budget=20000 \
     --dump-dom \
     "$url" >"$OUTPUT_DIR/${slug}.html" 2>/dev/null
@@ -57,8 +65,8 @@ capture course-desktop microsoft/AI-For-Beginners 1440 1800
 capture course-mobile microsoft/AI-For-Beginners 390 1600
 capture cloudflared-desktop cloudflare/cloudflared 1440 1900
 capture cloudflared-mobile cloudflare/cloudflared 390 1700
-capture fallback-desktop cloudflare/cloudflared 1440 1900 "&fallback=1"
-capture fallback-mobile cloudflare/cloudflared 390 1700 "&fallback=1"
+capture fallback-desktop cloudflare/cloudflared 1440 1900 "" block-api
+capture fallback-mobile cloudflare/cloudflared 390 1700 "" block-api
 
 grep -F "playable open-source synthesizer app" "$OUTPUT_DIR/synth-desktop.html"
 grep -F "musicians" "$OUTPUT_DIR/synth-desktop.html"
@@ -87,7 +95,8 @@ for proof in cloudflared-desktop cloudflared-mobile fallback-desktop fallback-mo
   ! grep -Eqi "Website or web application|Deprecated versions|Cap.?n Proto" "$OUTPUT_DIR/${proof}.html"
 done
 
-grep -F "README fallback mode was deliberately used" "$OUTPUT_DIR/fallback-desktop.html"
+grep -F "GitHub's metadata service could not be reached" "$OUTPUT_DIR/fallback-desktop.html" && exit 1 || true
+grep -F "GitHub's metadata API was unavailable, so this reading uses the public README directly" "$OUTPUT_DIR/fallback-desktop.html"
 grep -F "README-only reading" "$OUTPUT_DIR/fallback-desktop.html"
 grep -F "Reading complete using the public README fallback" "$OUTPUT_DIR/fallback-desktop.html"
 ! grep -Fq "GitHub's public request limit has been reached" "$OUTPUT_DIR/fallback-desktop.html"
