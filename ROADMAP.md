@@ -38,43 +38,48 @@ Tracked through issue #33 and PR #34.
 - [x] Correct irrelevant actions, malformed raw wording and mobile overflow found during visual review
 - [x] Deploy and verify merge commit `4a140dad75f1b14819f41162380ce5ace10025cc`
 
-The v1.1 repair materially improved both original examples. Later owner testing exposed a new false classification and a runtime availability failure, so the v1.1 completion decision is withdrawn.
+The v1.1 repair materially improved both original examples. Later owner testing exposed a false network-service classification and a runtime availability failure, so v1.2 replaced its completion decision.
 
-## Network-service and rate-limit resilience repair v1.2 — active
+## Network-service and rate-limit resilience repair v1.2 — complete
 
-Tracked through issue #36.
+Tracked and accepted through issue #36 and PR #37.
 
 - [x] Record the owner-supplied `cloudflare/cloudflared` false-classification screenshot
 - [x] Record the owner-supplied GitHub anonymous API exhaustion screenshot
 - [x] Define command-line network client and background-service evidence
 - [x] Prevent tunnel, proxy, origin, HTTP and webserver terminology from implying a website by itself
 - [x] Add a bounded cloudflared correction for purpose, audience, actions, capabilities and evidence
+- [x] Select primary actions by explicit user purpose
 - [x] Remove deprecated-version and incidental dependency links from primary actions
 - [x] Add direct public README fallback through `raw.githubusercontent.com`
 - [x] Keep the fallback account-free, token-free, browser-only and read-only
 - [x] Label unavailable licence, branch, language and progress metadata
 - [x] Add deterministic network-service and fallback contracts
 - [x] Add live cloudflared acceptance while retaining Synth One and AI For Beginners regression gates
-- [x] Add normal and forced-fallback desktop and narrow-width proof capture
-- [ ] Pass exact-head GitHub Actions
-- [ ] Complete protected exact-head review
-- [ ] Guarded squash-merge the accepted repair
-- [ ] Deploy GitHub Pages from the accepted merge commit
-- [ ] Verify the exact public deployment and fallback behaviour
-- [ ] Record the final completion state only if all issue #36 gates pass
+- [x] Add normal desktop and narrow-width cloudflared proof capture
+- [x] Block `api.github.com` in Chromium and prove automatic fallback on desktop and narrow width
+- [x] Pass exact-head GitHub Actions at `2d180ea00652979301c1a971026f62ebea041781`
+- [x] Complete protected exact-head review
+- [x] Guarded squash-merge PR #37
+- [x] Deploy GitHub Pages from merge commit `ad84160424e86ba88b02444d1b242419e1cb0dee`
+- [x] Verify exact public deployment in issue #36 comment `5153255602`
+- [x] Close issue #36 as completed
 
-## Current completion decision
+## Completion decision
 
-Project Reader is **not complete** while issue #36 is open.
+Project Reader v1.2 is complete as a finished public prototype.
 
-Completion requires both of these outcomes:
+The live reader now meets all three representative acceptance contracts:
 
-1. `cloudflare/cloudflared` is explained as a command-line Cloudflare Tunnel client and daemon, not a website.
-2. A useful reduced reading still renders when GitHub's anonymous metadata API is unavailable.
+- Synth One is understood as a playable iPhone/iPad synthesizer and open-source codebase for musicians and developers.
+- AI For Beginners is understood as a beginner curriculum with lessons, quizzes, labs, translations and clear course starting actions.
+- cloudflared is understood as a command-line Cloudflare Tunnel client and daemon, not a website.
 
-The earlier Synth One and AI For Beginners readings remain mandatory regression checks. Overall completion for analysed repositories remains unknown when owner authority is absent.
+When GitHub's metadata API is unavailable, a useful reduced reading is built from the public README without an account or token. Missing metadata is labelled rather than guessed.
 
-## Optional future research, not part of issue #36
+Overall completion for analysed repositories remains unknown when recognised owner authority is absent.
+
+## Optional future research, not unfinished project work
 
 - observe external readers using the product;
 - test whether the explanation improves understanding;
