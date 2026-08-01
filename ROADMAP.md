@@ -13,7 +13,7 @@
 - [x] Establish beginner-first progressive disclosure
 - [x] Retain the Python evidence toolkit as tested reference code
 
-## Browser-only public reader v1.0 — technically complete, product acceptance failed
+## Browser-only public reader v1.0 — technical release, product acceptance superseded
 
 - [x] Remove the Oracle VPS from the required public runtime
 - [x] Read public GitHub evidence directly in the browser
@@ -21,9 +21,11 @@
 - [x] Deploy and verify an exact GitHub Pages commit
 - [x] Record the owner-supplied screenshots that invalidated product acceptance
 
-The v1.0 implementation ran safely, but its output mostly repeated repository descriptions and language totals. That is not sufficient project understanding.
+The v1.0 implementation ran safely, but its output mostly repeated repository descriptions and language totals. That was not sufficient project understanding.
 
-## README comprehension repair v1.1 — active issue #33
+## README comprehension repair v1.1 — complete
+
+Tracked and accepted through issue #33 and PR #34.
 
 - [x] Define application, curriculum, library, command-line, website, documentation, template, research and mixed classifications
 - [x] Build bounded deterministic README section and link extraction
@@ -33,21 +35,32 @@ The v1.0 implementation ran safely, but its output mostly repeated repository de
 - [x] Add deterministic Synth One, AI For Beginners and unknown-project fixtures
 - [x] Add live acceptance checks against both failed repositories
 - [x] Add desktop and narrow-width browser proof capture
-- [ ] Pass exact-head GitHub Actions
-- [ ] Complete protected review
-- [ ] Guarded squash merge
-- [ ] Deploy GitHub Pages from the accepted merge commit
-- [ ] Verify the exact public deployment
-- [ ] Record final evidence and close issue #33
+- [x] Correct irrelevant actions, malformed raw wording and mobile overflow found during visual review
+- [x] Pass exact-head GitHub Actions at `6d79145e981ef6d553a4f682db70b73381231cc8`
+- [x] Complete protected exact-head review
+- [x] Guarded squash-merge PR #34
+- [x] Deploy GitHub Pages from merge commit `4a140dad75f1b14819f41162380ce5ace10025cc`
+- [x] Verify exact public deployment in issue #33 comment `5153152571`
+- [x] Close issue #33 as completed
 
-## Completion boundary
+## Completion decision
 
-Project Reader is complete only when the live reader produces useful, materially different explanations for both acceptance repositories:
+Project Reader is complete as a finished public prototype.
 
-- Synth One must be understood as a playable iPhone/iPad synthesizer and an open-source codebase for musicians and developers.
-- AI For Beginners must be understood as a beginner curriculum with lessons, quizzes, labs, translations and a clear course starting point.
+The live reader now produces useful, materially different explanations for both acceptance repositories:
 
-The output must do more than repeat the GitHub description or list detected languages. Overall completion must remain unknown when owner authority is absent.
+- Synth One is understood as a playable iPhone/iPad synthesizer and an open-source codebase for musicians and developers.
+- AI For Beginners is understood as a beginner curriculum with lessons, quizzes, labs, translations and clear course starting actions.
+
+The output does more than repeat the GitHub description or list detected languages. Overall completion remains unknown when owner authority is absent.
+
+## Optional future research, not unfinished project work
+
+- observe external readers using the product;
+- test whether the explanation improves understanding;
+- investigate demand for private or owner-ready reports.
+
+No external comprehension or commercial-success claim has been made.
 
 ## Not included
 

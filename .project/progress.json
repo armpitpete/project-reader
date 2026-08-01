@@ -1,21 +1,26 @@
 {
   "schema_version": 1,
   "authority": "ROADMAP.md",
-  "updated_at": "2026-08-01T20:27:00+01:00",
+  "updated_at": "2026-08-01T20:56:00+01:00",
   "release": {
     "name": "README Comprehension Repair v1.1",
     "implemented": true,
-    "tested": false,
-    "merged": false,
-    "deployed": false,
-    "publicly_verified": false,
+    "tested": true,
+    "reviewed": true,
+    "merged": true,
+    "deployed": true,
+    "publicly_verified": true,
+    "complete": true,
     "external_comprehension_proven": false,
     "commercial_validation_proven": false,
     "authoritative_issue": "https://github.com/armpitpete/project-reader/issues/33",
+    "accepted_head": "6d79145e981ef6d553a4f682db70b73381231cc8",
+    "implementation_merge_commit": "4a140dad75f1b14819f41162380ce5ace10025cc",
+    "deployment_evidence": "https://github.com/armpitpete/project-reader/issues/33#issuecomment-5153152571",
     "public_url": "https://armpitpete.github.io/project-reader/",
     "runtime": "browser-only",
     "public_data_origin": "https://api.github.com",
-    "product_classification": "active acceptance repair; not complete"
+    "product_classification": "finished public prototype"
   },
   "stages": [
     {
@@ -39,36 +44,36 @@
     {
       "id": "tests",
       "label": "Exact-head deterministic and live checks passed",
-      "completed": 0,
+      "completed": 1,
       "total": 1
     },
     {
       "id": "review",
       "label": "Exact-head protected review accepted",
-      "completed": 0,
+      "completed": 1,
       "total": 1
     },
     {
       "id": "merged",
       "label": "Accepted v1.1 candidate merged to main",
-      "completed": 0,
+      "completed": 1,
       "total": 1
     },
     {
       "id": "deployed",
       "label": "GitHub Pages deployed from the accepted merge commit",
-      "completed": 0,
+      "completed": 1,
       "total": 1
     },
     {
       "id": "public-verification",
       "label": "Public deployment and both acceptance readings verified",
-      "completed": 0,
+      "completed": 1,
       "total": 1
     }
   ],
   "overall": {
     "enabled": true,
-    "reason": "The bounded issue #33 repair has eight equally weighted mechanical stages."
+    "reason": "All eight bounded issue #33 release stages are complete."
   }
 }

@@ -6,18 +6,19 @@ Public reader:
 
 https://armpitpete.github.io/project-reader/
 
-## Current status
+## Status
 
-Project Reader is undergoing the issue #33 acceptance repair.
+Project Reader v1.1 is complete as a finished public prototype.
 
-The previous browser-only release proved safe read-only operation, but owner-supplied screenshots showed that it mostly repeated repository descriptions and language totals. It did not reliably explain what unfamiliar projects were, who they served or what someone could actually do with them.
+- Accepted implementation head: `6d79145e981ef6d553a4f682db70b73381231cc8`
+- Implementation and deployment commit: `4a140dad75f1b14819f41162380ce5ace10025cc`
+- Public deployment evidence: issue #33 comment `5153152571`
+- Runtime: browser-only and read-only
+- Hosted artificial-intelligence service: none
 
-The correction is complete only after the deployed reader gives materially useful, different explanations for:
+The v1.1 repair followed owner-supplied screenshots showing that the earlier release mostly repeated repository descriptions and language totals. The corrected reader now interprets bounded README evidence and produces materially different explanations for different kinds of project.
 
-- `AudioKit/AudioKitSynthOne`;
-- `microsoft/AI-For-Beginners`.
-
-## What the corrected reader answers
+## What the reader answers
 
 The plain reading starts with:
 
@@ -46,9 +47,37 @@ It can distinguish common project forms including:
 - research and dataset repositories;
 - mixed or unclear projects.
 
-It extracts evidence-backed purpose, audience, useful actions, visible capabilities, explicit limitations and planned work. Every derived answer keeps short supporting README evidence available for inspection.
+It extracts evidence-backed purpose, audience, useful actions, visible capabilities, explicit limitations and planned work. Short supporting README passages remain available for inspection.
+
+A final bounded polish layer removes irrelevant social, localisation and software-development-kit links from primary actions, improves raw README wording and prioritises the most useful starting action.
 
 No hosted artificial-intelligence service is used.
+
+## Acceptance evidence
+
+The release was tested against the two repositories that exposed the earlier failure.
+
+### AudioKit Synth One
+
+The reader now explains that Synth One is:
+
+- a playable open-source synthesizer app for iPhone and iPad;
+- for musicians using the app and developers studying or contributing to the code;
+- built from synthesizer parts such as oscillators, filters, reverbs and effects;
+- accompanied by completed work, planned updates and contribution ideas;
+- available through useful app, feature, source-code and contribution actions.
+
+### AI For Beginners
+
+The reader now explains that AI For Beginners is:
+
+- a beginner curriculum for learning artificial intelligence;
+- organised as 24 lessons over roughly 12 weeks;
+- supported by quizzes, practical labs, notebooks and translations;
+- a course rather than a software application;
+- accessible through course setup, lesson-list, resource and source-repository actions.
+
+For both repositories, overall completion remains unknown because no recognised owner-defined completion measure is available.
 
 ## Browser-only public reading
 
@@ -72,6 +101,7 @@ Project Reader:
 - reports unknown when completion or likelihood is unsupported;
 - keeps implementation languages secondary to project purpose and user actions;
 - omits language rows below 0.1% after rounding;
+- does not invent a generic purpose for an unknown language;
 - does not claim external comprehension or commercial demand.
 
 ## Input and limits
@@ -95,7 +125,7 @@ pytest
 node tests/browser_comprehension_contract.mjs
 ```
 
-Live issue #33 acceptance:
+Live acceptance:
 
 ```bash
 GITHUB_TOKEN=... node tests/live_browser_acceptance.mjs
@@ -122,5 +152,5 @@ Project Reader remains read-only. It does not provide:
 - writes to analysed repositories;
 - stored contact messages;
 - a multi-repository dashboard;
-- hosted AI interpretation;
+- hosted artificial-intelligence interpretation;
 - external comprehension or commercial-validation claims.
