@@ -25,7 +25,42 @@ function anchoredAction(repo, label, anchor, source) {
   };
 }
 
-function filterActions(reading, repo) {
+function resolveReadmeLink(repo, href) {
+  try {
+    if (/^https?:\/\//i.test(href)) {
+      const url = new URL(href);
+      if (url.protocol === "http:") url.protocol = "https:";
+      return safePublicUrl(url.href);
+    }
+    const fullName = repo?.full_name;
+    const branch = repo?.default_branch;
+    if (!fullName || !branch || href.startsWith("#")) return null;
+    if (href.startsWith("/")) return safePublicUrl(`https://github.com${href}`);
+    return safePublicUrl(
+      new URL(
+        href,
+        `https://github.com/${fullName}/blob/${encodeURIComponent(branch)}/`
+      ).href
+    );
+  } catch {
+    return null;
+  }
+}
+
+function findReadmeAction(readme, repo, labelPattern, label, source) {
+  const pattern = /(?<!!)\[([^\]]{1,180})\]\(([^)\s]+)(?:\s+["'][^"']*["'])?\)/g;
+  let match;
+  const text = String(readme || "");
+  while ((match = pattern.exec(text))) {
+    const linkLabel = cleanMarkdown(match[1]);
+    if (!labelPattern.test(linkLabel)) continue;
+    const url = resolveReadmeLink(repo, match[2].trim().replace(/^<|>$/g, ""));
+    if (url) return { label, url, source };
+  }
+  return null;
+}
+
+function filterActions(reading, repo, readme) {
   const type = reading.classification.id;
   const ownRepository = String(repo?.html_url || "").toLowerCase().replace(/\/$/, "");
   let actions = reading.actions.filter(action => {
@@ -54,8 +89,16 @@ function filterActions(reading, repo) {
     });
   } else if (type === "curriculum") {
     actions = actions.filter(action => /course setup|lesson|course resources|microsoft learn|source repository/i.test(action.label));
+    const setup = findReadmeAction(
+      readme,
+      repo,
+      /^course setup$/i,
+      "Start with the course setup",
+      "README course contents"
+    );
     const lessons = anchoredAction(repo, "Browse the course lessons", "content", "README course contents");
     const source = sourceAction(repo);
+    if (setup) actions.push(setup);
     if (lessons) actions.push(lessons);
     if (source) actions.push(source);
     const order = [/course setup/i, /course lessons/i, /course resources|microsoft learn/i, /source repository/i];
@@ -173,9 +216,11 @@ function polishEvidence(reading, readme) {
 }
 
 export function polishReading(reading, repo, readme) {
+  const actions = filterActions(reading, repo, readme);
   return {
     ...reading,
-    actions: filterActions(reading, repo),
+    actions,
+    start: actions[0] || reading.start,
     capabilities: polishCapabilities(reading),
     unfinished: polishUnfinished(reading, readme),
     evidence: polishEvidence(reading, readme)
