@@ -1,48 +1,78 @@
 # Project Reader
 
-**Public GitHub projects explained simply.**
-
-Project Reader helps non-technical people, young people and neurodivergent readers understand what a public GitHub project says about itself.
+**Public GitHub projects explained in ordinary language.**
 
 Public reader:
 
 https://armpitpete.github.io/project-reader/
 
-## What the reader answers
+## Current status
 
-The simple reading starts with:
+Project Reader is undergoing the issue #33 acceptance repair.
 
-1. What is this project?
-2. What can someone do with it?
-3. What appears to work or be finished?
-4. What is unfinished or unclear?
-5. What was it made with?
-6. Where can I see it?
+The previous browser-only release proved safe read-only operation, but owner-supplied screenshots showed that it mostly repeated repository descriptions and language totals. It did not reliably explain what unfamiliar projects were, who they served or what someone could actually do with them.
 
-Completion, likelihood, evidence links and technical details remain available behind closed optional sections.
+The correction is complete only after the deployed reader gives materially useful, different explanations for:
+
+- `AudioKit/AudioKitSynthOne`;
+- `microsoft/AI-For-Beginners`.
+
+## What the corrected reader answers
+
+The plain reading starts with:
+
+1. What is this?
+2. Who is it for?
+3. What can I do with it?
+4. What already exists?
+5. What is unfinished or uncertain?
+6. Where should I start?
+
+Completion and likelihood remain separate optional questions. They stay unknown unless a recognised owner progress record supports them.
+
+## Deterministic README comprehension
+
+The public reader runs entirely in the visitor's browser. It requests public repository information directly from GitHub and applies bounded deterministic rules to the README and repository metadata.
+
+It can distinguish common project forms including:
+
+- applications and products;
+- learning courses and curricula;
+- libraries and frameworks;
+- command-line tools;
+- websites and web applications;
+- documentation collections;
+- templates and starter projects;
+- research and dataset repositories;
+- mixed or unclear projects.
+
+It extracts evidence-backed purpose, audience, useful actions, visible capabilities, explicit limitations and planned work. Every derived answer keeps short supporting README evidence available for inspection.
+
+No hosted artificial-intelligence service is used.
 
 ## Browser-only public reading
 
-Project Reader v1.0 runs entirely in the visitor's browser. It requests public repository information directly from GitHub's REST API.
-
-It may read:
+Project Reader may read:
 
 - public repository metadata;
 - the README;
 - `.project/progress.json` when present and valid;
 - GitHub's repository-language totals.
 
-It never receives a GitHub token and has no repository write path. It does not send the repository address to a Project Reader server.
+It receives no GitHub token in the public browser and has no repository write path. It does not send the repository address to a Project Reader server.
 
 ## Evidence rules
 
 Project Reader:
 
+- lets richer README evidence outrank a short repository slogan;
+- does not infer purpose or completion from stars, age, activity or language volume;
 - calculates defined-stage completion only from valid numeric stages in `.project/progress.json`;
 - respects an owner record that disables an overall percentage;
 - reports unknown when completion or likelihood is unsupported;
-- does not treat activity, open issues, repository age or code volume as completion evidence;
-- does not claim that browser reading proves external comprehension or commercial demand.
+- keeps implementation languages secondary to project purpose and user actions;
+- omits language rows below 0.1% after rounding;
+- does not claim external comprehension or commercial demand.
 
 ## Input and limits
 
@@ -51,44 +81,37 @@ Accepted input:
 - `owner/name`;
 - a root `https://github.com/owner/name` address.
 
-Only public repositories are supported. GitHub applies an unauthenticated public API rate limit.
-
-## Python evidence toolkit
-
-The repository retains the earlier Python evidence, interpretation and rendering packages as a tested reference implementation and command-line toolkit.
-
-Examples:
-
-```bash
-python scripts/collect_public_evidence.py \
-  https://github.com/armpitpete/over-my-home \
-  --output evidence.json
-
-python scripts/interpret_evidence.py evidence.json \
-  --output interpretation.json
-
-python scripts/render_evidence_reading.py evidence.json \
-  --output project-reading.html
-```
+Only public repositories are supported. GitHub applies an unauthenticated public API rate limit. Unusual or badly structured READMEs can still be misunderstood, so the evidence view remains part of the product.
 
 ## Develop and test
 
-Requires Python 3.12 or newer.
+Requires Python 3.12 or newer and Node.js 22 or newer.
 
 ```bash
 python -m venv .venv
 . .venv/bin/activate        # Windows PowerShell: .venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev]"
 pytest
+node tests/browser_comprehension_contract.mjs
 ```
 
-Static proofs:
+Live issue #33 acceptance:
 
 ```bash
-python scripts/render_sample.py
-python scripts/render_project_status_engine.py
-python -m http.server 8000 --directory prototype
+GITHUB_TOKEN=... node tests/live_browser_acceptance.mjs
 ```
+
+Build the public artifact:
+
+```bash
+python scripts/build_pages_site.py \
+  --commit 0123456789abcdef0123456789abcdef01234567 \
+  --output public
+```
+
+## Python evidence toolkit
+
+The repository retains the earlier Python evidence, interpretation and rendering packages as a tested reference implementation and command-line toolkit. They are not the public browser runtime.
 
 ## Boundaries
 
@@ -99,15 +122,5 @@ Project Reader remains read-only. It does not provide:
 - writes to analysed repositories;
 - stored contact messages;
 - a multi-repository dashboard;
-- external comprehension or commercial validation.
-
-## Completion status
-
-**Project Reader v1.0 is complete as a finished public prototype.**
-
-- **Implemented:** browser-only public reader merged at `49827b54022fe31a3645946be364d8830329a541`.
-- **Tested:** all deterministic, static, browser-artifact and live-public-reference gates passed.
-- **Deployed and verified:** GitHub Pages publicly reported exact deployment-verification commit `9c6301699f2598dde3bf698e3d69823132a30f9f`.
-- **Repository governance:** Threadkeeper's canonical policy pointer merged at `d06bfbaf9f83d59476ce74166022703d202fcfde`.
-- **Runtime:** browser-only; the Oracle VPS API is not required.
-- **External validation:** not claimed. Reader interviews and commercial testing would be separate future research, not unfinished software work.
+- hosted AI interpretation;
+- external comprehension or commercial-validation claims.
