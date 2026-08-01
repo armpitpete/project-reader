@@ -8,7 +8,8 @@ on:
     paths:
       - ".github/workflows/pages.yml"
       - "prototype/public-reader.html"
-      - "prototype/project-status-engine.html"
+      - "prototype/app.js"
+      - "prototype/comprehension.js"
       - "scripts/build_pages_site.py"
   workflow_dispatch:
 
@@ -42,27 +43,37 @@ jobs:
 
           root = Path("public")
           files = sorted(path.name for path in root.iterdir())
-          assert files == [".nojekyll", "deployment.json", "index.html"]
+          assert files == [
+              ".nojekyll",
+              "app.js",
+              "comprehension.js",
+              "deployment.json",
+              "index.html",
+          ]
 
           metadata = json.loads((root / "deployment.json").read_text(encoding="utf-8"))
-          assert metadata["schema_version"] == 2
+          assert metadata["schema_version"] == 3
           assert metadata["deployed_commit"] == "${{ github.sha }}"
           assert metadata["runtime"] == "browser-only"
           assert metadata["public_data_origin"] == "https://api.github.com"
           assert metadata["public_files"] == files
 
           html = (root / "index.html").read_text(encoding="utf-8")
+          app = (root / "app.js").read_text(encoding="utf-8")
+          comprehension = (root / "comprehension.js").read_text(encoding="utf-8")
+          public = html + app + comprehension
           assert "Project Reader" in html
-          assert "Public GitHub repository" in html
+          assert "Understand what a public GitHub project is" in html
           assert "Read this project" in html
-          assert "https://api.github.com" in html
-          assert "reader-api.merrinworld.uk" not in html
+          assert "https://api.github.com" in app
+          assert "reader-api.merrinworld.uk" not in public
           assert "Project Reader deployment commit:" in html
           assert "${{ github.sha }}" in html
-          assert "innerHTML" not in html
-          assert "GITHUB_TOKEN" not in html
+          assert "innerHTML" not in public
+          assert "GITHUB_TOKEN" not in public
+          assert "buildComprehension" in comprehension
           blocked = ("I:\\", "C:\\", "SECRET", "PRIVATE KEY")
-          assert not any(value in html.upper() for value in blocked)
+          assert not any(value in public.upper() for value in blocked)
           PY
       - name: Configure Pages
         if: github.event_name != 'pull_request'
@@ -115,6 +126,7 @@ jobs:
                       payload = json.load(response)
                   if (
                       payload.get("deployed_commit") == expected
+                      and payload.get("schema_version") == 3
                       and payload.get("runtime") == "browser-only"
                       and payload.get("public_data_origin") == "https://api.github.com"
                   ):
@@ -133,18 +145,20 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           DEPLOYMENT_URL: ${{ steps.deployment.outputs.page_url }}
           DEPLOYED_COMMIT: ${{ github.sha }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           cat > /tmp/project-reader-deployment.md <<EOF
-          ## Public deployment verified
+          ## Corrected public deployment verified
 
-          GitHub Pages deployed and publicly returned the exact release metadata.
+          GitHub Pages deployed and publicly returned the exact issue #33 release metadata.
 
           - deployed commit: \`$DEPLOYED_COMMIT\`
           - public reader: $DEPLOYMENT_URL
           - verification file: ${DEPLOYMENT_URL%/}/deployment.json
           - runtime: browser-only
           - public data origin: \`https://api.github.com\`
+          - deployment run: $RUN_URL
 
-          The Oracle VPS API is not part of the public runtime. This satisfies the final deployment and public-verification gates in issue #25.
+          The deployed reader uses the deterministic README comprehension layer accepted for issue #33.
           EOF
-          gh issue comment 25 --repo "$GITHUB_REPOSITORY" --body-file /tmp/project-reader-deployment.md
+          gh issue comment 33 --repo "$GITHUB_REPOSITORY" --body-file /tmp/project-reader-deployment.md
