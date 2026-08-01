@@ -10,6 +10,7 @@ on:
       - "prototype/public-reader.html"
       - "prototype/app.js"
       - "prototype/comprehension.js"
+      - "prototype/polish.js"
       - "scripts/build_pages_site.py"
   workflow_dispatch:
 
@@ -49,6 +50,7 @@ jobs:
               "comprehension.js",
               "deployment.json",
               "index.html",
+              "polish.js",
           ]
 
           metadata = json.loads((root / "deployment.json").read_text(encoding="utf-8"))
@@ -61,7 +63,8 @@ jobs:
           html = (root / "index.html").read_text(encoding="utf-8")
           app = (root / "app.js").read_text(encoding="utf-8")
           comprehension = (root / "comprehension.js").read_text(encoding="utf-8")
-          public = html + app + comprehension
+          polish = (root / "polish.js").read_text(encoding="utf-8")
+          public = html + app + comprehension + polish
           assert "Project Reader" in html
           assert "Understand what a public GitHub project is" in html
           assert "Read this project" in html
@@ -72,6 +75,10 @@ jobs:
           assert "innerHTML" not in public
           assert "GITHUB_TOKEN" not in public
           assert "buildComprehension" in comprehension
+          assert "polishReading" in app
+          assert "Study or change the source code" in polish
+          assert "Browse the course lessons" in polish
+          assert "overflow-x:hidden" in html
           blocked = ("I:\\", "C:\\", "SECRET", "PRIVATE KEY")
           assert not any(value in public.upper() for value in blocked)
           PY
@@ -159,6 +166,6 @@ jobs:
           - public data origin: \`https://api.github.com\`
           - deployment run: $RUN_URL
 
-          The deployed reader uses the deterministic README comprehension layer accepted for issue #33.
+          The deployed reader uses the deterministic README comprehension and output-polish layers accepted for issue #33.
           EOF
           gh issue comment 33 --repo "$GITHUB_REPOSITORY" --body-file /tmp/project-reader-deployment.md
