@@ -25,22 +25,30 @@ def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
         "comprehension.js",
         "deployment.json",
         "index.html",
+        "network-corrections.js",
         "polish.js",
+        "resilience.js",
     ]
 
     metadata = json.loads((tmp_path / "deployment.json").read_text(encoding="utf-8"))
     assert metadata == {
-        "schema_version": 3,
-        "project": "Project Reader evidence-backed public repository comprehension",
+        "schema_version": 4,
+        "project": "Project Reader resilient evidence-backed repository comprehension",
         "repository": "armpitpete/project-reader",
         "deployed_commit": HEAD,
         "runtime": "browser-only",
-        "public_data_origin": "https://api.github.com",
+        "public_data_origins": [
+            "https://api.github.com",
+            "https://raw.githubusercontent.com",
+        ],
+        "rate_limit_fallback": "public README without account or token",
         "source_html": "prototype/public-reader.html",
         "source_scripts": [
             "prototype/app.js",
             "prototype/comprehension.js",
+            "prototype/network-corrections.js",
             "prototype/polish.js",
+            "prototype/resilience.js",
         ],
         "public_files": public_files,
     }
@@ -48,8 +56,10 @@ def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
     html = (tmp_path / "index.html").read_text(encoding="utf-8")
     app = (tmp_path / "app.js").read_text(encoding="utf-8")
     comprehension = (tmp_path / "comprehension.js").read_text(encoding="utf-8")
+    network = (tmp_path / "network-corrections.js").read_text(encoding="utf-8")
     polish = (tmp_path / "polish.js").read_text(encoding="utf-8")
-    public = html + app + comprehension + polish
+    resilience = (tmp_path / "resilience.js").read_text(encoding="utf-8")
+    public = html + app + comprehension + network + polish + resilience
 
     assert "Project Reader" in html
     assert "Understand what a public GitHub project is" in html
@@ -60,15 +70,24 @@ def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
     assert '<script type="module" src="./app.js"></script>' in html
     assert "Project Reader deployment commit:" in html
     assert HEAD in html
+    assert "https://raw.githubusercontent.com" in html
+    assert "falls back to the public README" in html
     assert "reader-api.merrinworld.uk" not in public
     assert "GITHUB_TOKEN" not in public
     assert "PRIVATE KEY" not in public.upper()
-    assert "innerHTML" not in app + comprehension + polish
+    assert "innerHTML" not in app + comprehension + network + polish + resilience
     assert 'method: "GET"' in app
     assert 'method: "POST"' not in app
     assert "buildComprehension" in comprehension
     assert "polishReading" in app
+    assert "correctNetworkServiceReading" in app
+    assert "fetchRawReadme" in app
     assert "polishReading" in polish
+    assert "Command-line network client or service" in network
+    assert "Install or download the command-line client" in network
+    assert "Deprecated versions" not in network
+    assert "raw-content service" in resilience
+    assert "without account or token" in json.dumps(metadata)
     assert "Learning course or curriculum" in comprehension
     assert "Application and open-source codebase" in comprehension
     assert "coding or markup language" not in comprehension
