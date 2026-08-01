@@ -10,7 +10,9 @@ on:
       - "prototype/public-reader.html"
       - "prototype/app.js"
       - "prototype/comprehension.js"
+      - "prototype/network-corrections.js"
       - "prototype/polish.js"
+      - "prototype/resilience.js"
       - "scripts/build_pages_site.py"
   workflow_dispatch:
 
@@ -50,25 +52,34 @@ jobs:
               "comprehension.js",
               "deployment.json",
               "index.html",
+              "network-corrections.js",
               "polish.js",
+              "resilience.js",
           ]
 
           metadata = json.loads((root / "deployment.json").read_text(encoding="utf-8"))
-          assert metadata["schema_version"] == 3
+          assert metadata["schema_version"] == 4
           assert metadata["deployed_commit"] == "${{ github.sha }}"
           assert metadata["runtime"] == "browser-only"
-          assert metadata["public_data_origin"] == "https://api.github.com"
+          assert metadata["public_data_origins"] == [
+              "https://api.github.com",
+              "https://raw.githubusercontent.com",
+          ]
+          assert metadata["rate_limit_fallback"] == "public README without account or token"
           assert metadata["public_files"] == files
 
           html = (root / "index.html").read_text(encoding="utf-8")
           app = (root / "app.js").read_text(encoding="utf-8")
           comprehension = (root / "comprehension.js").read_text(encoding="utf-8")
+          network = (root / "network-corrections.js").read_text(encoding="utf-8")
           polish = (root / "polish.js").read_text(encoding="utf-8")
-          public = html + app + comprehension + polish
+          resilience = (root / "resilience.js").read_text(encoding="utf-8")
+          public = html + app + comprehension + network + polish + resilience
           assert "Project Reader" in html
           assert "Understand what a public GitHub project is" in html
           assert "Read this project" in html
           assert "https://api.github.com" in app
+          assert "https://raw.githubusercontent.com" in html
           assert "reader-api.merrinworld.uk" not in public
           assert "Project Reader deployment commit:" in html
           assert "${{ github.sha }}" in html
@@ -76,6 +87,9 @@ jobs:
           assert "GITHUB_TOKEN" not in public
           assert "buildComprehension" in comprehension
           assert "polishReading" in app
+          assert "correctNetworkServiceReading" in app
+          assert "Command-line network client or service" in network
+          assert "fetchRawReadme" in resilience
           assert "Study or change the source code" in polish
           assert "Browse the course lessons" in polish
           assert "overflow-x:hidden" in html
@@ -133,9 +147,13 @@ jobs:
                       payload = json.load(response)
                   if (
                       payload.get("deployed_commit") == expected
-                      and payload.get("schema_version") == 3
+                      and payload.get("schema_version") == 4
                       and payload.get("runtime") == "browser-only"
-                      and payload.get("public_data_origin") == "https://api.github.com"
+                      and payload.get("public_data_origins") == [
+                          "https://api.github.com",
+                          "https://raw.githubusercontent.com",
+                      ]
+                      and payload.get("rate_limit_fallback") == "public README without account or token"
                   ):
                       print(f"verified-url={url}")
                       print(f"verified-commit={expected}")
@@ -155,17 +173,18 @@ jobs:
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           cat > /tmp/project-reader-deployment.md <<EOF
-          ## Corrected public deployment verified
+          ## Resilient public deployment verified
 
-          GitHub Pages deployed and publicly returned the exact issue #33 release metadata.
+          GitHub Pages deployed and publicly returned the exact issue #36 release metadata.
 
           - deployed commit: \`$DEPLOYED_COMMIT\`
           - public reader: $DEPLOYMENT_URL
           - verification file: ${DEPLOYMENT_URL%/}/deployment.json
           - runtime: browser-only
-          - public data origin: \`https://api.github.com\`
+          - public data origins: \`https://api.github.com\`, \`https://raw.githubusercontent.com\`
+          - anonymous API fallback: public README without account or token
           - deployment run: $RUN_URL
 
-          The deployed reader uses the deterministic README comprehension and output-polish layers accepted for issue #33.
+          The deployed reader contains the accepted command-line network-service correction and the rate-limit-resilient README fallback required by issue #36.
           EOF
-          gh issue comment 33 --repo "$GITHUB_REPOSITORY" --body-file /tmp/project-reader-deployment.md
+          gh issue comment 36 --repo "$GITHUB_REPOSITORY" --body-file /tmp/project-reader-deployment.md
