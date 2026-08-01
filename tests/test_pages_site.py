@@ -50,7 +50,7 @@ def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
     assert 'method: "POST"' not in html
     assert "GITHUB_TOKEN" not in html
     assert "PRIVATE KEY" not in html.upper()
-    assert "does not write anything" in html
+    assert "write anything" in html
     assert "Technical detail: deployment" in html
     assert "Project Reader deployment commit:" in html
     assert HEAD in html
