@@ -75,7 +75,8 @@ function setStatus(message, tone="") { statusLine.textContent = message; statusL
 function setBusy(busy) { button.disabled = busy; input.disabled = busy; button.textContent = busy ? "Reading..." : "Read this project"; }
 function clearResult() { result.replaceChildren(); result.dataset.visible = "false"; }
 function el(name, text="", className="") { const node=document.createElement(name); if(text) node.textContent=text; if(className) node.className=className; return node; }
-function externalLink(text, href) { const link=el("a",text,"external-link"); link.href=href; link.target="_blank"; link.rel="noopener noreferrer"; return link; }
+function safePublicUrl(value) { try { const url=new URL(value); return url.protocol==="https:" ? url.href : null; } catch { return null; } }
+function externalLink(text, href) { const safeHref=safePublicUrl(href); if(!safeHref) throw new Error("A public link in the repository evidence was unsafe."); const link=el("a",text,"external-link"); link.href=safeHref; link.target="_blank"; link.rel="noopener noreferrer"; return link; }
 function appendParagraph(parent, text, className="") { parent.append(el("p",text,className)); }
 function answerCard(title) { const card=el("section","","answer-card"); card.append(el("h3",title)); return card; }
 
@@ -175,7 +176,8 @@ function renderReading(repo, readme, progress, languages, checkedAt) {
 
   let card=answerCard("What is this project?"); appendParagraph(card,purpose); simple.append(card);
   card=answerCard("What can someone do with it?");
-  if(repo.homepage) { appendParagraph(card,"The repository owner provides a public project website."); card.append(externalLink("Open the project website",repo.homepage)); }
+  const homepage=safePublicUrl(repo.homepage);
+  if(homepage) { appendParagraph(card,"The repository owner provides a public project website."); card.append(externalLink("Open the project website",homepage)); }
   else { appendParagraph(card,"The public repository is the available project surface."); card.append(externalLink("Open the project on GitHub",repo.html_url)); }
   simple.append(card);
 
