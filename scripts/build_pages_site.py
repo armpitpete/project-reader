@@ -11,7 +11,9 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = ROOT / "prototype" / "public-reader.html"
 DEFAULT_APP = ROOT / "prototype" / "app.js"
 DEFAULT_COMPREHENSION = ROOT / "prototype" / "comprehension.js"
+DEFAULT_NETWORK_CORRECTIONS = ROOT / "prototype" / "network-corrections.js"
 DEFAULT_POLISH = ROOT / "prototype" / "polish.js"
+DEFAULT_RESILIENCE = ROOT / "prototype" / "resilience.js"
 SHA = re.compile(r"^[0-9a-f]{40}$")
 
 
@@ -22,7 +24,9 @@ def build_pages_site(
     source: Path = DEFAULT_SOURCE,
     app_source: Path = DEFAULT_APP,
     comprehension_source: Path = DEFAULT_COMPREHENSION,
+    network_corrections_source: Path = DEFAULT_NETWORK_CORRECTIONS,
     polish_source: Path = DEFAULT_POLISH,
+    resilience_source: Path = DEFAULT_RESILIENCE,
 ) -> tuple[Path, ...]:
     if not SHA.fullmatch(commit):
         raise ValueError("Deployment commit must be a 40-character lowercase Git SHA.")
@@ -45,36 +49,48 @@ def build_pages_site(
     index = output / "index.html"
     app = output / "app.js"
     comprehension = output / "comprehension.js"
+    network_corrections = output / "network-corrections.js"
     polish = output / "polish.js"
+    resilience = output / "resilience.js"
     metadata = output / "deployment.json"
     nojekyll = output / ".nojekyll"
 
     index.write_text(html, encoding="utf-8")
     shutil.copyfile(app_source, app)
     shutil.copyfile(comprehension_source, comprehension)
+    shutil.copyfile(network_corrections_source, network_corrections)
     shutil.copyfile(polish_source, polish)
+    shutil.copyfile(resilience_source, resilience)
     public_files = [
         ".nojekyll",
         "app.js",
         "comprehension.js",
         "deployment.json",
         "index.html",
+        "network-corrections.js",
         "polish.js",
+        "resilience.js",
     ]
     metadata.write_text(
         json.dumps(
             {
-                "schema_version": 3,
-                "project": "Project Reader evidence-backed public repository comprehension",
+                "schema_version": 4,
+                "project": "Project Reader resilient evidence-backed repository comprehension",
                 "repository": "armpitpete/project-reader",
                 "deployed_commit": commit,
                 "runtime": "browser-only",
-                "public_data_origin": "https://api.github.com",
+                "public_data_origins": [
+                    "https://api.github.com",
+                    "https://raw.githubusercontent.com",
+                ],
+                "rate_limit_fallback": "public README without account or token",
                 "source_html": "prototype/public-reader.html",
                 "source_scripts": [
                     "prototype/app.js",
                     "prototype/comprehension.js",
+                    "prototype/network-corrections.js",
                     "prototype/polish.js",
+                    "prototype/resilience.js",
                 ],
                 "public_files": public_files,
             },
@@ -85,7 +101,16 @@ def build_pages_site(
         encoding="utf-8",
     )
     nojekyll.write_text("", encoding="utf-8")
-    return (nojekyll, app, comprehension, metadata, index, polish)
+    return (
+        nojekyll,
+        app,
+        comprehension,
+        metadata,
+        index,
+        network_corrections,
+        polish,
+        resilience,
+    )
 
 
 def main() -> int:
