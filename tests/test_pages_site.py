@@ -44,6 +44,8 @@ def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
     assert "Project status and why Project Reader says this" in html
     assert "Technical sources and repository details" in html
     assert "Simple reading" in html
+    assert "function safePublicUrl" in html
+    assert 'url.protocol==="https:"' in html
     assert "innerHTML" not in html
     assert 'method: "POST"' not in html
     assert "GITHUB_TOKEN" not in html
