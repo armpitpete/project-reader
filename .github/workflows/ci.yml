@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -24,6 +24,8 @@ jobs:
         run: pytest
       - name: Run deterministic browser comprehension contract
         run: node tests/browser_comprehension_contract.mjs
+      - name: Run network-service and fallback contract
+        run: node tests/network_and_fallback_contract.mjs
       - name: Rebuild static Python proofs
         run: |
           python scripts/render_sample.py
@@ -45,19 +47,27 @@ jobs:
               "comprehension.js",
               "deployment.json",
               "index.html",
+              "network-corrections.js",
               "polish.js",
+              "resilience.js",
           ]
           metadata = json.loads((root / "deployment.json").read_text(encoding="utf-8"))
-          assert metadata["schema_version"] == 3
+          assert metadata["schema_version"] == 4
           assert metadata["runtime"] == "browser-only"
-          assert metadata["public_data_origin"] == "https://api.github.com"
+          assert metadata["public_data_origins"] == [
+              "https://api.github.com",
+              "https://raw.githubusercontent.com",
+          ]
+          assert metadata["rate_limit_fallback"] == "public README without account or token"
           assert metadata["public_files"] == files
 
           html = (root / "index.html").read_text(encoding="utf-8")
           app = (root / "app.js").read_text(encoding="utf-8")
           comprehension = (root / "comprehension.js").read_text(encoding="utf-8")
+          network = (root / "network-corrections.js").read_text(encoding="utf-8")
           polish = (root / "polish.js").read_text(encoding="utf-8")
-          public = html + app + comprehension + polish
+          resilience = (root / "resilience.js").read_text(encoding="utf-8")
+          public = html + app + comprehension + network + polish + resilience
           assert "reader-api.merrinworld.uk" not in public
           assert "innerHTML" not in public
           assert "GITHUB_TOKEN" not in public
@@ -67,10 +77,15 @@ jobs:
           assert "coding or markup language" not in comprehension
           assert "buildComprehension" in comprehension
           assert "polishReading" in app
+          assert "correctNetworkServiceReading" in app
+          assert "fetchRawReadme" in app
+          assert "Command-line network client or service" in network
+          assert "raw.githubusercontent.com" in resilience
           assert "Study or change the source code" in polish
           assert "Browse the course lessons" in polish
           assert "overflow-x:hidden" in html
           assert "script-src 'self'" in html
+          assert "connect-src https://api.github.com https://raw.githubusercontent.com" in html
           PY
 
   live-public-reference:
@@ -112,7 +127,7 @@ jobs:
 
   live-browser-acceptance:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     env:
       GITHUB_TOKEN: ${{ github.token }}
       PROJECT_READER_ACCEPTANCE_OUTPUT: /tmp/project-reader-browser-acceptance.json
@@ -121,7 +136,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Read both failed acceptance repositories
+      - name: Read all three acceptance repositories
         run: node tests/live_browser_acceptance.mjs
       - uses: actions/upload-artifact@v4
         with:
@@ -134,7 +149,7 @@ jobs:
       - test
       - live-browser-acceptance
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -142,7 +157,7 @@ jobs:
           python-version: "3.12"
       - name: Build public artifact
         run: python scripts/build_pages_site.py --commit "$GITHUB_SHA" --output /tmp/project-reader-public
-      - name: Capture desktop and narrow-width browser proofs
+      - name: Capture normal and fallback desktop and narrow-width proofs
         run: bash tests/capture_browser_proofs.sh /tmp/project-reader-public /tmp/project-reader-browser-proofs
       - uses: actions/upload-artifact@v4
         with:

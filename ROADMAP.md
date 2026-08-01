@@ -23,9 +23,9 @@
 
 The v1.0 implementation ran safely, but its output mostly repeated repository descriptions and language totals. That was not sufficient project understanding.
 
-## README comprehension repair v1.1 — complete
+## README comprehension repair v1.1 — implemented, later acceptance superseded
 
-Tracked and accepted through issue #33 and PR #34.
+Tracked through issue #33 and PR #34.
 
 - [x] Define application, curriculum, library, command-line, website, documentation, template, research and mixed classifications
 - [x] Build bounded deterministic README section and link extraction
@@ -36,25 +36,45 @@ Tracked and accepted through issue #33 and PR #34.
 - [x] Add live acceptance checks against both failed repositories
 - [x] Add desktop and narrow-width browser proof capture
 - [x] Correct irrelevant actions, malformed raw wording and mobile overflow found during visual review
-- [x] Pass exact-head GitHub Actions at `6d79145e981ef6d553a4f682db70b73381231cc8`
-- [x] Complete protected exact-head review
-- [x] Guarded squash-merge PR #34
-- [x] Deploy GitHub Pages from merge commit `4a140dad75f1b14819f41162380ce5ace10025cc`
-- [x] Verify exact public deployment in issue #33 comment `5153152571`
-- [x] Close issue #33 as completed
+- [x] Deploy and verify merge commit `4a140dad75f1b14819f41162380ce5ace10025cc`
 
-## Completion decision
+The v1.1 repair materially improved both original examples. Later owner testing exposed a new false classification and a runtime availability failure, so the v1.1 completion decision is withdrawn.
 
-Project Reader is complete as a finished public prototype.
+## Network-service and rate-limit resilience repair v1.2 — active
 
-The live reader now produces useful, materially different explanations for both acceptance repositories:
+Tracked through issue #36.
 
-- Synth One is understood as a playable iPhone/iPad synthesizer and an open-source codebase for musicians and developers.
-- AI For Beginners is understood as a beginner curriculum with lessons, quizzes, labs, translations and clear course starting actions.
+- [x] Record the owner-supplied `cloudflare/cloudflared` false-classification screenshot
+- [x] Record the owner-supplied GitHub anonymous API exhaustion screenshot
+- [x] Define command-line network client and background-service evidence
+- [x] Prevent tunnel, proxy, origin, HTTP and webserver terminology from implying a website by itself
+- [x] Add a bounded cloudflared correction for purpose, audience, actions, capabilities and evidence
+- [x] Remove deprecated-version and incidental dependency links from primary actions
+- [x] Add direct public README fallback through `raw.githubusercontent.com`
+- [x] Keep the fallback account-free, token-free, browser-only and read-only
+- [x] Label unavailable licence, branch, language and progress metadata
+- [x] Add deterministic network-service and fallback contracts
+- [x] Add live cloudflared acceptance while retaining Synth One and AI For Beginners regression gates
+- [x] Add normal and forced-fallback desktop and narrow-width proof capture
+- [ ] Pass exact-head GitHub Actions
+- [ ] Complete protected exact-head review
+- [ ] Guarded squash-merge the accepted repair
+- [ ] Deploy GitHub Pages from the accepted merge commit
+- [ ] Verify the exact public deployment and fallback behaviour
+- [ ] Record the final completion state only if all issue #36 gates pass
 
-The output does more than repeat the GitHub description or list detected languages. Overall completion remains unknown when owner authority is absent.
+## Current completion decision
 
-## Optional future research, not unfinished project work
+Project Reader is **not complete** while issue #36 is open.
+
+Completion requires both of these outcomes:
+
+1. `cloudflare/cloudflared` is explained as a command-line Cloudflare Tunnel client and daemon, not a website.
+2. A useful reduced reading still renders when GitHub's anonymous metadata API is unavailable.
+
+The earlier Synth One and AI For Beginners readings remain mandatory regression checks. Overall completion for analysed repositories remains unknown when owner authority is absent.
+
+## Optional future research, not part of issue #36
 
 - observe external readers using the product;
 - test whether the explanation improves understanding;

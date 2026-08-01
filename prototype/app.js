@@ -1,5 +1,13 @@
 import { buildComprehension, safePublicUrl, validProgress } from "./comprehension.js";
+import { correctNetworkServiceReading } from "./network-corrections.js";
 import { polishReading } from "./polish.js";
+import {
+  fallbackNotice,
+  fallbackRepository,
+  fetchRawReadme,
+  GitHubApiError,
+  repositoryReference
+} from "./resilience.js";
 
 const GITHUB_API = "https://api.github.com";
 const form = document.querySelector("#reader-form");
@@ -76,41 +84,49 @@ function addActionList(parent, actions) {
   parent.append(list);
 }
 
-function parseRepository(value) {
-  const text = value.trim();
-  let match = text.match(/^([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)$/);
-  if (!match) {
-    try {
-      const url = new URL(text);
-      if (url.protocol !== "https:" || url.hostname !== "github.com" || url.search || url.hash) throw new Error();
-      const parts = url.pathname.split("/").filter(Boolean);
-      if (parts.length !== 2) throw new Error();
-      match = [text, parts[0], parts[1].replace(/\.git$/i, "")];
-    } catch {
-      throw new Error("Enter owner/name or a root public GitHub repository address.");
-    }
+async function githubJson(path, allowMissing = false) {
+  let response;
+  try {
+    response = await fetch(`${GITHUB_API}${path}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28"
+      },
+      cache: "no-store"
+    });
+  } catch {
+    throw new GitHubApiError("GitHub's metadata service could not be reached.", { unavailable: true });
   }
-  const owner = match[1];
-  const repo = match[2].replace(/\.git$/i, "");
-  if (!owner || !repo || owner.length > 100 || repo.length > 100 || owner.startsWith(".") || repo.startsWith(".")) {
-    throw new Error("That repository address is not supported.");
+  if (allowMissing && response.status === 404) return null;
+  if (response.status === 404) {
+    throw new GitHubApiError("GitHub could not find that public repository. Check the name and visibility.", { status: 404 });
   }
-  return { owner, repo, fullName: `${owner}/${repo}` };
+  if (response.status === 403 || response.status === 429) {
+    throw new GitHubApiError("GitHub's public request allowance is unavailable.", {
+      status: response.status,
+      unavailable: true,
+      rateLimited: true
+    });
+  }
+  if (!response.ok) {
+    throw new GitHubApiError("GitHub could not provide repository metadata right now.", {
+      status: response.status,
+      unavailable: response.status >= 500
+    });
+  }
+  return response.json();
 }
 
-async function githubJson(path, allowMissing = false) {
-  const response = await fetch(`${GITHUB_API}${path}`, {
-    method: "GET",
-    headers: {
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28"
+async function optionalGithubJson(path) {
+  try {
+    return { value: await githubJson(path, true), unavailable: false };
+  } catch (error) {
+    if (error instanceof GitHubApiError && error.unavailable) {
+      return { value: null, unavailable: true };
     }
-  });
-  if (allowMissing && response.status === 404) return null;
-  if (response.status === 404) throw new Error("GitHub could not find that public repository. Check the name and visibility.");
-  if (response.status === 403) throw new Error("GitHub's public request limit has been reached. Try again later or open the repository on GitHub.");
-  if (!response.ok) throw new Error("GitHub could not provide the public repository evidence right now.");
-  return response.json();
+    throw error;
+  }
 }
 
 function decodeFile(payload) {
@@ -124,52 +140,116 @@ function decodeFile(payload) {
   }
 }
 
-async function readRepository(reference) {
-  const parsed = parseRepository(reference);
-  const repo = await githubJson(`/repos/${encodeURIComponent(parsed.owner)}/${encodeURIComponent(parsed.repo)}`);
-  if (repo.private) throw new Error("Private repositories are not supported.");
-  const base = `/repos/${encodeURIComponent(repo.owner.login)}/${encodeURIComponent(repo.name)}`;
-  const branch = encodeURIComponent(repo.default_branch);
-  const [progressPayload, readmePayload, languages] = await Promise.all([
-    githubJson(`${base}/contents/.project/progress.json?ref=${branch}`, true),
-    githubJson(`${base}/readme?ref=${branch}`, true),
-    githubJson(`${base}/languages`, true)
-  ]);
-  let progress = null;
-  const progressText = decodeFile(progressPayload);
-  if (progressText) {
-    try {
-      const candidate = JSON.parse(progressText);
-      if (validProgress(candidate)) progress = candidate;
-    } catch {
-      progress = null;
-    }
+function parseProgress(payload) {
+  const text = decodeFile(payload);
+  if (!text) return null;
+  try {
+    const candidate = JSON.parse(text);
+    return validProgress(candidate) ? candidate : null;
+  } catch {
+    return null;
   }
+}
+
+async function readFallback(reference, { rateLimited = false, forced = false } = {}) {
+  const raw = await fetchRawReadme(reference);
   return {
-    repo,
-    readme: decodeFile(readmePayload),
-    progress,
-    languages: languages || {},
-    checkedAt: new Date().toISOString().replace(/\.\d{3}Z$/, "Z")
+    repo: fallbackRepository(reference, raw.ref),
+    readme: raw.text,
+    progress: null,
+    languages: {},
+    checkedAt: new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
+    context: {
+      sourceMode: "readme-fallback",
+      metadataAvailable: false,
+      languageDataAvailable: false,
+      rateLimited,
+      notice: forced
+        ? "README fallback mode was deliberately used for this proof. Repository metadata, licence, language totals and owner progress were not requested."
+        : fallbackNotice(rateLimited)
+    }
   };
 }
 
-export function renderReading(repo, readme, progress, languages, checkedAt) {
-  const reading = polishReading(
+export async function readRepository(referenceValue, { forceFallback = false } = {}) {
+  const reference = repositoryReference(referenceValue);
+  if (forceFallback) return readFallback(reference, { forced: true });
+
+  let repo;
+  try {
+    repo = await githubJson(`/repos/${encodeURIComponent(reference.owner)}/${encodeURIComponent(reference.repo)}`);
+  } catch (error) {
+    if (error instanceof GitHubApiError && error.unavailable) {
+      return readFallback(reference, { rateLimited: error.rateLimited });
+    }
+    throw error;
+  }
+  if (repo.private) throw new Error("Private repositories are not supported.");
+
+  const base = `/repos/${encodeURIComponent(repo.owner.login)}/${encodeURIComponent(repo.name)}`;
+  const branch = encodeURIComponent(repo.default_branch);
+  const [rawResult, progressResult, languagesResult] = await Promise.all([
+    fetchRawReadme(reference).catch(() => null),
+    optionalGithubJson(`${base}/contents/.project/progress.json?ref=${branch}`),
+    optionalGithubJson(`${base}/languages`)
+  ]);
+
+  let readme = rawResult?.text || null;
+  let readmeApiUnavailable = false;
+  if (!readme) {
+    const readmeResult = await optionalGithubJson(`${base}/readme?ref=${branch}`);
+    readme = decodeFile(readmeResult.value);
+    readmeApiUnavailable = readmeResult.unavailable;
+  }
+  if (!readme) {
+    if (progressResult.unavailable || languagesResult.unavailable || readmeApiUnavailable) {
+      return readFallback(reference, { rateLimited: true });
+    }
+    throw new Error("The repository does not provide a readable public README.");
+  }
+
+  const partialMetadata = progressResult.unavailable || languagesResult.unavailable;
+  return {
+    repo,
+    readme,
+    progress: parseProgress(progressResult.value),
+    languages: languagesResult.value || {},
+    checkedAt: new Date().toISOString().replace(/\.\d{3}Z$/, "Z"),
+    context: {
+      sourceMode: partialMetadata ? "api-partial" : "api-enriched",
+      metadataAvailable: true,
+      languageDataAvailable: !languagesResult.unavailable,
+      rateLimited: partialMetadata,
+      notice: partialMetadata
+        ? "The public README was read successfully, but some optional GitHub metadata was unavailable. The plain reading remains usable; missing technical details are labelled below."
+        : ""
+    }
+  };
+}
+
+export function renderReading(repo, readme, progress, languages, checkedAt, context = {}) {
+  const baseReading = polishReading(
     buildComprehension(repo, readme, progress, languages),
     repo,
     readme
   );
+  const reading = correctNetworkServiceReading(baseReading, repo, readme);
   const article = el("article", "", "reader-result-content");
+
+  if (context.notice) appendParagraph(article, context.notice, "notice");
 
   const header = el("header", "", "reading-header");
   header.append(el("p", reading.classification.label, "eyebrow"));
   header.append(el("h2", repo.full_name));
   appendParagraph(header, reading.purpose, "project-summary");
   const tags = el("div", "", "tag-row");
-  tags.append(el("span", repo.archived ? "Archived repository" : "Active repository", "tag"));
-  if (repo.fork) tags.append(el("span", "Fork of another repository", "tag"));
-  if (repo.license?.spdx_id) tags.append(el("span", `Licence: ${repo.license.spdx_id}`, "tag"));
+  if (context.metadataAvailable === false) {
+    tags.append(el("span", "README-only reading", "tag"));
+  } else {
+    tags.append(el("span", repo.archived ? "Archived repository" : "Active repository", "tag"));
+    if (repo.fork) tags.append(el("span", "Fork of another repository", "tag"));
+    if (repo.license?.spdx_id) tags.append(el("span", `Licence: ${repo.license.spdx_id}`, "tag"));
+  }
   header.append(tags);
   article.append(header);
 
@@ -244,7 +324,11 @@ export function renderReading(repo, readme, progress, languages, checkedAt) {
   const technical = el("details");
   technical.append(el("summary", "Technical sources and implementation details"));
   const technicalGrid = el("div", "", "detail-grid");
-  appendParagraph(technicalGrid, `Source branch: ${repo.default_branch}. Checked: ${checkedAt}.`, "small");
+  if (context.metadataAvailable === false) {
+    appendParagraph(technicalGrid, `README source reference: ${repo.default_branch}. Checked: ${checkedAt}. Repository metadata was unavailable.`, "small");
+  } else {
+    appendParagraph(technicalGrid, `Source branch: ${repo.default_branch}. Checked: ${checkedAt}.`, "small");
+  }
   appendParagraph(technicalGrid, `Project type: ${reading.classification.label}. Classification confidence: ${reading.classification.confidence}.`, "small");
 
   const sourceList = el("ul", "", "evidence-list");
@@ -261,9 +345,11 @@ export function renderReading(repo, readme, progress, languages, checkedAt) {
     progressItem.append(externalLink("Owner progress record", `${repo.html_url}/blob/${encodeURIComponent(repo.default_branch)}/.project/progress.json`));
     sourceList.append(progressItem);
   }
-  const languagesItem = el("li");
-  languagesItem.append(externalLink("GitHub language data", `${GITHUB_API}/repos/${repo.full_name}/languages`));
-  sourceList.append(languagesItem);
+  if (context.languageDataAvailable !== false) {
+    const languagesItem = el("li");
+    languagesItem.append(externalLink("GitHub language data", `${GITHUB_API}/repos/${repo.full_name}/languages`));
+    sourceList.append(languagesItem);
+  }
   technicalGrid.append(sourceList);
 
   if (reading.languages.length) {
@@ -276,10 +362,15 @@ export function renderReading(repo, readme, progress, languages, checkedAt) {
       languageList.append(el("li", text));
     }
     technicalGrid.append(languageList);
+  } else if (context.languageDataAvailable === false) {
+    appendParagraph(technicalGrid, "Implementation-language totals were not available in this reading mode.", "small muted");
   }
+
   appendParagraph(
     technicalGrid,
-    "This reading uses public GitHub responses in your browser. It does not clone the repository, run its code, inspect private data or write anything.",
+    context.sourceMode === "readme-fallback"
+      ? "This reduced reading uses a public README fetched directly from GitHub's raw-content service. It does not use an account, token, server, repository clone or write access."
+      : "This reading uses public GitHub responses in your browser. It does not clone the repository, run its code, inspect private data or write anything.",
     "small"
   );
   technical.append(technicalGrid);
@@ -288,15 +379,27 @@ export function renderReading(repo, readme, progress, languages, checkedAt) {
   return article;
 }
 
-async function runReading(reference) {
+async function runReading(reference, { forceFallback = false } = {}) {
   clearResult();
   setBusy(true);
-  setStatus("Reading the README and public repository evidence…");
+  setStatus(forceFallback ? "Reading the public README in fallback mode…" : "Reading the README and public repository evidence…");
   try {
-    const reading = await readRepository(reference);
-    result.append(renderReading(reading.repo, reading.readme, reading.progress, reading.languages, reading.checkedAt));
+    const reading = await readRepository(reference, { forceFallback });
+    result.append(renderReading(
+      reading.repo,
+      reading.readme,
+      reading.progress,
+      reading.languages,
+      reading.checkedAt,
+      reading.context
+    ));
     result.dataset.visible = "true";
-    setStatus("Reading complete.");
+    setStatus(
+      reading.context.sourceMode === "readme-fallback"
+        ? "Reading complete using the public README fallback."
+        : "Reading complete.",
+      reading.context.sourceMode === "readme-fallback" ? "warning" : ""
+    );
     result.focus({ preventScroll: true });
     result.scrollIntoView({ block: "start" });
     const url = new URL(window.location.href);
@@ -318,7 +421,8 @@ form.addEventListener("submit", event => {
 
 const initialUrl = new URL(window.location.href);
 const initial = initialUrl.searchParams.get("repo");
+const forceFallback = initialUrl.searchParams.get("fallback") === "1";
 if (initial) {
   input.value = initial;
-  if (initialUrl.searchParams.get("autorun") === "1") runReading(initial);
+  if (initialUrl.searchParams.get("autorun") === "1") runReading(initial, { forceFallback });
 }

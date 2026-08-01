@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { writeFile } from "node:fs/promises";
 import { buildComprehension } from "../prototype/comprehension.js";
+import { correctNetworkServiceReading } from "../prototype/network-corrections.js";
 import { polishReading } from "../prototype/polish.js";
 
 const token = process.env.GITHUB_TOKEN || process.env.PROJECT_READER_GITHUB_TOKEN || "";
@@ -36,11 +37,12 @@ async function read(fullName) {
     try { progress = JSON.parse(decode(progressPayload)); } catch { progress = null; }
   }
   const readme = decode(readmePayload);
-  const reading = polishReading(
+  const base = polishReading(
     buildComprehension(repo, readme, progress, languages),
     repo,
     readme
   );
+  const reading = correctNetworkServiceReading(base, repo, readme);
   return { repo, readme, progress, languages, reading };
 }
 
@@ -82,17 +84,36 @@ assert.ok(course.unfinished.some(item => /conversational AI/i.test(item)));
 assert.ok(course.evidence.every(record => !/sketchnote|:---:|@girlie/i.test(record.excerpt)));
 assert.equal(course.progress.completion, null);
 
+const cloudflaredSource = await read("cloudflare/cloudflared");
+const cloudflared = cloudflaredSource.reading;
+assert.equal(cloudflared.classification.id, "network-service");
+assert.equal(cloudflared.classification.label, "Command-line network client or service");
+assert.doesNotMatch(cloudflared.classification.label, /website|web application/i);
+assert.match(cloudflared.purpose, /command-line client/i);
+assert.match(cloudflared.purpose, /background service/i);
+assert.match(cloudflared.purpose, /Cloudflare Tunnel/i);
+assert.match(cloudflared.purpose, /outbound connections/i);
+assert.ok(cloudflared.actions.some(action => /install or download/i.test(action.label)));
+assert.ok(cloudflared.actions.some(action => /Tunnel documentation/i.test(action.label)));
+assert.ok(cloudflared.actions.every(action => !/deprecated|cap.?n proto|requirements/i.test(`${action.label} ${action.source}`)));
+assert.ok(cloudflared.capabilities.some(item => /implemented Cloudflare Tunnel client and daemon/i.test(item)));
+assert.ok(cloudflared.capabilities.some(item => /outbound tunnel connections/i.test(item)));
+assert.equal(cloudflared.progress.completion, null);
+
 assert.notEqual(synth.purpose, synthSource.repo.description);
 assert.notEqual(course.purpose, courseSource.repo.description);
+assert.notEqual(cloudflared.purpose, cloudflaredSource.repo.description);
 assert.notEqual(synth.purpose, course.purpose);
-assert.ok([...synth.languages, ...course.languages].every(item => item.percentage >= 0.1));
-assert.ok(!JSON.stringify({ synth, course }).includes("coding or markup language"));
+assert.notEqual(course.purpose, cloudflared.purpose);
+assert.ok([...synth.languages, ...course.languages, ...cloudflared.languages].every(item => item.percentage >= 0.1));
+assert.ok(!JSON.stringify({ synth, course, cloudflared }).includes("coding or markup language"));
 
 const report = {
-  schema_version: 2,
+  schema_version: 3,
   checked_repositories: {
     "AudioKit/AudioKitSynthOne": synth,
-    "microsoft/AI-For-Beginners": course
+    "microsoft/AI-For-Beginners": course,
+    "cloudflare/cloudflared": cloudflared
   }
 };
 const output = process.env.PROJECT_READER_ACCEPTANCE_OUTPUT;
