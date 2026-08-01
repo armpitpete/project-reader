@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; connect-src https://api.github.com; img-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; connect-src https://api.github.com; img-src 'none'; style-src 'unsafe-inline'; script-src 'self';">
 <title>Project Reader</title>
 <style>
-:root{color-scheme:light;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:18px;line-height:1.55}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f7f7f2;color:#18212b}main{max-width:72rem;margin:0 auto;padding:1.5rem 1rem 3rem}.reader-shell{display:grid;gap:1.25rem}.reader-header{display:grid;gap:.35rem;padding-bottom:.9rem;border-bottom:1px solid #d7d8d0}h1,h2,h3{color:#101820;line-height:1.2;margin:0}h1{font-size:2rem}h2{font-size:1.55rem}h3{font-size:1.15rem}p,ul{margin:.35rem 0 0;max-width:68ch}.reader-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.75rem;align-items:end}.input-group{display:grid;gap:.4rem}label{font-weight:780}input{width:100%;min-height:2.75rem;border:2px solid #374151;border-radius:.35rem;background:#fff;color:#101820;font:inherit;padding:.55rem .7rem}button{min-height:2.75rem;border:2px solid #172033;border-radius:.35rem;background:#172033;color:#fff;font:inherit;font-weight:780;padding:.55rem .85rem;cursor:pointer}button:disabled{cursor:wait;opacity:.72}.status-line{min-height:1.6rem;font-weight:700}.status-line[data-tone="error"]{color:#8a1f11}.reader-result{display:none;min-width:0;margin-top:.35rem}.reader-result[data-visible="true"]{display:grid;gap:1rem}.reading-header{display:grid;gap:.35rem;padding:1rem;border:1px solid #cfd2c8;border-radius:.55rem;background:#fff}.simple-reading{display:grid;gap:.8rem}.answer-card{display:grid;gap:.3rem;padding:1rem;border-left:5px solid #2f5d62;background:#fff}.answer-card p{margin:0}.answer-list{margin:.15rem 0 0;padding-left:1.2rem}.muted{color:#4b5563}.notice{padding:.85rem 1rem;border:1px solid #c7aa59;border-radius:.45rem;background:#fffbed}.tag-row{display:flex;flex-wrap:wrap;gap:.45rem}.tag{display:inline-block;padding:.18rem .5rem;border-radius:999px;background:#e7ece9;font-size:.9rem;font-weight:700}details{border-top:1px solid #d7d8d0;padding:.9rem 0}summary{cursor:pointer;font-weight:800}.detail-grid{display:grid;gap:.85rem;padding-top:.75rem}.evidence-list{display:grid;gap:.45rem;padding-left:1.2rem}a{color:#135b70;text-underline-offset:.18em}:focus-visible{outline:4px solid #0f5132;outline-offset:4px}code{overflow-wrap:anywhere}.external-link::after{content:" ↗"}.small{font-size:.94rem}.danger{color:#8a1f11}
-@media(max-width:700px){main{padding:1rem .85rem 2.5rem}h1{font-size:1.65rem}.reader-form{grid-template-columns:1fr}button{width:100%}}
+:root{color-scheme:light;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:18px;line-height:1.55;--ink:#17212b;--muted:#53606d;--paper:#f5f4ee;--card:#fff;--line:#d5d6cf;--accent:#245d64;--accent-soft:#e5efef;--action:#17233b}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);overflow-x:hidden}main{max-width:68rem;margin:0 auto;padding:1.5rem 1rem 3rem}.reader-shell{display:grid;gap:1.25rem;min-width:0}.reader-header{display:grid;gap:.35rem;padding-bottom:1rem;border-bottom:1px solid var(--line)}h1,h2,h3{color:#0e1720;line-height:1.18;margin:0}h1{font-size:2rem}h2{font-size:1.55rem}h3{font-size:1.12rem}h1,h2,h3,p,li,a,code{overflow-wrap:anywhere;word-break:normal}p,ul,ol{margin:.4rem 0 0;max-width:70ch}.reader-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.75rem;align-items:end;min-width:0}.input-group{display:grid;gap:.4rem;min-width:0}label{font-weight:780}input{width:100%;min-width:0;min-height:2.8rem;border:2px solid #364151;border-radius:.35rem;background:#fff;color:#101820;font:inherit;padding:.55rem .7rem}button{min-height:2.8rem;border:2px solid var(--action);border-radius:.35rem;background:var(--action);color:#fff;font:inherit;font-weight:780;padding:.55rem .9rem;cursor:pointer}button:disabled{cursor:wait;opacity:.7}.status-line{min-height:1.6rem;font-weight:700}.status-line[data-tone="error"]{color:#8a1f11}.reader-result{display:none;min-width:0;margin-top:.25rem}.reader-result[data-visible="true"]{display:grid;gap:1rem}.reader-result-content,.reading-header,.simple-reading,.answer-card,.detail-grid{min-width:0}.reader-result-content{display:grid;gap:1rem}.reading-header{display:grid;gap:.45rem;padding:1.1rem;border:1px solid #cdd0c7;border-radius:.6rem;background:var(--card)}.eyebrow{margin:0;color:var(--accent);font-weight:800;text-transform:uppercase;letter-spacing:.05em;font-size:.8rem}.project-summary{font-size:1.05rem}.simple-reading{display:grid;gap:.8rem}.answer-card{display:grid;gap:.35rem;padding:1rem;border-left:5px solid var(--accent);background:var(--card)}.answer-card p{margin:0}.answer-list,.action-list{margin:.2rem 0 0;padding-left:1.2rem;display:grid;gap:.45rem}.action-list li{display:grid;gap:.1rem;min-width:0}.source-note{display:block;color:var(--muted);font-size:.84rem}.muted{color:var(--muted)}.tag-row{display:flex;flex-wrap:wrap;gap:.45rem}.tag{display:inline-block;padding:.18rem .52rem;border-radius:999px;background:var(--accent-soft);font-size:.86rem;font-weight:700}.primary-action{display:inline-block;width:fit-content;max-width:100%;margin-top:.5rem;padding:.55rem .75rem;border-radius:.35rem;background:var(--action);color:#fff;font-weight:800;text-decoration:none}.primary-action:visited{color:#fff}details{border-top:1px solid var(--line);padding:.9rem 0;min-width:0}summary{cursor:pointer;font-weight:800}.detail-grid{display:grid;gap:.85rem;padding-top:.75rem}.evidence-list{display:grid;gap:.5rem;padding-left:1.25rem;min-width:0}.evidence-records{gap:1rem}.evidence-records li{padding-bottom:.65rem;border-bottom:1px solid #e4e5df}.evidence-excerpt{font-size:.94rem;color:#36424d}a{color:#135b70;text-underline-offset:.18em}:focus-visible{outline:4px solid #0f5132;outline-offset:4px}code{overflow-wrap:anywhere}.external-link::after{content:" ↗"}.small{font-size:.92rem}.technical-detail{margin-top:.5rem}
+@media(max-width:700px){main{padding:1rem .8rem 2.5rem}h1{font-size:1.65rem}h2{font-size:1.35rem}.reader-form{grid-template-columns:1fr}button{width:100%}.answer-card{padding:.85rem}.reading-header{padding:.9rem}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
 </style>
 </head>
@@ -17,7 +17,7 @@
 <section class="reader-shell" aria-labelledby="project-reader-title">
   <header class="reader-header">
     <h1 id="project-reader-title">Project Reader</h1>
-    <p>Public GitHub projects explained in ordinary language.</p>
+    <p>Understand what a public GitHub project is, who it is for and what you can do with it.</p>
   </header>
 
   <form class="reader-form" id="reader-form">
@@ -36,233 +36,12 @@
     <div class="detail-grid">
       <p>Your browser asks GitHub directly for public repository information. Project Reader has no server, account, tracking form or GitHub write access.</p>
       <p>GitHub can see those public API requests and applies an unauthenticated rate limit. Private repositories cannot be read.</p>
-      <p>Project Reader reports unknown when the repository does not provide enough evidence. It does not treat activity, open issues, code volume or age as proof of completion.</p>
+      <p>The plain reading is produced by bounded rules, not a hosted artificial-intelligence service. It can still misunderstand unusual README structures, so the linked evidence remains available for checking.</p>
     </div>
   </details>
 </section>
+<!-- DEPLOYMENT_DETAIL -->
 </main>
-<script>
-"use strict";
-const GITHUB_API = "https://api.github.com";
-const form = document.querySelector("#reader-form");
-const input = document.querySelector("#repository");
-const button = document.querySelector("#read-button");
-const statusLine = document.querySelector("#status-line");
-const result = document.querySelector("#reader-result");
-
-const LANGUAGE_HELP = {
-  "Python":"Python is a language for giving a computer step-by-step instructions. It is often used for data work, automation and web services.",
-  "JavaScript":"JavaScript is a language that can make web pages respond when someone presses a button, changes a control or enters information.",
-  "TypeScript":"TypeScript is a way of writing JavaScript instructions with extra checks that can catch some mistakes before the program is used.",
-  "HTML":"HTML describes what is on a web page, such as headings, paragraphs, links, buttons and forms.",
-  "CSS":"CSS contains appearance rules for a web page, including spacing, text size, colours and layout.",
-  "Shell":"Shell scripts give a computer a sequence of command-line tasks to perform.",
-  "PowerShell":"PowerShell gives Windows and other computers scripted administrative and automation instructions.",
-  "C++":"C++ is a compiled language often used where close control of performance, memory or hardware matters.",
-  "C":"C is a compiled language often used for operating systems, embedded devices and performance-sensitive programs.",
-  "Rust":"Rust is a compiled language designed to provide strong memory-safety checks while keeping high performance.",
-  "Java":"Java is a language used to build applications that run through the Java platform on many kinds of computer.",
-  "Kotlin":"Kotlin is a language commonly used for Android applications and software that runs on the Java platform.",
-  "Swift":"Swift is a language mainly used to build applications for Apple devices.",
-  "PHP":"PHP is a language commonly used by web servers to assemble pages and work with stored information.",
-  "Ruby":"Ruby is a language often used for web applications, automation and readable scripting.",
-  "Go":"Go is a compiled language often used for network services and command-line tools.",
-  "SourcePawn":"SourcePawn is a scripting language used to make plugins for Source-engine game servers.",
-  "Pawn":"Pawn is a small scripting language used in some games and embedded systems."
-};
-
-function setStatus(message, tone="") { statusLine.textContent = message; statusLine.dataset.tone = tone; }
-function setBusy(busy) { button.disabled = busy; input.disabled = busy; button.textContent = busy ? "Reading..." : "Read this project"; }
-function clearResult() { result.replaceChildren(); result.dataset.visible = "false"; }
-function el(name, text="", className="") { const node=document.createElement(name); if(text) node.textContent=text; if(className) node.className=className; return node; }
-function safePublicUrl(value) { try { const url=new URL(value); return url.protocol==="https:" ? url.href : null; } catch { return null; } }
-function externalLink(text, href) { const safeHref=safePublicUrl(href); if(!safeHref) throw new Error("A public link in the repository evidence was unsafe."); const link=el("a",text,"external-link"); link.href=safeHref; link.target="_blank"; link.rel="noopener noreferrer"; return link; }
-function appendParagraph(parent, text, className="") { parent.append(el("p",text,className)); }
-function answerCard(title) { const card=el("section","","answer-card"); card.append(el("h3",title)); return card; }
-
-function parseRepository(value) {
-  const text=value.trim();
-  let match=text.match(/^([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)$/);
-  if(!match) {
-    try {
-      const url=new URL(text);
-      if(url.protocol!=="https:" || url.hostname!=="github.com" || url.search || url.hash) throw new Error();
-      const parts=url.pathname.split("/").filter(Boolean);
-      if(parts.length!==2) throw new Error();
-      match=[text,parts[0],parts[1].replace(/\.git$/i,"")];
-    } catch { throw new Error("Enter owner/name or a root public GitHub repository address."); }
-  }
-  const owner=match[1]; const repo=match[2].replace(/\.git$/i,"");
-  if(!owner || !repo || owner.length>100 || repo.length>100 || owner.startsWith(".") || repo.startsWith(".")) {
-    throw new Error("That repository address is not supported.");
-  }
-  return {owner,repo,fullName:`${owner}/${repo}`};
-}
-
-async function githubJson(path, allowMissing=false) {
-  const response=await fetch(`${GITHUB_API}${path}`, {headers:{"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}});
-  if(allowMissing && response.status===404) return null;
-  if(response.status===404) throw new Error("GitHub could not find that public repository. Check the name and visibility.");
-  if(response.status===403) throw new Error("GitHub's public request limit has been reached. Try again later or open the repository on GitHub.");
-  if(!response.ok) throw new Error("GitHub could not provide the public repository evidence right now.");
-  return response.json();
-}
-
-function decodeFile(payload) {
-  if(!payload || payload.type!=="file" || payload.encoding!=="base64" || typeof payload.content!=="string") return null;
-  try {
-    const binary=atob(payload.content.replace(/\s/g,""));
-    const bytes=Uint8Array.from(binary, character=>character.charCodeAt(0));
-    return new TextDecoder("utf-8",{fatal:false}).decode(bytes);
-  } catch { return null; }
-}
-
-function cleanMarkdown(text) {
-  return text.replace(/```[\s\S]*?```/g," ").replace(/`([^`]+)`/g,"$1").replace(/!\[[^\]]*\]\([^)]*\)/g," ").replace(/\[([^\]]+)\]\([^)]*\)/g,"$1").replace(/^#{1,6}\s+/gm,"").replace(/^[-*+]\s+/gm,"").replace(/[>*_~|]/g," ").replace(/\s+/g," ").trim();
-}
-
-function readmePurpose(readme, fallback) {
-  if(!readme) return fallback;
-  const withoutBadges=readme.replace(/\[!\[[^\]]*\]\([^)]*\)\]\([^)]*\)/g," ");
-  const paragraphs=withoutBadges.split(/\n\s*\n/).map(cleanMarkdown).filter(item=>item.length>=30 && !/^installation|^usage|^license|^contents|^table of contents/i.test(item));
-  return (paragraphs[0] || fallback).slice(0,420);
-}
-
-function validProgress(value) {
-  return value && typeof value==="object" && !Array.isArray(value) && Array.isArray(value.stages);
-}
-
-function progressSummary(progress) {
-  if(!validProgress(progress)) return {done:[],remaining:[],completion:null,completionReason:"No recognised owner progress record was found.",allComplete:false};
-  const stages=progress.stages.filter(stage=>stage && typeof stage.label==="string" && Number.isFinite(stage.completed) && Number.isFinite(stage.total) && stage.total>0 && stage.completed>=0);
-  const done=stages.filter(stage=>stage.completed>=stage.total).map(stage=>stage.label);
-  const remaining=stages.filter(stage=>stage.completed<stage.total).map(stage=>stage.label);
-  const total=stages.reduce((sum,stage)=>sum+stage.total,0);
-  const completed=stages.reduce((sum,stage)=>sum+Math.min(stage.completed,stage.total),0);
-  const explicitlyDisabled=progress.overall && progress.overall.enabled===false;
-  const completion=total>0 && !explicitlyDisabled ? Math.round((completed/total)*100) : null;
-  const completionReason=explicitlyDisabled ? "The owner progress record explicitly disables an overall percentage." : total>0 ? `Based only on ${stages.length} defined stage${stages.length===1?"":"s"} in .project/progress.json.` : "The progress record contains no usable numeric stages.";
-  return {done,remaining,completion,completionReason,allComplete:stages.length>0 && remaining.length===0};
-}
-
-function languageRows(languages) {
-  const entries=Object.entries(languages || {}).filter(([,bytes])=>Number.isFinite(bytes) && bytes>0).sort((a,b)=>b[1]-a[1]);
-  const total=entries.reduce((sum,[,bytes])=>sum+bytes,0);
-  return entries.map(([name,bytes])=>({name,percentage:total?Math.round((bytes/total)*1000)/10:0,help:LANGUAGE_HELP[name] || `${name} is a coding or markup language detected in this repository. The files alone do not show its exact purpose here.`}));
-}
-
-function addList(card, items, emptyText) {
-  if(!items.length) { appendParagraph(card,emptyText,"muted"); return; }
-  const list=el("ul","","answer-list"); items.slice(0,8).forEach(item=>list.append(el("li",item))); card.append(list);
-}
-
-function renderReading(repo, readme, progress, languages, checkedAt) {
-  const summary=progressSummary(progress);
-  const languageData=languageRows(languages);
-  const purpose=repo.description && repo.description.trim() ? repo.description.trim() : readmePurpose(readme,"The repository does not provide a clear plain-language purpose.");
-  const article=el("article","","reader-result-content");
-  const header=el("header","","reading-header");
-  header.append(el("h2",repo.full_name));
-  appendParagraph(header,purpose);
-  const tags=el("div","","tag-row");
-  tags.append(el("span",repo.archived?"Archived repository":"Active repository","tag"));
-  if(repo.fork) tags.append(el("span","Fork of another repository","tag"));
-  if(repo.license && repo.license.spdx_id) tags.append(el("span",`Licence: ${repo.license.spdx_id}`,"tag"));
-  header.append(tags);
-  article.append(header);
-
-  const simple=el("section","","simple-reading");
-  simple.append(el("h2","Simple reading"));
-
-  let card=answerCard("What is this project?"); appendParagraph(card,purpose); simple.append(card);
-  card=answerCard("What can someone do with it?");
-  const homepage=safePublicUrl(repo.homepage);
-  if(homepage) { appendParagraph(card,"The repository owner provides a public project website."); card.append(externalLink("Open the project website",homepage)); }
-  else { appendParagraph(card,"The public repository is the available project surface."); card.append(externalLink("Open the project on GitHub",repo.html_url)); }
-  simple.append(card);
-
-  card=answerCard("What appears to work or be finished?");
-  addList(card,summary.done,"The repository does not provide a recognised list of finished stages. That does not mean nothing is finished.");
-  simple.append(card);
-
-  card=answerCard("What is unfinished or unclear?");
-  addList(card,summary.remaining,"No unfinished defined stages are listed. Work outside the progress record may still exist.");
-  if(!validProgress(progress)) appendParagraph(card,"How complete the project is remains unknown.","muted");
-  simple.append(card);
-
-  card=answerCard("What was it made with?");
-  if(languageData.length) {
-    languageData.slice(0,5).forEach(item=>{const block=el("p"); const strong=el("strong",`${item.name}: `); block.append(strong,document.createTextNode(item.help)); card.append(block);});
-  } else appendParagraph(card,"GitHub did not report any repository languages.","muted");
-  simple.append(card);
-
-  card=answerCard("Where can I see it?");
-  card.append(externalLink("Open the public repository",repo.html_url));
-  card.append(document.createTextNode(" "));
-  card.append(externalLink("Contact the project owner",repo.owner.html_url));
-  simple.append(card);
-  article.append(simple);
-
-  const statusDetails=el("details"); statusDetails.append(el("summary","Project status and why Project Reader says this"));
-  const statusGrid=el("div","","detail-grid");
-  const completionText=summary.completion===null ? "Unknown" : `${summary.completion}% of the defined stages`;
-  appendParagraph(statusGrid,`Defined-stage completion: ${completionText}. ${summary.completionReason}`);
-  const likelihood=summary.allComplete ? "The defined stages are already complete; a future completion forecast is not needed." : "Likelihood of finishing is unknown. Public repository files do not support a reliable prediction.";
-  appendParagraph(statusGrid,likelihood);
-  appendParagraph(statusGrid,"Open issues, recent activity, repository age and language amounts are not used as completion evidence.");
-  appendParagraph(statusGrid,"External reader comprehension and commercial demand have not been assessed by this browser reading.","notice");
-  statusDetails.append(statusGrid); article.append(statusDetails);
-
-  const technical=el("details"); technical.append(el("summary","Technical sources and repository details"));
-  const technicalGrid=el("div","","detail-grid");
-  appendParagraph(technicalGrid,`Source branch: ${repo.default_branch}. Checked: ${checkedAt}.`,"small");
-  const evidence=el("ul","","evidence-list");
-  const repoLink=el("li"); repoLink.append(externalLink("Repository metadata and files",repo.html_url)); evidence.append(repoLink);
-  if(progress) { const progressLink=el("li"); progressLink.append(externalLink("Owner progress record",`${repo.html_url}/blob/${encodeURIComponent(repo.default_branch)}/.project/progress.json`)); evidence.append(progressLink); }
-  if(readme) { const readmeLink=el("li"); readmeLink.append(externalLink("README",`${repo.html_url}#readme`)); evidence.append(readmeLink); }
-  const languageLink=el("li"); languageLink.append(externalLink("GitHub language data",`${GITHUB_API}/repos/${repo.full_name}/languages`)); evidence.append(languageLink);
-  technicalGrid.append(evidence);
-  if(languageData.length) {
-    const list=el("ul","","evidence-list"); languageData.forEach(item=>list.append(el("li",`${item.name}: ${item.percentage}% of language bytes reported by GitHub`))); technicalGrid.append(el("h3","Detected languages and amounts"),list);
-  }
-  appendParagraph(technicalGrid,"This reading uses only public GitHub REST responses in your browser. It does not clone the repository, run its code, inspect private data or write anything.","small");
-  technical.append(technicalGrid); article.append(technical);
-  return article;
-}
-
-async function readRepository(reference) {
-  const parsed=parseRepository(reference);
-  const repo=await githubJson(`/repos/${encodeURIComponent(parsed.owner)}/${encodeURIComponent(parsed.repo)}`);
-  if(repo.private) throw new Error("Private repositories are not supported.");
-  const base=`/repos/${encodeURIComponent(repo.owner.login)}/${encodeURIComponent(repo.name)}`;
-  const branch=encodeURIComponent(repo.default_branch);
-  const [progressPayload,readmePayload,languages]=await Promise.all([
-    githubJson(`${base}/contents/.project/progress.json?ref=${branch}`,true),
-    githubJson(`${base}/readme?ref=${branch}`,true),
-    githubJson(`${base}/languages`,true)
-  ]);
-  let progress=null;
-  const progressText=decodeFile(progressPayload);
-  if(progressText) { try { const candidate=JSON.parse(progressText); if(validProgress(candidate)) progress=candidate; } catch {} }
-  const readme=decodeFile(readmePayload);
-  return {repo,readme,progress,languages:languages || {},checkedAt:new Date().toISOString().replace(/\.\d{3}Z$/,"Z")};
-}
-
-form.addEventListener("submit",async event=>{
-  event.preventDefault(); clearResult(); setBusy(true); setStatus("Reading public GitHub evidence...");
-  try {
-    const reading=await readRepository(input.value);
-    result.append(renderReading(reading.repo,reading.readme,reading.progress,reading.languages,reading.checkedAt));
-    result.dataset.visible="true"; setStatus("Reading complete."); result.focus({preventScroll:true}); result.scrollIntoView({block:"start"});
-    const url=new URL(window.location.href); url.searchParams.set("repo",reading.repo.full_name); history.replaceState(null,"",url);
-  } catch(error) {
-    const message=error instanceof Error ? error.message : "Project Reader could not read that public repository.";
-    setStatus(message,"error");
-  } finally { setBusy(false); }
-});
-
-const initial=new URL(window.location.href).searchParams.get("repo");
-if(initial) input.value=initial;
-</script>
+<script type="module" src="./app.js"></script>
 </body>
 </html>

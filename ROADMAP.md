@@ -2,61 +2,52 @@
 
 ## Foundation v0.1 — complete
 
-- [x] Lock the simple first-screen contract
 - [x] Separate completion from likelihood
 - [x] Define evidence and uncertainty rules
 - [x] Add deterministic scoring and accessible static proofs
 
-## Public evidence and interpretation v0.2–v0.5 — complete
+## Public evidence and interpretation v0.2–v0.7 — complete reference work
 
-- [x] Prove one cited public-repository reading
 - [x] Collect bounded public evidence at one exact commit
 - [x] Interpret evidence without turning activity into progress
-- [x] Render a complete ordinary-reader page
-- [x] Deploy the first static public proof
-
-## ND/YP reader and public API v0.6–v0.7 — superseded
-
 - [x] Establish beginner-first progressive disclosure
-- [x] Build and test the read-only Python public API
-- [x] Deploy an API-backed public reader
-- [x] Identify the archive-deployment mismatch that made the VPS a continuing release dependency
+- [x] Retain the Python evidence toolkit as tested reference code
 
-The Python API and evidence packages remain as tested reference and command-line tooling. The VPS API is not part of the completed public product.
+## Browser-only public reader v1.0 — technically complete, product acceptance failed
 
-## Self-contained public reader v1.0 — complete
+- [x] Remove the Oracle VPS from the required public runtime
+- [x] Read public GitHub evidence directly in the browser
+- [x] Preserve read-only operation, safe links and honest unknowns
+- [x] Deploy and verify an exact GitHub Pages commit
+- [x] Record the owner-supplied screenshots that invalidated product acceptance
 
-Tracked and accepted through issue #25.
+The v1.0 implementation ran safely, but its output mostly repeated repository descriptions and language totals. That is not sufficient project understanding.
 
-- [x] Read public repository metadata directly through GitHub's REST API in the browser
-- [x] Read README, `.project/progress.json` and language totals where available
-- [x] Preserve simple reading, project-status detail and technical-source detail
-- [x] Calculate only owner-defined stage completion and preserve honest unknowns
-- [x] Remove the Oracle VPS API from the required runtime and release path
-- [x] Prevent token use, repository writes, unsafe external links and external HTML injection
-- [x] Update Pages metadata, tests, workflow assertions and project authority records
-- [x] Pass exact-head deterministic, static, browser-artifact and live-public-reference checks
-- [x] Guarded squash-merge the implementation
-- [x] Deploy GitHub Pages from the exact release commit
-- [x] Verify public deployment metadata against that exact commit
-- [x] Resolve all remaining implementation, research and pilot issues
-- [x] Adopt Threadkeeper's canonical repository-write policy pointer
+## README comprehension repair v1.1 — active issue #33
 
-Implementation merge: `49827b54022fe31a3645946be364d8830329a541`.
-
-Deployment-verification commit: `9c6301699f2598dde3bf698e3d69823132a30f9f`.
-
-Repository-policy commit: `d06bfbaf9f83d59476ce74166022703d202fcfde`.
-
-Public reader:
-
-https://armpitpete.github.io/project-reader/
+- [x] Define application, curriculum, library, command-line, website, documentation, template, research and mixed classifications
+- [x] Build bounded deterministic README section and link extraction
+- [x] Generate purpose, audience, concrete actions, capabilities and explicit uncertainty
+- [x] Keep completion authority separate from ordinary README evidence
+- [x] Move language totals to secondary technical detail and remove zero-value rows
+- [x] Add deterministic Synth One, AI For Beginners and unknown-project fixtures
+- [x] Add live acceptance checks against both failed repositories
+- [x] Add desktop and narrow-width browser proof capture
+- [ ] Pass exact-head GitHub Actions
+- [ ] Complete protected review
+- [ ] Guarded squash merge
+- [ ] Deploy GitHub Pages from the accepted merge commit
+- [ ] Verify the exact public deployment
+- [ ] Record final evidence and close issue #33
 
 ## Completion boundary
 
-Project Reader is complete as a finished public prototype.
+Project Reader is complete only when the live reader produces useful, materially different explanations for both acceptance repositories:
 
-External comprehension interviews and a paid-outcome test would be separate product research. No external comprehension or commercial success is claimed.
+- Synth One must be understood as a playable iPhone/iPad synthesizer and an open-source codebase for musicians and developers.
+- AI For Beginners must be understood as a beginner curriculum with lessons, quizzes, labs, translations and a clear course starting point.
+
+The output must do more than repeat the GitHub description or list detected languages. Overall completion must remain unknown when owner authority is absent.
 
 ## Not included
 
@@ -65,4 +56,5 @@ External comprehension interviews and a paid-outcome test would be separate prod
 - Repository writes
 - Contact-form storage
 - Multi-repository dashboards
+- Hosted artificial-intelligence services
 - Commercial validation claims

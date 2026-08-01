@@ -9,21 +9,26 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Python package
         run: python -m pip install -q -e ".[dev]"
-      - name: Run tests
+      - name: Run Python tests
         run: pytest
-      - name: Rebuild static proofs
+      - name: Run deterministic browser comprehension contract
+        run: node tests/browser_comprehension_contract.mjs
+      - name: Rebuild static Python proofs
         run: |
           python scripts/render_sample.py
           python scripts/render_project_status_engine.py
-          git diff --exit-code -- prototype
+          git diff --exit-code -- prototype/project-status-engine.html prototype/sample-reader.html
       - name: Build browser-only public artifact
         run: python scripts/build_pages_site.py --commit "$GITHUB_SHA" --output /tmp/project-reader-public
       - name: Verify browser-only safety boundary
@@ -33,21 +38,39 @@ jobs:
           from pathlib import Path
 
           root = Path("/tmp/project-reader-public")
-          assert sorted(path.name for path in root.iterdir()) == [
+          files = sorted(path.name for path in root.iterdir())
+          assert files == [
               ".nojekyll",
+              "app.js",
+              "comprehension.js",
               "deployment.json",
               "index.html",
+              "polish.js",
           ]
           metadata = json.loads((root / "deployment.json").read_text(encoding="utf-8"))
+          assert metadata["schema_version"] == 3
           assert metadata["runtime"] == "browser-only"
           assert metadata["public_data_origin"] == "https://api.github.com"
+          assert metadata["public_files"] == files
+
           html = (root / "index.html").read_text(encoding="utf-8")
-          assert "reader-api.merrinworld.uk" not in html
-          assert "innerHTML" not in html
-          assert "GITHUB_TOKEN" not in html
-          assert 'method: "POST"' not in html
-          assert "function safePublicUrl" in html
-          assert 'url.protocol==="https:"' in html
+          app = (root / "app.js").read_text(encoding="utf-8")
+          comprehension = (root / "comprehension.js").read_text(encoding="utf-8")
+          polish = (root / "polish.js").read_text(encoding="utf-8")
+          public = html + app + comprehension + polish
+          assert "reader-api.merrinworld.uk" not in public
+          assert "innerHTML" not in public
+          assert "GITHUB_TOKEN" not in public
+          assert 'method: "POST"' not in app
+          assert 'method: "GET"' in app
+          assert "javascript:" not in app.lower()
+          assert "coding or markup language" not in comprehension
+          assert "buildComprehension" in comprehension
+          assert "polishReading" in app
+          assert "Study or change the source code" in polish
+          assert "Browse the course lessons" in polish
+          assert "overflow-x:hidden" in html
+          assert "script-src 'self'" in html
           PY
 
   live-public-reference:
@@ -60,7 +83,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install
+      - name: Install retained Python toolkit
         run: python -m pip install -q -e .
       - name: Run retained Python toolkit against public repositories
         run: |
@@ -86,3 +109,45 @@ jobs:
           assert all(len(item["source_commit"]) == 40 for item in proofs.values())
           assert all(item["html_contains_reader_questions"] for item in proofs.values())
           PY
+
+  live-browser-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      PROJECT_READER_ACCEPTANCE_OUTPUT: /tmp/project-reader-browser-acceptance.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Read both failed acceptance repositories
+        run: node tests/live_browser_acceptance.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: project-reader-browser-acceptance
+          path: /tmp/project-reader-browser-acceptance.json
+          if-no-files-found: error
+
+  browser-proof:
+    needs:
+      - test
+      - live-browser-acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build public artifact
+        run: python scripts/build_pages_site.py --commit "$GITHUB_SHA" --output /tmp/project-reader-public
+      - name: Capture desktop and narrow-width browser proofs
+        run: bash tests/capture_browser_proofs.sh /tmp/project-reader-public /tmp/project-reader-browser-proofs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: project-reader-browser-proofs
+          path: |
+            /tmp/project-reader-browser-proofs/*.png
+            /tmp/project-reader-browser-proofs/*.html
+          if-no-files-found: error

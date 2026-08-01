@@ -1,0 +1,50 @@
+{
+  "synth": {
+    "repo": {
+      "name": "AudioKitSynthOne",
+      "full_name": "AudioKit/AudioKitSynthOne",
+      "description": "AudioKit Synth One: Open-Source iOS Synthesizer App",
+      "default_branch": "master",
+      "html_url": "https://github.com/AudioKit/AudioKitSynthOne",
+      "homepage": "",
+      "owner": {"html_url": "https://github.com/AudioKit"},
+      "archived": false,
+      "fork": false,
+      "license": {"spdx_id": "MIT"}
+    },
+    "readme": "# AudioKit Synth One\n\nWe've open-sourced the code for this synthesizer so everyone can make changes, introduce features and fix bugs. Synth One is Universal for iPhone/iPad.\n\nMany features are available as modules in AudioKit, including oscillators, filters, reverbs, effects and other audio processing.\n\n## Features & App Store Location\n\n- [AudioKit Synth One Features](https://audiokitpro.com/synth)\n- [Download in App Store](http://itunes.apple.com/us/app/audiokit-synth-one-synthesizer/id1371050497)\n\n## Link Installation\n\nThe repository builds and runs without modification, but the Link functionality will be missing unless extra SDK files are supplied.\n\n## Opportunities for Contributing\n\n- Ability to search presets\n- MIDI Learn Matrix\n- Add an EQ Panel\n\n✓ DONE: Create an iPhone/Universal version.\n✓ DONE: Add accessibility functionality.\n\nThere are a few major updates we intend for this synth:\n\n- AUV3 Plugin support\n- MPE\n\n## Code Usage\n\nYou are free to use this code as a learning tool, change it, build a larger app and contribute code back. Musicians can use the app and developers with audio experience can contribute.",
+    "languages": {"Swift": 750000, "Objective-C": 115000, "Objective-C++": 83000, "C++": 48000, "C": 2800, "Ruby": 1000, "Shell": 1}
+  },
+  "course": {
+    "repo": {
+      "name": "AI-For-Beginners",
+      "full_name": "microsoft/AI-For-Beginners",
+      "description": "12 Weeks, 24 Lessons, AI for All!",
+      "default_branch": "main",
+      "html_url": "https://github.com/microsoft/AI-For-Beginners",
+      "homepage": "",
+      "owner": {"html_url": "https://github.com/microsoft"},
+      "archived": false,
+      "fork": false,
+      "license": {"spdx_id": "MIT"}
+    },
+    "readme": "# Artificial Intelligence for Beginners - A Curriculum\n\nExplore Artificial Intelligence with our 12-week, 24-lesson curriculum. It includes practical lessons, quizzes and labs. The curriculum is beginner-friendly.\n\n## Multi-Language Support\n\nTranslations are available in many languages.\n\n## What you will learn\n\n- Symbolic AI and knowledge representation\n- Neural Networks and Deep Learning\n- Computer Vision\n- Genetic Algorithms and Multi-Agent Systems\n\n## What we will not cover in this curriculum\n\n- Business cases of using AI\n- Classic Machine Learning\n- Conversational AI and chat bots\n- Deep Mathematics behind deep learning\n\n# Content\n\n- [Course Setup](./lessons/0-course-setup/setup.md)\n- [Introduction and History of AI](./lessons/1-Intro/README.md)\n- [Neural Networks Notebook](./lessons/3-NeuralNetworks/README.md)\n- [Computer Vision Lab](./lessons/4-ComputerVision/06-IntroCV/lab/README.md)",
+    "languages": {"Jupyter Notebook": 999900, "Python": 50, "HTML": 20, "Vue": 10, "JavaScript": 5, "Dockerfile": 1, "Shell": 1}
+  },
+  "unknown": {
+    "repo": {
+      "name": "odd-box",
+      "full_name": "example/odd-box",
+      "description": "Experiments and notes",
+      "default_branch": "main",
+      "html_url": "https://github.com/example/odd-box",
+      "homepage": "",
+      "owner": {"html_url": "https://github.com/example"},
+      "archived": false,
+      "fork": false,
+      "license": null
+    },
+    "readme": "# Odd Box\n\nA collection of experiments and notes.\n\n## Included\n\n- One example\n- A short note",
+    "languages": {"MadeUpLanguage": 1000, "Shell": 1}
+  }
+}

@@ -1,73 +1,74 @@
 {
   "schema_version": 1,
   "authority": "ROADMAP.md",
-  "updated_at": "2026-08-01T18:58:00Z",
+  "updated_at": "2026-08-01T20:27:00+01:00",
   "release": {
-    "name": "Self-contained Public Reader v1.0",
+    "name": "README Comprehension Repair v1.1",
     "implemented": true,
-    "tested": true,
-    "merged": true,
-    "deployed": true,
-    "publicly_verified": true,
-    "complete": true,
+    "tested": false,
+    "merged": false,
+    "deployed": false,
+    "publicly_verified": false,
     "external_comprehension_proven": false,
     "commercial_validation_proven": false,
-    "authoritative_issue": "https://github.com/armpitpete/project-reader/issues/25",
-    "implementation_merge_commit": "49827b54022fe31a3645946be364d8830329a541",
-    "deployment_verification_commit": "9c6301699f2598dde3bf698e3d69823132a30f9f",
-    "repository_policy_commit": "d06bfbaf9f83d59476ce74166022703d202fcfde",
-    "deployment_evidence": "https://github.com/armpitpete/project-reader/issues/25#issuecomment-5152912610",
+    "authoritative_issue": "https://github.com/armpitpete/project-reader/issues/33",
     "public_url": "https://armpitpete.github.io/project-reader/",
     "runtime": "browser-only",
     "public_data_origin": "https://api.github.com",
-    "product_classification": "finished public prototype"
+    "product_classification": "active acceptance repair; not complete"
   },
   "stages": [
     {
-      "id": "browser-reader",
-      "label": "Self-contained browser reader implemented",
+      "id": "comprehension-layer",
+      "label": "Deterministic README comprehension layer implemented",
       "completed": 1,
       "total": 1
     },
     {
-      "id": "evidence-rules",
-      "label": "Owner-defined completion and honest unknown rules preserved",
+      "id": "acceptance-fixtures",
+      "label": "Synth One, AI For Beginners and unknown-project fixtures implemented",
       "completed": 1,
       "total": 1
     },
     {
-      "id": "runtime-independence",
-      "label": "Oracle VPS removed from the required public runtime",
+      "id": "live-contracts",
+      "label": "Live repository and browser proof contracts implemented",
       "completed": 1,
       "total": 1
     },
     {
       "id": "tests",
-      "label": "Exact-head deterministic, static, Pages and live public checks passed",
-      "completed": 1,
+      "label": "Exact-head deterministic and live checks passed",
+      "completed": 0,
+      "total": 1
+    },
+    {
+      "id": "review",
+      "label": "Exact-head protected review accepted",
+      "completed": 0,
       "total": 1
     },
     {
       "id": "merged",
-      "label": "v1.0 implementation and deployment verification merged to main",
-      "completed": 1,
+      "label": "Accepted v1.1 candidate merged to main",
+      "completed": 0,
       "total": 1
     },
     {
       "id": "deployed",
-      "label": "GitHub Pages deployed from the accepted release commit",
-      "completed": 1,
+      "label": "GitHub Pages deployed from the accepted merge commit",
+      "completed": 0,
       "total": 1
     },
     {
       "id": "public-verification",
-      "label": "Public deployment metadata verified against the exact release commit",
-      "completed": 1,
+      "label": "Public deployment and both acceptance readings verified",
+      "completed": 0,
       "total": 1
     }
   ],
   "overall": {
     "enabled": true,
-    "reason": "All seven bounded v1.0 completion stages are complete."
+    "reason": "The bounded issue #33 repair has eight equally weighted mechanical stages."
   }
 }
