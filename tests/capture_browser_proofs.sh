@@ -58,8 +58,22 @@ capture course-mobile microsoft/AI-For-Beginners 390 1600
 grep -F "playable open-source synthesizer app" "$OUTPUT_DIR/synth-desktop.html"
 grep -F "musicians" "$OUTPUT_DIR/synth-desktop.html"
 grep -F "Get or open the app" "$OUTPUT_DIR/synth-desktop.html"
+grep -F "Study or change the source code" "$OUTPUT_DIR/synth-desktop.html"
+grep -F "oscillators, filters, reverbs and effects" "$OUTPUT_DIR/synth-desktop.html"
+grep -F "iPhone/Universal version and accessibility support" "$OUTPUT_DIR/synth-desktop.html"
+grep -F "preset search, a MIDI learn matrix and assignable touchpads" "$OUTPUT_DIR/synth-desktop.html"
+! grep -Eqi "Ableton Link SDK|From: Localizations" "$OUTPUT_DIR/synth-desktop.html"
+
 grep -F "beginner curriculum for learning artificial intelligence" "$OUTPUT_DIR/course-desktop.html"
 grep -F "24 lessons" "$OUTPUT_DIR/course-desktop.html"
 grep -F "Start with the course setup" "$OUTPUT_DIR/course-desktop.html"
+grep -F "Browse the course lessons" "$OUTPUT_DIR/course-desktop.html"
+grep -F "business uses of AI" "$OUTPUT_DIR/course-desktop.html"
+grep -F "deeper mathematics of deep learning" "$OUTPUT_DIR/course-desktop.html"
+! grep -Eqi "@girlie|Machine Learning for Beginners Curriculum|:---:" "$OUTPUT_DIR/course-desktop.html"
+
+for proof in "$OUTPUT_DIR"/*.html; do
+  ! grep -Fq "coding or markup language" "$proof"
+done
 
 printf 'browser-proof=pass\n'
