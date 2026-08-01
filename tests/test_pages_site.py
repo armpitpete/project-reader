@@ -25,6 +25,7 @@ def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
         "comprehension.js",
         "deployment.json",
         "index.html",
+        "polish.js",
     ]
 
     metadata = json.loads((tmp_path / "deployment.json").read_text(encoding="utf-8"))
@@ -36,13 +37,19 @@ def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
         "runtime": "browser-only",
         "public_data_origin": "https://api.github.com",
         "source_html": "prototype/public-reader.html",
-        "source_scripts": ["prototype/app.js", "prototype/comprehension.js"],
+        "source_scripts": [
+            "prototype/app.js",
+            "prototype/comprehension.js",
+            "prototype/polish.js",
+        ],
         "public_files": public_files,
     }
 
     html = (tmp_path / "index.html").read_text(encoding="utf-8")
     app = (tmp_path / "app.js").read_text(encoding="utf-8")
     comprehension = (tmp_path / "comprehension.js").read_text(encoding="utf-8")
+    polish = (tmp_path / "polish.js").read_text(encoding="utf-8")
+    public = html + app + comprehension + polish
 
     assert "Project Reader" in html
     assert "Understand what a public GitHub project is" in html
@@ -53,13 +60,15 @@ def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
     assert '<script type="module" src="./app.js"></script>' in html
     assert "Project Reader deployment commit:" in html
     assert HEAD in html
-    assert "reader-api.merrinworld.uk" not in html + app + comprehension
-    assert "GITHUB_TOKEN" not in html + app + comprehension
-    assert "PRIVATE KEY" not in (html + app + comprehension).upper()
-    assert "innerHTML" not in app + comprehension
+    assert "reader-api.merrinworld.uk" not in public
+    assert "GITHUB_TOKEN" not in public
+    assert "PRIVATE KEY" not in public.upper()
+    assert "innerHTML" not in app + comprehension + polish
     assert 'method: "GET"' in app
     assert 'method: "POST"' not in app
     assert "buildComprehension" in comprehension
+    assert "polishReading" in app
+    assert "polishReading" in polish
     assert "Learning course or curriculum" in comprehension
     assert "Application and open-source codebase" in comprehension
     assert "coding or markup language" not in comprehension
@@ -71,10 +80,15 @@ def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
     assert "What is unfinished or uncertain?" in app
     assert "Where should I start?" in app
     assert "Evidence behind the plain reading" in app
+    assert "Study or change the source code" in polish
+    assert "Browse the course lessons" in polish
+    assert "deeper mathematics of deep learning" in polish
+    assert "overflow-x:hidden" in html
+    assert "overflow-wrap:anywhere" in html
     assert "write anything" in app
-    assert "I:\\" not in html + app + comprehension
-    assert "C:\\" not in html + app + comprehension
-    assert "SECRET" not in (html + app + comprehension).upper()
+    assert "I:\\" not in public
+    assert "C:\\" not in public
+    assert "SECRET" not in public.upper()
 
 
 def test_pages_site_rejects_non_commit_identifier(tmp_path: Path) -> None:
