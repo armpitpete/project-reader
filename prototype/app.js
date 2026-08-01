@@ -1,4 +1,5 @@
 import { buildComprehension, safePublicUrl, validProgress } from "./comprehension.js";
+import { polishReading } from "./polish.js";
 
 const GITHUB_API = "https://api.github.com";
 const form = document.querySelector("#reader-form");
@@ -154,7 +155,11 @@ async function readRepository(reference) {
 }
 
 export function renderReading(repo, readme, progress, languages, checkedAt) {
-  const reading = buildComprehension(repo, readme, progress, languages);
+  const reading = polishReading(
+    buildComprehension(repo, readme, progress, languages),
+    repo,
+    readme
+  );
   const article = el("article", "", "reader-result-content");
 
   const header = el("header", "", "reading-header");
