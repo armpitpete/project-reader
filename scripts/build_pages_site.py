@@ -15,6 +15,8 @@ DEFAULT_NETWORK_CORRECTIONS = ROOT / "prototype" / "network-corrections.js"
 DEFAULT_POLISH = ROOT / "prototype" / "polish.js"
 DEFAULT_RESILIENCE = ROOT / "prototype" / "resilience.js"
 SHA = re.compile(r"^[0-9a-f]{40}$")
+PUBLIC_ORIGIN = "https://armpitpete.github.io/project-reader/"
+SITEMAP_NAMESPACE = "http://www.sitemaps.org/schemas/sitemap/0.9"
 
 
 def build_pages_site(
@@ -53,6 +55,7 @@ def build_pages_site(
     polish = output / "polish.js"
     resilience = output / "resilience.js"
     metadata = output / "deployment.json"
+    sitemap = output / "sitemap.xml"
     nojekyll = output / ".nojekyll"
 
     index.write_text(html, encoding="utf-8")
@@ -61,6 +64,13 @@ def build_pages_site(
     shutil.copyfile(network_corrections_source, network_corrections)
     shutil.copyfile(polish_source, polish)
     shutil.copyfile(resilience_source, resilience)
+    sitemap.write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        f'<urlset xmlns="{SITEMAP_NAMESPACE}">\n'
+        f"  <url><loc>{PUBLIC_ORIGIN}</loc></url>\n"
+        "</urlset>\n",
+        encoding="utf-8",
+    )
     public_files = [
         ".nojekyll",
         "app.js",
@@ -70,6 +80,7 @@ def build_pages_site(
         "network-corrections.js",
         "polish.js",
         "resilience.js",
+        "sitemap.xml",
     ]
     metadata.write_text(
         json.dumps(
@@ -110,6 +121,7 @@ def build_pages_site(
         network_corrections,
         polish,
         resilience,
+        sitemap,
     )
 
 
