@@ -99,6 +99,14 @@ jobs:
           assert "script-src 'self'" in html
           assert "connect-src https://api.github.com https://raw.githubusercontent.com" in html
           PY
+      - name: Upload sitemap candidate evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-reader-sitemap-candidate
+          path: |
+            /tmp/project-reader-public/sitemap.xml
+            /tmp/project-reader-public/deployment.json
+          if-no-files-found: error
 
   live-public-reference:
     runs-on: ubuntu-latest
