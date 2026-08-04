@@ -1,6 +1,8 @@
+import importlib.util
 import json
 from pathlib import Path
-import importlib.util
+from urllib.parse import urlsplit
+import xml.etree.ElementTree as ET
 
 import pytest
 
@@ -13,6 +15,8 @@ build_pages_site_module = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(build_pages_site_module)
 build_pages_site = build_pages_site_module.build_pages_site
 HEAD = "f" * 40
+PUBLIC_URL = "https://armpitpete.github.io/project-reader/"
+SITEMAP_NAMESPACE = "http://www.sitemaps.org/schemas/sitemap/0.9"
 
 
 def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
@@ -28,6 +32,7 @@ def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
         "network-corrections.js",
         "polish.js",
         "resilience.js",
+        "sitemap.xml",
     ]
 
     metadata = json.loads((tmp_path / "deployment.json").read_text(encoding="utf-8"))
@@ -108,6 +113,37 @@ def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
     assert "I:\\" not in public
     assert "C:\\" not in public
     assert "SECRET" not in public.upper()
+
+
+def test_pages_site_generates_exact_project_scoped_sitemap(tmp_path: Path) -> None:
+    build_pages_site(commit=HEAD, output=tmp_path)
+
+    sitemap = tmp_path / "sitemap.xml"
+    root = ET.parse(sitemap).getroot()
+    assert root.tag == f"{{{SITEMAP_NAMESPACE}}}urlset"
+
+    locations = [
+        element.text
+        for element in root.findall(
+            f"{{{SITEMAP_NAMESPACE}}}url/{{{SITEMAP_NAMESPACE}}}loc"
+        )
+    ]
+    assert locations == [PUBLIC_URL]
+    assert len(locations) == len(set(locations))
+
+    parsed = urlsplit(locations[0])
+    assert parsed.scheme == "https"
+    assert parsed.netloc == "armpitpete.github.io"
+    assert parsed.path == "/project-reader/"
+    assert parsed.query == ""
+    assert parsed.fragment == ""
+
+    assert sitemap.read_text(encoding="utf-8") == (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        f'<urlset xmlns="{SITEMAP_NAMESPACE}">\n'
+        f"  <url><loc>{PUBLIC_URL}</loc></url>\n"
+        "</urlset>\n"
+    )
 
 
 def test_pages_site_rejects_non_commit_identifier(tmp_path: Path) -> None:
