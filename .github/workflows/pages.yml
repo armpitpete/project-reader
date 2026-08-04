@@ -43,6 +43,7 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
+          import xml.etree.ElementTree as ET
 
           root = Path("public")
           files = sorted(path.name for path in root.iterdir())
@@ -55,6 +56,7 @@ jobs:
               "network-corrections.js",
               "polish.js",
               "resilience.js",
+              "sitemap.xml",
           ]
 
           metadata = json.loads((root / "deployment.json").read_text(encoding="utf-8"))
@@ -67,6 +69,16 @@ jobs:
           ]
           assert metadata["rate_limit_fallback"] == "public README without account or token"
           assert metadata["public_files"] == files
+
+          namespace = "http://www.sitemaps.org/schemas/sitemap/0.9"
+          sitemap = ET.parse(root / "sitemap.xml").getroot()
+          assert sitemap.tag == f"{{{namespace}}}urlset"
+          locations = [
+              element.text
+              for element in sitemap.findall(f"{{{namespace}}}url/{{{namespace}}}loc")
+          ]
+          assert locations == ["https://armpitpete.github.io/project-reader/"]
+          assert len(locations) == len(set(locations))
 
           html = (root / "index.html").read_text(encoding="utf-8")
           app = (root / "app.js").read_text(encoding="utf-8")
@@ -129,22 +141,42 @@ jobs:
           import json
           import os
           import time
+          import xml.etree.ElementTree as ET
           from urllib.error import HTTPError, URLError
           from urllib.request import Request, urlopen
 
           base = os.environ["DEPLOYMENT_URL"].rstrip("/")
           expected = os.environ["EXPECTED_COMMIT"]
-          url = f"{base}/deployment.json"
+          metadata_url = f"{base}/deployment.json"
+          sitemap_url = f"{base}/sitemap.xml"
+          namespace = "http://www.sitemaps.org/schemas/sitemap/0.9"
+          expected_locations = ["https://armpitpete.github.io/project-reader/"]
           last_error = "no response"
 
           for attempt in range(1, 31):
-              request = Request(
-                  f"{url}?verification={expected}-{attempt}",
+              metadata_request = Request(
+                  f"{metadata_url}?verification={expected}-{attempt}",
+                  headers={"Cache-Control": "no-cache", "Pragma": "no-cache"},
+              )
+              sitemap_request = Request(
+                  f"{sitemap_url}?verification={expected}-{attempt}",
                   headers={"Cache-Control": "no-cache", "Pragma": "no-cache"},
               )
               try:
-                  with urlopen(request, timeout=20) as response:
+                  with urlopen(metadata_request, timeout=20) as response:
                       payload = json.load(response)
+                  with urlopen(sitemap_request, timeout=20) as response:
+                      sitemap_status = response.status
+                      sitemap_content_type = response.headers.get_content_type()
+                      sitemap_body = response.read()
+
+                  sitemap = ET.fromstring(sitemap_body)
+                  locations = [
+                      element.text
+                      for element in sitemap.findall(
+                          f"{{{namespace}}}url/{{{namespace}}}loc"
+                      )
+                  ]
                   if (
                       payload.get("deployed_commit") == expected
                       and payload.get("schema_version") == 4
@@ -154,12 +186,31 @@ jobs:
                           "https://raw.githubusercontent.com",
                       ]
                       and payload.get("rate_limit_fallback") == "public README without account or token"
+                      and sitemap_status == 200
+                      and sitemap_content_type in {"application/xml", "text/xml"}
+                      and sitemap.tag == f"{{{namespace}}}urlset"
+                      and locations == expected_locations
+                      and len(locations) == len(set(locations))
                   ):
-                      print(f"verified-url={url}")
+                      print(f"verified-url={metadata_url}")
                       print(f"verified-commit={expected}")
+                      print(f"verified-sitemap={sitemap_url}")
+                      print(f"verified-sitemap-content-type={sitemap_content_type}")
+                      print(f"verified-sitemap-locations={locations!r}")
                       break
-                  last_error = f"unexpected deployment metadata: {payload!r}"
-              except (HTTPError, URLError, TimeoutError, json.JSONDecodeError) as error:
+                  last_error = (
+                      f"unexpected deployment state: metadata={payload!r}, "
+                      f"sitemap_status={sitemap_status!r}, "
+                      f"sitemap_content_type={sitemap_content_type!r}, "
+                      f"sitemap_tag={sitemap.tag!r}, locations={locations!r}"
+                  )
+              except (
+                  HTTPError,
+                  URLError,
+                  TimeoutError,
+                  json.JSONDecodeError,
+                  ET.ParseError,
+              ) as error:
                   last_error = f"{type(error).__name__}: {error}"
               time.sleep(5)
           else:
@@ -173,18 +224,21 @@ jobs:
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           cat > /tmp/project-reader-deployment.md <<EOF
-          ## Resilient public deployment verified
+          ## Project-scoped sitemap deployment verified
 
-          GitHub Pages deployed and publicly returned the exact issue #36 release metadata.
+          GitHub Pages deployed and publicly returned the exact Project Reader release metadata and sitemap contract.
 
           - deployed commit: \`$DEPLOYED_COMMIT\`
           - public reader: $DEPLOYMENT_URL
           - verification file: ${DEPLOYMENT_URL%/}/deployment.json
+          - sitemap: ${DEPLOYMENT_URL%/}/sitemap.xml
+          - sitemap root: standard \`urlset\`
+          - sitemap URL set: \`https://armpitpete.github.io/project-reader/\`
           - runtime: browser-only
           - public data origins: \`https://api.github.com\`, \`https://raw.githubusercontent.com\`
           - anonymous API fallback: public README without account or token
           - deployment run: $RUN_URL
 
-          The deployed reader contains the accepted command-line network-service correction and the rate-limit-resilient README fallback required by issue #36.
+          The deployment preserves the accepted Project Reader product boundary and adds only the project-scoped sitemap authorised by issue #41.
           EOF
-          gh issue comment 36 --repo "$GITHUB_REPOSITORY" --body-file /tmp/project-reader-deployment.md
+          gh issue comment 41 --repo "$GITHUB_REPOSITORY" --body-file /tmp/project-reader-deployment.md
