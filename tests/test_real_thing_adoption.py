@@ -32,7 +32,7 @@ def test_percentage_100_does_not_create_lifecycle_completion():
     status, progress = load_records()
     status = copy.deepcopy(status)
     status["lifecycle_status"]["verified"] = "complete"
-    with pytest.raises(AdoptionError, match="must stop at live-behaviour-verified|planning percentage|cannot be lifecycle complete"):
+    with pytest.raises(AdoptionError, match="cannot be lifecycle complete without human acceptance"):
         validate_adoption(status, progress)
 
 
@@ -62,6 +62,19 @@ def test_automated_browser_acceptance_is_not_human_acceptance():
     human["evidence"] = ["https://github.com/armpitpete/project-reader/actions/runs/30934402526#live-browser-acceptance"]
     with pytest.raises(AdoptionError, match="automated evidence cannot establish human acceptance"):
         validate_adoption(status, progress)
+
+
+def test_future_direct_human_acceptance_can_advance_without_validator_change():
+    status, progress = load_records()
+    status = copy.deepcopy(status)
+    human = status["lifecycle_status"]["stages"][7]
+    human["result"] = "PASS"
+    human["relationship"] = "direct"
+    human["observed_environment"] = human["required_environment"]
+    human["evidence"] = ["human:explicit-live-experience-acceptance-fixture"]
+    status["lifecycle_status"]["claimed"] = "complete"
+    status["lifecycle_status"]["verified"] = "complete"
+    validate_adoption(status, progress)
 
 
 def test_legacy_unqualified_complete_is_rejected():
