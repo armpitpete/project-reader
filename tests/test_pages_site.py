@@ -46,6 +46,7 @@ def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
             "https://api.github.com",
             "https://raw.githubusercontent.com",
         ],
+        "analytics_origin": "https://collect.merrinworld.uk",
         "rate_limit_fallback": "public README without account or token",
         "source_html": "prototype/public-reader.html",
         "source_scripts": [
@@ -73,6 +74,12 @@ def test_pages_site_contains_only_public_reader_files(tmp_path: Path) -> None:
     assert 'role="status" aria-live="polite"' in html
     assert 'aria-label="Project Reader result"' in html
     assert '<script type="module" src="./app.js"></script>' in html
+    assert '<script src="https://collect.merrinworld.uk/beacon.js" data-site="project_reader" defer></script>' in html
+    assert "connect-src https://api.github.com https://raw.githubusercontent.com https://collect.merrinworld.uk" in html
+    assert "script-src 'self' https://collect.merrinworld.uk" in html
+    assert "random site-local browser token" in html
+    assert "stores no IP address" in html
+    assert "cross-site visitor identity" in html
     assert "Project Reader deployment commit:" in html
     assert HEAD in html
     assert "https://raw.githubusercontent.com" in html
