@@ -1,14 +1,20 @@
 from __future__ import annotations
 
 import copy
+import importlib.util
 import json
 from pathlib import Path
 
 import pytest
 
-from scripts.validate_real_thing_adoption import AdoptionError, validate_adoption
-
 ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = ROOT / "scripts" / "validate_real_thing_adoption.py"
+SPEC = importlib.util.spec_from_file_location("validate_real_thing_adoption", MODULE_PATH)
+assert SPEC and SPEC.loader
+MODULE = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(MODULE)
+AdoptionError = MODULE.AdoptionError
+validate_adoption = MODULE.validate_adoption
 
 
 def load_records():
