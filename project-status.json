@@ -1,0 +1,135 @@
+{
+  "project": "armpitpete/project-reader",
+  "finish_line": "Project Reader public prototype is implemented, reviewed, merged, deployed and verified in production, with explicit human acceptance recorded separately before lifecycle completion is claimed.",
+  "percentage_complete": {
+    "estimate": 100,
+    "confidence": "high",
+    "evidence": [
+      "The bounded engineering/publication stages recorded for the accepted releases are complete; this percentage is planning/release-scope information only and does not establish lifecycle completion."
+    ],
+    "remaining_work": [
+      "Obtain and record direct human acceptance of the live Project Reader experience before any lifecycle-complete claim."
+    ],
+    "blockers": []
+  },
+  "completion_likelihood": {
+    "assessment": "likely",
+    "confidence": "medium",
+    "reasons": [
+      "Implementation, exact-head checks, protected review, merge, deployment and live production verification have direct evidence; human acceptance remains unproven."
+    ]
+  },
+  "lifecycle_status": {
+    "claimed": "live-behaviour-verified",
+    "verified": "live-behaviour-verified",
+    "authority": "armpitpete/merrin-project-controls@7bc8b7f5ef921851ad163093f089d28d8128bf6c",
+    "limitations": [
+      "Automated browser acceptance and browser-proof workflows are not human acceptance.",
+      "No direct human acceptance evidence is recorded for the current live Project Reader experience."
+    ],
+    "stages": [
+      {
+        "stage": "designed",
+        "required": true,
+        "required_environment": "accepted Project Reader issue #41 scope",
+        "observed_environment": "accepted Project Reader issue #41 scope",
+        "result": "PASS",
+        "relationship": "direct",
+        "evidence": [
+          "https://github.com/armpitpete/project-reader/issues/41"
+        ],
+        "limitations": []
+      },
+      {
+        "stage": "implemented",
+        "required": true,
+        "required_environment": "Project Reader PR #43 exact accepted head 887381979687ba76db9e8b27edcd30883b4a2d6a",
+        "observed_environment": "Project Reader PR #43 exact accepted head 887381979687ba76db9e8b27edcd30883b4a2d6a",
+        "result": "PASS",
+        "relationship": "direct",
+        "evidence": [
+          "https://github.com/armpitpete/project-reader/pull/43"
+        ],
+        "limitations": []
+      },
+      {
+        "stage": "automated-checks",
+        "required": true,
+        "required_environment": "Project Reader PR #43 exact-head automated checks for 887381979687ba76db9e8b27edcd30883b4a2d6a",
+        "observed_environment": "Project Reader PR #43 exact-head automated checks for 887381979687ba76db9e8b27edcd30883b4a2d6a",
+        "result": "PASS",
+        "relationship": "direct",
+        "evidence": [
+          "https://github.com/armpitpete/project-reader/actions/runs/30934400339",
+          "https://github.com/armpitpete/project-reader/actions/runs/30934402526"
+        ],
+        "limitations": []
+      },
+      {
+        "stage": "independent-review",
+        "required": true,
+        "required_environment": "Project Reader PR #43 protected exact-head review for 887381979687ba76db9e8b27edcd30883b4a2d6a",
+        "observed_environment": "Project Reader PR #43 protected exact-head review for 887381979687ba76db9e8b27edcd30883b4a2d6a",
+        "result": "PASS",
+        "relationship": "direct",
+        "evidence": [
+          "https://github.com/armpitpete/project-reader/pull/43#pullrequestreview-4857302288"
+        ],
+        "limitations": []
+      },
+      {
+        "stage": "merged",
+        "required": true,
+        "required_environment": "Project Reader default-branch commit 4e64c5486863a41fc011078c502bb8fd3b827460",
+        "observed_environment": "Project Reader default-branch commit 4e64c5486863a41fc011078c502bb8fd3b827460",
+        "result": "PASS",
+        "relationship": "direct",
+        "evidence": [
+          "https://github.com/armpitpete/project-reader/commit/4e64c5486863a41fc011078c502bb8fd3b827460"
+        ],
+        "limitations": []
+      },
+      {
+        "stage": "deployed",
+        "required": true,
+        "required_environment": "GitHub Pages deployment of Project Reader commit 4e64c5486863a41fc011078c502bb8fd3b827460",
+        "observed_environment": "GitHub Pages deployment of Project Reader commit 4e64c5486863a41fc011078c502bb8fd3b827460",
+        "result": "PASS",
+        "relationship": "direct",
+        "evidence": [
+          "https://github.com/armpitpete/project-reader/actions/runs/30935272781",
+          "https://github.com/armpitpete/project-reader/issues/41#issuecomment-5182617708"
+        ],
+        "limitations": []
+      },
+      {
+        "stage": "live-behaviour",
+        "required": true,
+        "required_environment": "live https://armpitpete.github.io/project-reader/ deployment at commit 4e64c5486863a41fc011078c502bb8fd3b827460",
+        "observed_environment": "live https://armpitpete.github.io/project-reader/ deployment at commit 4e64c5486863a41fc011078c502bb8fd3b827460",
+        "result": "PASS",
+        "relationship": "direct",
+        "evidence": [
+          "https://github.com/armpitpete/project-reader/issues/41#issuecomment-5182631309",
+          "https://armpitpete.github.io/project-reader/deployment.json",
+          "https://armpitpete.github.io/project-reader/sitemap.xml"
+        ],
+        "limitations": [
+          "This proves the explicit production deployment and sitemap/runtime claims exercised by the live verifier; it does not prove human comprehension or satisfaction."
+        ]
+      },
+      {
+        "stage": "human-acceptance",
+        "required": true,
+        "required_environment": "explicit human acceptance of the live Project Reader experience",
+        "result": "INSUFFICIENT",
+        "relationship": "missing",
+        "evidence": [],
+        "limitations": [
+          "No direct human acceptance record has been identified. Automated browser acceptance is not a substitute."
+        ]
+      }
+    ]
+  },
+  "next_bounded_action": "Obtain explicit human acceptance against the actual live Project Reader experience, or keep lifecycle status at live-behaviour-verified."
+}
