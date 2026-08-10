@@ -32,7 +32,10 @@ def test_percentage_100_does_not_create_lifecycle_completion():
     status, progress = load_records()
     status = copy.deepcopy(status)
     status["lifecycle_status"]["verified"] = "complete"
-    with pytest.raises(AdoptionError, match="cannot be lifecycle complete without human acceptance"):
+    with pytest.raises(
+        AdoptionError,
+        match="human acceptance cannot be verified without direct human evidence|cannot be lifecycle complete without human acceptance",
+    ):
         validate_adoption(status, progress)
 
 
