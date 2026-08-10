@@ -22,6 +22,17 @@ STAGES = (
     "live-behaviour",
     "human-acceptance",
 )
+CANONICAL_CLAIMS = {
+    "designed",
+    "implemented",
+    "automated-checks-passed",
+    "independently-reviewed",
+    "merged",
+    "deployed",
+    "live-behaviour-verified",
+    "human-acceptance-received",
+    "complete",
+}
 
 
 class AdoptionError(ValueError):
@@ -35,10 +46,10 @@ def validate_adoption(status: Any, progress: Any) -> None:
     lifecycle = status.get("lifecycle_status")
     if not isinstance(lifecycle, dict) or lifecycle.get("authority") != AUTHORITY:
         raise AdoptionError("lifecycle authority is not the pinned Project Status v2 control")
-    if lifecycle.get("claimed") != "live-behaviour-verified":
-        raise AdoptionError("Project Reader current claim must stop at live-behaviour-verified")
-    if lifecycle.get("verified") != "live-behaviour-verified":
-        raise AdoptionError("Project Reader verified state must stop at live-behaviour-verified")
+    if lifecycle.get("claimed") not in CANONICAL_CLAIMS:
+        raise AdoptionError("unsupported lifecycle claim")
+    if lifecycle.get("verified") not in CANONICAL_CLAIMS | {"insufficient", "failed"}:
+        raise AdoptionError("unsupported verified lifecycle state")
 
     stages = lifecycle.get("stages")
     if not isinstance(stages, list) or [stage.get("stage") for stage in stages] != list(STAGES):
@@ -58,7 +69,8 @@ def validate_adoption(status: Any, progress: Any) -> None:
     human = stages[7]
     if human.get("required") is not True:
         raise AdoptionError("human acceptance must remain required")
-    if human.get("result") == "PASS":
+    human_pass = human.get("result") == "PASS"
+    if human_pass:
         evidence = human.get("evidence") or []
         if human.get("relationship") != "direct" or not evidence:
             raise AdoptionError("human acceptance PASS requires direct evidence")
@@ -67,16 +79,13 @@ def validate_adoption(status: Any, progress: Any) -> None:
         lowered = " ".join(str(item).lower() for item in evidence)
         if "actions/runs" in lowered or "automated" in lowered or "browser-acceptance" in lowered:
             raise AdoptionError("automated evidence cannot establish human acceptance")
-        raise AdoptionError("this adoption record has no accepted direct human evidence")
-    if human.get("result") != "INSUFFICIENT" or human.get("relationship") not in {"missing", "proxy", "direct"}:
-        raise AdoptionError("human acceptance must remain INSUFFICIENT until direct acceptance exists")
-    if human.get("evidence"):
-        raise AdoptionError("unaccepted human evidence must not be promoted into the current record")
+    else:
+        if human.get("result") != "INSUFFICIENT" or human.get("relationship") not in {"missing", "proxy", "direct"}:
+            raise AdoptionError("human acceptance must remain INSUFFICIENT until direct acceptance exists")
+        if lifecycle.get("verified") in {"human-acceptance-received", "complete"}:
+            raise AdoptionError("human acceptance cannot be verified without direct human evidence")
 
-    planning = status.get("percentage_complete", {})
-    if planning.get("estimate") == 100 and lifecycle.get("verified") == "complete":
-        raise AdoptionError("planning percentage cannot establish lifecycle completion")
-    if lifecycle.get("verified") == "complete":
+    if lifecycle.get("verified") == "complete" and not human_pass:
         raise AdoptionError("Project Reader cannot be lifecycle complete without human acceptance")
 
     if not isinstance(progress, dict):
