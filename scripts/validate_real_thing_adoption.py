@@ -7,6 +7,7 @@ The checks below are Project Reader-specific additions only.
 """
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import sys
@@ -22,6 +23,15 @@ CANONICAL_PATH = (
     / "7bc8b7f5ef921851ad163093f089d28d8128bf6c"
     / "validate_project_status.py"
 )
+CANONICAL_BLOB_SHA = "d0e704ab42d72da6b66fb1d9f31d739ed6220abd"
+CANONICAL_BYTES = CANONICAL_PATH.read_bytes()
+actual_blob_sha = hashlib.sha1(
+    f"blob {len(CANONICAL_BYTES)}\0".encode("ascii") + CANONICAL_BYTES
+).hexdigest()
+if actual_blob_sha != CANONICAL_BLOB_SHA:
+    raise RuntimeError(
+        "vendored canonical Project Status validator does not match the pinned authority"
+    )
 SPEC = importlib.util.spec_from_file_location("pinned_project_status_validator", CANONICAL_PATH)
 if SPEC is None or SPEC.loader is None:
     raise RuntimeError("pinned canonical Project Status validator cannot be loaded")
