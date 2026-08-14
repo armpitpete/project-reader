@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; connect-src https://api.github.com https://raw.githubusercontent.com; img-src 'none'; style-src 'unsafe-inline'; script-src 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'self'; connect-src https://api.github.com https://raw.githubusercontent.com https://collect.merrinworld.uk; img-src 'none'; style-src 'unsafe-inline'; script-src 'self' https://collect.merrinworld.uk;">
 <title>Project Reader</title>
 <meta name="description" content="Understand what a public GitHub project is, who it is for and what you can do with it.">
 <link rel="canonical" href="https://armpitpete.github.io/project-reader/">
@@ -56,7 +56,8 @@
   <details>
     <summary>Privacy, safety and limits</summary>
     <div class="detail-grid">
-      <p>Your browser asks GitHub directly for public repository information. Project Reader has no server, account, tracking form or GitHub write access.</p>
+      <p>Your browser asks GitHub directly for public repository information. Project Reader has no application account or GitHub write access.</p>
+      <p>Privacy-first Merrin Analytics records page views and uses a random site-local browser token only to estimate visitor numbers. The collector stores no IP address, raw visitor token, precise location or cross-site visitor identity.</p>
       <p>The normal reading uses GitHub's public metadata API. If its anonymous request allowance is unavailable, Project Reader falls back to the public README through GitHub's raw-content service and labels the missing metadata.</p>
       <p>Private repositories cannot be read. The fallback does not request or store a GitHub token.</p>
       <p>The plain reading is produced by bounded rules, not a hosted artificial-intelligence service. It can still misunderstand unusual README structures, so the linked evidence remains available for checking.</p>
@@ -66,5 +67,6 @@
 <!-- DEPLOYMENT_DETAIL -->
 </main>
 <script type="module" src="./app.js"></script>
+<script src="https://collect.merrinworld.uk/beacon.js" data-site="project_reader" defer></script>
 </body>
 </html>

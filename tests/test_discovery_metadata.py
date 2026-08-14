@@ -13,7 +13,7 @@ DESCRIPTION = (
 )
 PUBLIC_URL = "https://armpitpete.github.io/project-reader/"
 BASELINE_BODY_SHA256 = (
-    "896d7eb8e34412250e87418acb55d83889675ad95bd1bebf20b7be4b418971c2"
+    "9e0686923dfcf3b6c67d5131acc75cef417bee508e126c0c3ceb5bed0ebff813"
 )
 
 
@@ -52,8 +52,8 @@ def test_public_shell_exposes_complete_discovery_identity() -> None:
 
     assert (
         "default-src 'none'; base-uri 'none'; form-action 'self'; "
-        "connect-src https://api.github.com https://raw.githubusercontent.com; "
-        "img-src 'none'; style-src 'unsafe-inline'; script-src 'self';"
+        "connect-src https://api.github.com https://raw.githubusercontent.com https://collect.merrinworld.uk; "
+        "img-src 'none'; style-src 'unsafe-inline'; script-src 'self' https://collect.merrinworld.uk;"
     ) in page_head
 
 
@@ -77,7 +77,9 @@ def test_structured_identity_matches_visible_project_reader_wording() -> None:
     assert f"<p>{DESCRIPTION}</p>" in body(html)
 
 
-def test_metadata_repair_does_not_change_visible_body_or_application() -> None:
+def test_analytics_change_preserves_application_and_has_exact_reviewed_body() -> None:
     page_body = body(document())
     assert hashlib.sha256(page_body.encode("utf-8")).hexdigest() == BASELINE_BODY_SHA256
     assert '<script type="module" src="./app.js"></script>' in page_body
+    assert '<script src="https://collect.merrinworld.uk/beacon.js" data-site="project_reader" defer></script>' in page_body
+    assert "random site-local browser token" in page_body

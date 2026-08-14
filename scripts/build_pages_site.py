@@ -94,6 +94,7 @@ def build_pages_site(
                     "https://api.github.com",
                     "https://raw.githubusercontent.com",
                 ],
+                "analytics_origin": "https://collect.merrinworld.uk",
                 "rate_limit_fallback": "public README without account or token",
                 "source_html": "prototype/public-reader.html",
                 "source_scripts": [
