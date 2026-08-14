@@ -20,6 +20,10 @@ jobs:
           node-version: "22"
       - name: Install Python package
         run: python -m pip install -q -e ".[dev]"
+      - name: Run pinned canonical Project Status validator
+        run: python vendor/merrin-project-controls/7bc8b7f5ef921851ad163093f089d28d8128bf6c/validate_project_status.py project-status.json
+      - name: Run Project Reader adoption validation
+        run: python scripts/validate_real_thing_adoption.py project-status.json .project/progress.json
       - name: Run Python tests
         run: pytest
       - name: Run deterministic browser comprehension contract
