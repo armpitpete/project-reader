@@ -1,38 +1,32 @@
 #!/usr/bin/env python3
 """Validate Project Reader's exact Real-Thing Proof adoption record.
 
-This is deliberately project-specific. Canonical lifecycle semantics remain owned by
-armpitpete/merrin-project-controls@7bc8b7f5ef921851ad163093f089d28d8128bf6c.
+Canonical lifecycle semantics are executed first from the immutable vendored snapshot
+of armpitpete/merrin-project-controls@7bc8b7f5ef921851ad163093f089d28d8128bf6c.
+The checks below are Project Reader-specific additions only.
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import sys
 from pathlib import Path
 from typing import Any
 
 AUTHORITY = "armpitpete/merrin-project-controls@7bc8b7f5ef921851ad163093f089d28d8128bf6c"
-STAGES = (
-    "designed",
-    "implemented",
-    "automated-checks",
-    "independent-review",
-    "merged",
-    "deployed",
-    "live-behaviour",
-    "human-acceptance",
+ROOT = Path(__file__).resolve().parents[1]
+CANONICAL_PATH = (
+    ROOT
+    / "vendor"
+    / "merrin-project-controls"
+    / "7bc8b7f5ef921851ad163093f089d28d8128bf6c"
+    / "validate_project_status.py"
 )
-CANONICAL_CLAIMS = {
-    "designed",
-    "implemented",
-    "automated-checks-passed",
-    "independently-reviewed",
-    "merged",
-    "deployed",
-    "live-behaviour-verified",
-    "human-acceptance-received",
-    "complete",
-}
+SPEC = importlib.util.spec_from_file_location("pinned_project_status_validator", CANONICAL_PATH)
+if SPEC is None or SPEC.loader is None:
+    raise RuntimeError("pinned canonical Project Status validator cannot be loaded")
+CANONICAL = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(CANONICAL)
 
 
 class AdoptionError(ValueError):
@@ -40,53 +34,32 @@ class AdoptionError(ValueError):
 
 
 def validate_adoption(status: Any, progress: Any) -> None:
-    if not isinstance(status, dict) or status.get("project") != "armpitpete/project-reader":
+    try:
+        CANONICAL.validate(status)
+    except CANONICAL.StatusError as exc:
+        raise AdoptionError(f"canonical Project Status rejection: {exc}") from exc
+
+    if status.get("project") != "armpitpete/project-reader":
         raise AdoptionError("unexpected Project Reader lifecycle record")
 
-    lifecycle = status.get("lifecycle_status")
-    if not isinstance(lifecycle, dict) or lifecycle.get("authority") != AUTHORITY:
+    lifecycle = status.get("lifecycle_status", {})
+    if lifecycle.get("authority") != AUTHORITY:
         raise AdoptionError("lifecycle authority is not the pinned Project Status v2 control")
-    if lifecycle.get("claimed") not in CANONICAL_CLAIMS:
-        raise AdoptionError("unsupported lifecycle claim")
-    if lifecycle.get("verified") not in CANONICAL_CLAIMS | {"insufficient", "failed"}:
-        raise AdoptionError("unsupported verified lifecycle state")
 
-    stages = lifecycle.get("stages")
-    if not isinstance(stages, list) or [stage.get("stage") for stage in stages] != list(STAGES):
-        raise AdoptionError("all eight lifecycle stages must appear once in canonical order")
+    planning = status.get("percentage_complete", {})
+    remaining = planning.get("remaining_work") or []
+    if planning.get("estimate") == 100 and remaining:
+        raise AdoptionError("100 percent planning progress is incompatible with declared remaining work")
 
-    for stage in stages[:7]:
-        name = stage["stage"]
-        if stage.get("required") is not True:
-            raise AdoptionError(f"{name} must remain required")
-        if stage.get("result") != "PASS" or stage.get("relationship") != "direct":
-            raise AdoptionError(f"{name} PASS requires direct evidence")
-        if not stage.get("evidence"):
-            raise AdoptionError(f"{name} PASS requires evidence")
-        if stage.get("observed_environment") != stage.get("required_environment"):
-            raise AdoptionError(f"{name} environment mismatch")
-
-    human = stages[7]
-    if human.get("required") is not True:
-        raise AdoptionError("human acceptance must remain required")
-    human_pass = human.get("result") == "PASS"
-    if human_pass:
+    stages = lifecycle.get("stages", [])
+    human = next((stage for stage in stages if stage.get("stage") == "human-acceptance"), None)
+    if not isinstance(human, dict):
+        raise AdoptionError("human acceptance stage is missing")
+    if human.get("result") == "PASS":
         evidence = human.get("evidence") or []
-        if human.get("relationship") != "direct" or not evidence:
-            raise AdoptionError("human acceptance PASS requires direct evidence")
-        if human.get("observed_environment") != human.get("required_environment"):
-            raise AdoptionError("human acceptance environment mismatch")
         lowered = " ".join(str(item).lower() for item in evidence)
         if "actions/runs" in lowered or "automated" in lowered or "browser-acceptance" in lowered:
             raise AdoptionError("automated evidence cannot establish human acceptance")
-    else:
-        if human.get("result") != "INSUFFICIENT" or human.get("relationship") not in {"missing", "proxy", "direct"}:
-            raise AdoptionError("human acceptance must remain INSUFFICIENT until direct acceptance exists")
-        if lifecycle.get("verified") in {"human-acceptance-received", "complete"}:
-            raise AdoptionError("human acceptance cannot be verified without direct human evidence")
-
-    if lifecycle.get("verified") == "complete" and not human_pass:
-        raise AdoptionError("Project Reader cannot be lifecycle complete without human acceptance")
 
     if not isinstance(progress, dict):
         raise AdoptionError("legacy progress record must be an object")
