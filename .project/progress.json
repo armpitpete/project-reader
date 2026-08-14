@@ -2,6 +2,7 @@
   "schema_version": 1,
   "authority": "ROADMAP.md",
   "updated_at": "2026-08-01T21:24:00+01:00",
+  "lifecycle_authority": "../project-status.json",
   "release": {
     "name": "Network-service and Rate-limit Resilience Repair v1.2",
     "implemented": true,
@@ -10,7 +11,8 @@
     "merged": true,
     "deployed": true,
     "publicly_verified": true,
-    "complete": true,
+    "bounded_release_stages_complete": true,
+    "completion_scope": "All ten bounded issue #36 release stages only; this is not whole-project lifecycle completion or human acceptance.",
     "external_comprehension_proven": false,
     "commercial_validation_proven": false,
     "authoritative_issue": "https://github.com/armpitpete/project-reader/issues/36",
@@ -91,6 +93,6 @@
   ],
   "overall": {
     "enabled": true,
-    "reason": "All ten bounded issue #36 release stages are complete."
+    "reason": "All ten bounded issue #36 release stages are complete; canonical lifecycle status is recorded separately in project-status.json."
   }
 }
