@@ -51,10 +51,13 @@ def test_deploy_script_preserves_exact_commit_and_server_secret_file() -> None:
     assert "access-control-allow-origin: $PAGES_ORIGIN" in script
 
 
-def test_example_env_contains_only_server_side_configuration_names() -> None:
+def test_example_env_stages_both_pages_origins_for_identity_migration() -> None:
     env = (ROOT / "config/env.example").read_text(encoding="utf-8")
 
-    assert "PROJECT_READER_ALLOWED_ORIGINS=https://armpitpete.github.io" in env
+    assert (
+        "PROJECT_READER_ALLOWED_ORIGINS="
+        "https://armpitpete.github.io,https://merrinworld.github.io"
+    ) in env
     assert "PROJECT_READER_API_BASE_URL=https://reader-api.merrinworld.uk" in env
     assert "PROJECT_READER_GITHUB_TOKEN=" in env
     assert "PRIVATE KEY" not in env.upper()
