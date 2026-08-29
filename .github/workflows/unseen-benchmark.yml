@@ -1,9 +1,7 @@
 name: Project Reader v1.3 Unseen Benchmark
 
 on:
-  push:
-    branches:
-      - agent/v1.3-unseen-generalisation-benchmark
+  workflow_dispatch:
 
 permissions:
   contents: read
