@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "reason": "Pre-evaluation replacement for frozen U03 repository identity that no longer resolves.",
+  "replaces": "U03",
+  "repositories": [
+    {
+      "id": "U03R1",
+      "repository": "audacity/audacity",
+      "stratum": "application_product",
+      "expectation_status": "pending_pre_evaluation"
+    }
+  ]
+}
