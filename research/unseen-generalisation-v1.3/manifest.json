@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "issue": 48,
+  "baseline_project_reader_main": "1332e0a6baab8b3dd03dff30473ac52edda2b52e",
+  "purpose": "Frozen unseen-repository corpus committed before Project Reader benchmark evaluation.",
+  "production_feature_freeze": true,
+  "known_tuned_exclusions": [
+    "AudioKit/AudioKitSynthOne",
+    "microsoft/AI-For-Beginners",
+    "cloudflare/cloudflared",
+    "armpitpete/project-status-engine",
+    "armpitpete/over-my-home",
+    "armpitpete/sample-hold-lab"
+  ],
+  "repositories": [
+    {"id":"U01","repository":"obsproject/obs-studio","stratum":"application_product","expectation_status":"pending_pre_evaluation"},
+    {"id":"U02","repository":"keepassxreboot/keepassxc","stratum":"application_product","expectation_status":"pending_pre_evaluation"},
+    {"id":"U03","repository":"AudacityTeam/Audacity","stratum":"application_product","expectation_status":"pending_pre_evaluation"},
+
+    {"id":"U04","repository":"BurntSushi/ripgrep","stratum":"command_line_tool","expectation_status":"pending_pre_evaluation"},
+    {"id":"U05","repository":"sharkdp/bat","stratum":"command_line_tool","expectation_status":"pending_pre_evaluation"},
+    {"id":"U06","repository":"junegunn/fzf","stratum":"command_line_tool","expectation_status":"pending_pre_evaluation"},
+
+    {"id":"U07","repository":"tailscale/tailscale","stratum":"network_background_service","expectation_status":"pending_pre_evaluation"},
+    {"id":"U08","repository":"syncthing/syncthing","stratum":"network_background_service","expectation_status":"pending_pre_evaluation"},
+    {"id":"U09","repository":"caddyserver/caddy","stratum":"network_background_service","expectation_status":"pending_pre_evaluation"},
+
+    {"id":"U10","repository":"pallets/flask","stratum":"library_framework","expectation_status":"pending_pre_evaluation"},
+    {"id":"U11","repository":"expressjs/express","stratum":"library_framework","expectation_status":"pending_pre_evaluation"},
+    {"id":"U12","repository":"tokio-rs/tokio","stratum":"library_framework","expectation_status":"pending_pre_evaluation"},
+
+    {"id":"U13","repository":"OpenTTD/OpenTTD","stratum":"game","expectation_status":"pending_pre_evaluation"},
+    {"id":"U14","repository":"wesnoth/wesnoth","stratum":"game","expectation_status":"pending_pre_evaluation"},
+
+    {"id":"U15","repository":"arduino/ArduinoCore-avr","stratum":"hardware_embedded","expectation_status":"pending_pre_evaluation"},
+    {"id":"U16","repository":"raspberrypi/pico-sdk","stratum":"hardware_embedded","expectation_status":"pending_pre_evaluation"},
+
+    {"id":"U17","repository":"mdn/content","stratum":"documentation_reference","expectation_status":"pending_pre_evaluation"},
+    {"id":"U18","repository":"rust-lang/book","stratum":"documentation_reference","expectation_status":"pending_pre_evaluation"},
+    {"id":"U19","repository":"kubernetes/website","stratum":"documentation_reference","expectation_status":"pending_pre_evaluation"},
+
+    {"id":"U20","repository":"ossu/computer-science","stratum":"course_curriculum","expectation_status":"pending_pre_evaluation"},
+    {"id":"U21","repository":"jwasham/coding-interview-university","stratum":"course_curriculum","expectation_status":"pending_pre_evaluation"},
+    {"id":"U22","repository":"mlabonne/llm-course","stratum":"course_curriculum","expectation_status":"pending_pre_evaluation"},
+
+    {"id":"U23","repository":"google-deepmind/alphafold","stratum":"research","expectation_status":"pending_pre_evaluation"},
+    {"id":"U24","repository":"tensorflow/models","stratum":"research","expectation_status":"pending_pre_evaluation"},
+
+    {"id":"U25","repository":"fivethirtyeight/data","stratum":"dataset","expectation_status":"pending_pre_evaluation"},
+    {"id":"U26","repository":"vega/vega-datasets","stratum":"dataset","expectation_status":"pending_pre_evaluation"},
+
+    {"id":"U27","repository":"obsidianmd/obsidian-sample-plugin","stratum":"plugin_extension","expectation_status":"pending_pre_evaluation"},
+    {"id":"U28","repository":"prettier/prettier-vscode","stratum":"plugin_extension","expectation_status":"pending_pre_evaluation"},
+
+    {"id":"U29","repository":"sindresorhus/awesome","stratum":"mixed_reference_collection","expectation_status":"pending_pre_evaluation"},
+    {"id":"U30","repository":"public-apis/public-apis","stratum":"mixed_reference_collection","expectation_status":"pending_pre_evaluation"}
+  ]
+}
