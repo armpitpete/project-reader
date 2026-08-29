@@ -1,0 +1,33 @@
+name: Project Reader v1.3 Unseen Benchmark
+
+on:
+  push:
+    branches:
+      - agent/v1.3-unseen-generalisation-benchmark
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PROJECT_READER_GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check benchmark runner syntax
+        run: node --check scripts/run_unseen_generalisation_benchmark.mjs
+      - name: Validate frozen corpus and production blobs
+        run: node scripts/run_unseen_generalisation_benchmark.mjs --validate-only
+      - name: Run all 30 unseen repositories against frozen production reader
+        run: node scripts/run_unseen_generalisation_benchmark.mjs --output /tmp/project-reader-v1.3-unseen-raw-results.json
+      - name: Upload raw benchmark evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-reader-v1.3-unseen-raw-results
+          path: /tmp/project-reader-v1.3-unseen-raw-results.json
+          if-no-files-found: error
