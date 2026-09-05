@@ -1,0 +1,500 @@
+{
+  "schema_version": 1,
+  "review": "independent-hostile-scoring",
+  "baseline_project_reader_main": "1332e0a6baab8b3dd03dff30473ac52edda2b52e",
+  "raw_workflow_run": 33251172617,
+  "raw_artifact_digest": "sha256:a378330050924956b173a2f24c0bf0a81ee0d529d33feffd05ec52b7dad62dc9",
+  "blind_matrix_sha256": "02d1822b1613b4bbf0fddbbc27f8f075c3fd7a3ffcbb97fca6330f970dd76c3d",
+  "legend": {
+    "P": "PASS",
+    "A": "PARTIAL",
+    "F": "FAIL",
+    "N": "NOT_APPLICABLE"
+  },
+  "dimensions": [
+    "classification",
+    "purpose",
+    "audience",
+    "actions",
+    "capabilities",
+    "unfinished_or_limits",
+    "unsupported_claims",
+    "important_omissions"
+  ],
+  "aggregate": {
+    "repositories": 30,
+    "critical_failures": 15,
+    "applicable_scores": 224,
+    "pass": 51,
+    "partial": 80,
+    "fail": 93,
+    "not_applicable": 16,
+    "pass_or_partial_rate": 0.584821,
+    "conclusion": "DOES_NOT_YET_GENERALISE"
+  },
+  "records": [
+    {
+      "id": "U01",
+      "repository": "obsproject/obs-studio",
+      "scores": [
+        "F",
+        "F",
+        "F",
+        "A",
+        "F",
+        "N",
+        "F",
+        "F"
+      ],
+      "critical": true
+    },
+    {
+      "id": "U02",
+      "repository": "keepassxreboot/keepassxc",
+      "scores": [
+        "F",
+        "A",
+        "F",
+        "A",
+        "P",
+        "N",
+        "F",
+        "A"
+      ],
+      "critical": true
+    },
+    {
+      "id": "U03R1",
+      "repository": "audacity/audacity",
+      "scores": [
+        "A",
+        "P",
+        "A",
+        "A",
+        "F",
+        "F",
+        "P",
+        "F"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U04",
+      "repository": "BurntSushi/ripgrep",
+      "scores": [
+        "P",
+        "P",
+        "A",
+        "A",
+        "A",
+        "N",
+        "P",
+        "A"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U05",
+      "repository": "sharkdp/bat",
+      "scores": [
+        "P",
+        "P",
+        "A",
+        "A",
+        "F",
+        "N",
+        "P",
+        "A"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U06",
+      "repository": "junegunn/fzf",
+      "scores": [
+        "P",
+        "F",
+        "A",
+        "P",
+        "F",
+        "N",
+        "P",
+        "F"
+      ],
+      "critical": true
+    },
+    {
+      "id": "U07",
+      "repository": "tailscale/tailscale",
+      "scores": [
+        "A",
+        "A",
+        "A",
+        "A",
+        "F",
+        "F",
+        "P",
+        "F"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U08",
+      "repository": "syncthing/syncthing",
+      "scores": [
+        "F",
+        "A",
+        "A",
+        "A",
+        "F",
+        "N",
+        "F",
+        "A"
+      ],
+      "critical": true
+    },
+    {
+      "id": "U09",
+      "repository": "caddyserver/caddy",
+      "scores": [
+        "F",
+        "A",
+        "A",
+        "A",
+        "P",
+        "N",
+        "F",
+        "A"
+      ],
+      "critical": true
+    },
+    {
+      "id": "U10",
+      "repository": "pallets/flask",
+      "scores": [
+        "F",
+        "F",
+        "P",
+        "A",
+        "F",
+        "F",
+        "F",
+        "F"
+      ],
+      "critical": true
+    },
+    {
+      "id": "U11",
+      "repository": "expressjs/express",
+      "scores": [
+        "P",
+        "P",
+        "A",
+        "A",
+        "F",
+        "F",
+        "P",
+        "F"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U12",
+      "repository": "tokio-rs/tokio",
+      "scores": [
+        "P",
+        "P",
+        "A",
+        "P",
+        "F",
+        "N",
+        "P",
+        "A"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U13",
+      "repository": "OpenTTD/OpenTTD",
+      "scores": [
+        "A",
+        "P",
+        "A",
+        "P",
+        "A",
+        "F",
+        "P",
+        "A"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U14",
+      "repository": "wesnoth/wesnoth",
+      "scores": [
+        "A",
+        "A",
+        "F",
+        "P",
+        "F",
+        "N",
+        "P",
+        "F"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U15",
+      "repository": "arduino/ArduinoCore-avr",
+      "scores": [
+        "A",
+        "P",
+        "A",
+        "A",
+        "F",
+        "N",
+        "P",
+        "F"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U16",
+      "repository": "raspberrypi/pico-sdk",
+      "scores": [
+        "P",
+        "P",
+        "P",
+        "P",
+        "F",
+        "F",
+        "P",
+        "F"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U17",
+      "repository": "mdn/content",
+      "scores": [
+        "P",
+        "P",
+        "P",
+        "A",
+        "F",
+        "N",
+        "P",
+        "A"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U18",
+      "repository": "rust-lang/book",
+      "scores": [
+        "A",
+        "P",
+        "A",
+        "A",
+        "F",
+        "F",
+        "P",
+        "A"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U19",
+      "repository": "kubernetes/website",
+      "scores": [
+        "A",
+        "P",
+        "A",
+        "A",
+        "F",
+        "N",
+        "A",
+        "A"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U20",
+      "repository": "ossu/computer-science",
+      "scores": [
+        "P",
+        "A",
+        "A",
+        "A",
+        "F",
+        "F",
+        "F",
+        "F"
+      ],
+      "critical": true
+    },
+    {
+      "id": "U21",
+      "repository": "jwasham/coding-interview-university",
+      "scores": [
+        "F",
+        "A",
+        "A",
+        "A",
+        "F",
+        "F",
+        "F",
+        "F"
+      ],
+      "critical": true
+    },
+    {
+      "id": "U22",
+      "repository": "mlabonne/llm-course",
+      "scores": [
+        "F",
+        "F",
+        "A",
+        "A",
+        "F",
+        "N",
+        "P",
+        "F"
+      ],
+      "critical": true
+    },
+    {
+      "id": "U23",
+      "repository": "google-deepmind/alphafold",
+      "scores": [
+        "F",
+        "A",
+        "A",
+        "P",
+        "F",
+        "F",
+        "F",
+        "F"
+      ],
+      "critical": true
+    },
+    {
+      "id": "U24",
+      "repository": "tensorflow/models",
+      "scores": [
+        "A",
+        "P",
+        "A",
+        "P",
+        "F",
+        "A",
+        "P",
+        "A"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U25",
+      "repository": "fivethirtyeight/data",
+      "scores": [
+        "A",
+        "P",
+        "A",
+        "A",
+        "F",
+        "F",
+        "P",
+        "A"
+      ],
+      "critical": false
+    },
+    {
+      "id": "U26",
+      "repository": "vega/vega-datasets",
+      "scores": [
+        "F",
+        "A",
+        "A",
+        "A",
+        "F",
+        "F",
+        "F",
+        "F"
+      ],
+      "critical": true
+    },
+    {
+      "id": "U27",
+      "repository": "obsidianmd/obsidian-sample-plugin",
+      "scores": [
+        "A",
+        "A",
+        "A",
+        "A",
+        "F",
+        "F",
+        "F",
+        "F"
+      ],
+      "critical": true
+    },
+    {
+      "id": "U28",
+      "repository": "prettier/prettier-vscode",
+      "scores": [
+        "F",
+        "F",
+        "F",
+        "P",
+        "F",
+        "N",
+        "F",
+        "F"
+      ],
+      "critical": true
+    },
+    {
+      "id": "U29",
+      "repository": "sindresorhus/awesome",
+      "scores": [
+        "F",
+        "F",
+        "A",
+        "F",
+        "A",
+        "N",
+        "F",
+        "F"
+      ],
+      "critical": true
+    },
+    {
+      "id": "U30",
+      "repository": "public-apis/public-apis",
+      "scores": [
+        "F",
+        "F",
+        "P",
+        "A",
+        "F",
+        "N",
+        "F",
+        "F"
+      ],
+      "critical": true
+    }
+  ],
+  "comparison_to_existing": {
+    "different_cells": 42,
+    "existing_critical_failures": 14,
+    "independent_critical_failures": 15,
+    "independent_harsher_cells_excluding_na": 16,
+    "independent_more_lenient_cells_excluding_na": 10,
+    "identical_cells_excluding_na": 198,
+    "material_new_critical": "U27"
+  },
+  "limitations": [
+    "Independent semantic scoring was blind to the existing scores until the blind matrix hash was fixed.",
+    "The original benchmark retained README SHA-256 values but did not retain exact README bodies or pin upstream repository commits, so exact upstream ground truth cannot be independently reconstructed from the benchmark artifact alone."
+  ]
+}
