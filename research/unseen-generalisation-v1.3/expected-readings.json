@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "baseline_project_reader_main": "1332e0a6baab8b3dd03dff30473ac52edda2b52e",
+  "records": [
+    {
+      "id":"U01","repository":"obsproject/obs-studio","stratum":"application_product","source":"https://github.com/obsproject/obs-studio",
+      "acceptable_types":["desktop application","application and open-source codebase"],
+      "core_purpose":"OBS Studio is software for capturing, compositing, encoding, recording and live-streaming video content.",
+      "audience":"People who record or stream video, plus developers and contributors working on OBS.",
+      "useful_actions":["Download or open OBS Studio","Read the help or documentation","Open the source repository or contribution guidance"],
+      "central_capabilities":["video capture","recording","live streaming","video compositing and encoding"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is primarily a website","It is only a software library"]
+    },
+    {
+      "id":"U02","repository":"keepassxreboot/keepassxc","stratum":"application_product","source":"https://github.com/keepassxreboot/keepassxc",
+      "acceptable_types":["desktop application","password manager application and open-source codebase"],
+      "core_purpose":"KeePassXC is an open-source password manager for storing credentials in an encrypted database that can work offline.",
+      "audience":"People who want to manage passwords locally, plus developers and contributors.",
+      "useful_actions":["Download or install KeePassXC","Read the user documentation","Open the source repository"],
+      "central_capabilities":["encrypted password database","offline password management","KeePass-compatible database format"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is a hosted cloud password service","It is primarily a website"]
+    },
+    {
+      "id":"U03R1","repository":"audacity/audacity","stratum":"application_product","source":"https://github.com/audacity/audacity",
+      "acceptable_types":["desktop application","audio editor and recorder","application and open-source codebase"],
+      "core_purpose":"Audacity is a cross-platform multi-track audio editor and recorder.",
+      "audience":"People who record or edit audio, plus developers contributing to Audacity.",
+      "useful_actions":["Download the stable application","Read Audacity documentation","Use the appropriate source branch and build instructions if contributing"],
+      "central_capabilities":["multi-track audio editing","audio recording","cross-platform desktop operation"],
+      "explicit_limits_or_unfinished":["The repository is undergoing major structural change for Audacity 4","The main branch is not currently the friendliest route for new contributors to Audacity 3.x"],
+      "materially_wrong_claims":["It is only an audio library","It is primarily a website"]
+    },
+    {
+      "id":"U04","repository":"BurntSushi/ripgrep","stratum":"command_line_tool","source":"https://github.com/BurntSushi/ripgrep",
+      "acceptable_types":["command-line tool","search utility"],
+      "core_purpose":"ripgrep is a command-line search tool that recursively searches files for regular-expression patterns while respecting common ignore rules by default.",
+      "audience":"Terminal users and developers who need fast text or code search.",
+      "useful_actions":["Install ripgrep","Read the user guide","Run rg to search files"],
+      "central_capabilities":["recursive regex search","gitignore-aware filtering","cross-platform command-line use"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is a website","It is a graphical desktop search application"]
+    },
+    {
+      "id":"U05","repository":"sharkdp/bat","stratum":"command_line_tool","source":"https://github.com/sharkdp/bat",
+      "acceptable_types":["command-line tool","cat-like file viewer"],
+      "core_purpose":"bat is a command-line file viewer and cat replacement that adds syntax highlighting and other presentation features.",
+      "audience":"Terminal users and developers who inspect text and source files.",
+      "useful_actions":["Install bat","Display files with bat","Read usage and configuration documentation"],
+      "central_capabilities":["syntax highlighting","Git change integration","cat-compatible file output"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is a desktop text editor","It is a website"]
+    },
+    {
+      "id":"U06","repository":"junegunn/fzf","stratum":"command_line_tool","source":"https://github.com/junegunn/fzf",
+      "acceptable_types":["command-line tool","interactive fuzzy finder"],
+      "core_purpose":"fzf is a general-purpose interactive command-line fuzzy finder and filter for selecting items from lists.",
+      "audience":"Command-line users who want fast interactive selection from files, history, processes and other lists.",
+      "useful_actions":["Install fzf","Run the finder from the terminal","Configure shell key bindings or completion"],
+      "central_capabilities":["fuzzy matching","interactive list filtering","shell key bindings and completion","Vim or Neovim integration"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is a graphical file manager","It is primarily a website"]
+    },
+    {
+      "id":"U07","repository":"tailscale/tailscale","stratum":"network_background_service","source":"https://github.com/tailscale/tailscale",
+      "acceptable_types":["network client and daemon","command-line network service","open-source codebase for Tailscale clients"],
+      "core_purpose":"This repository contains most of Tailscale's open-source client code, including the tailscaled daemon and tailscale CLI used for private WireGuard-based networking.",
+      "audience":"People operating Tailscale networks and developers working on the client software.",
+      "useful_actions":["Install or use Tailscale","Read Tailscale documentation","Inspect or contribute to the daemon and CLI source"],
+      "central_capabilities":["background networking daemon","command-line network control","cross-platform client code"],
+      "explicit_limits_or_unfinished":["The repository does not contain the mobile GUI code even though mobile apps use code from it"],
+      "materially_wrong_claims":["It is primarily a website","It is only a generic WireGuard library"]
+    },
+    {
+      "id":"U08","repository":"syncthing/syncthing","stratum":"network_background_service","source":"https://github.com/syncthing/syncthing",
+      "acceptable_types":["file synchronization application","background network service"],
+      "core_purpose":"Syncthing continuously synchronizes files between two or more computers with strong emphasis on data safety, security, ease of use and automation.",
+      "audience":"People who want continuous file synchronization between their own computers, plus contributors.",
+      "useful_actions":["Install and run Syncthing","Read setup documentation","Open the source repository"],
+      "central_capabilities":["continuous file synchronization between computers","automatic synchronization","security-focused data transfer"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is a cloud storage website","It is only a developer library"]
+    },
+    {
+      "id":"U09","repository":"caddyserver/caddy","stratum":"network_background_service","source":"https://github.com/caddyserver/caddy",
+      "acceptable_types":["web server","server platform","long-running network service"],
+      "core_purpose":"Caddy is an extensible server platform most commonly used as an HTTPS web server, with automatic TLS and modular configuration.",
+      "audience":"People operating web or network services and developers extending Caddy.",
+      "useful_actions":["Install Caddy","Follow the Getting Started guide","Read the full documentation"],
+      "central_capabilities":["automatic HTTPS","HTTP/1.1 HTTP/2 and HTTP/3 serving","dynamic configuration","modular extension system"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is a website rather than server software","It is only a command-line file utility"]
+    },
+    {
+      "id":"U10","repository":"pallets/flask","stratum":"library_framework","source":"https://github.com/pallets/flask",
+      "acceptable_types":["web application framework","Python library or framework"],
+      "core_purpose":"Flask is a lightweight Python WSGI web application framework designed to make small web applications easy to start while allowing larger applications to grow.",
+      "audience":"Python developers building web applications and services.",
+      "useful_actions":["Install Flask","Read the documentation","Build the simple starter application"],
+      "central_capabilities":["web request routing","WSGI application framework","extension ecosystem","flexible project structure"],
+      "explicit_limits_or_unfinished":["Flask deliberately does not force a particular dependency set or project layout"],
+      "materially_wrong_claims":["It is itself a hosted website","It is a complete end-user desktop application"]
+    },
+    {
+      "id":"U11","repository":"expressjs/express","stratum":"library_framework","source":"https://github.com/expressjs/express",
+      "acceptable_types":["Node.js web framework","software framework or library"],
+      "core_purpose":"Express is a minimal web framework for Node.js used to build HTTP servers, web applications and APIs.",
+      "audience":"JavaScript or Node.js developers building web servers, websites and APIs.",
+      "useful_actions":["Install Express from npm","Read the documentation","Follow the quick start or examples"],
+      "central_capabilities":["routing","HTTP helpers","template-engine support","application generation and middleware integration"],
+      "explicit_limits_or_unfinished":["The current README requires a supported Node.js version and advises reading migration guidance for major-version changes"],
+      "materially_wrong_claims":["It is an end-user website","It is a command-line network daemon"]
+    },
+    {
+      "id":"U12","repository":"tokio-rs/tokio","stratum":"library_framework","source":"https://github.com/tokio-rs/tokio",
+      "acceptable_types":["Rust asynchronous runtime","library and runtime framework"],
+      "core_purpose":"Tokio is an event-driven asynchronous runtime and I/O platform for writing reliable asynchronous applications in Rust.",
+      "audience":"Rust developers building asynchronous and networked software.",
+      "useful_actions":["Add Tokio to a Rust project","Read Tokio guides","Read the API documentation"],
+      "central_capabilities":["asynchronous task scheduling","non-blocking I/O reactor","asynchronous TCP and UDP sockets"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is a standalone end-user application","It is primarily a website"]
+    },
+    {
+      "id":"U13","repository":"OpenTTD/OpenTTD","stratum":"game","source":"https://github.com/OpenTTD/OpenTTD",
+      "acceptable_types":["game","open-source transport simulation game"],
+      "core_purpose":"OpenTTD is a transport simulation game based on Transport Tycoon Deluxe that reproduces and extends the original game.",
+      "audience":"Players of transport simulation games and developers or contributors working on OpenTTD.",
+      "useful_actions":["Download the stable game","Read the gameplay manual","Open add-on or contribution documentation"],
+      "central_capabilities":["transport simulation gameplay","stable and nightly builds","add-on or mod support"],
+      "explicit_limits_or_unfinished":["Nightly builds contain newer changes but may be less reliable than stable releases"],
+      "materially_wrong_claims":["It is a transport-planning library","It is primarily a website"]
+    },
+    {
+      "id":"U14","repository":"wesnoth/wesnoth","stratum":"game","source":"https://github.com/wesnoth/wesnoth",
+      "acceptable_types":["game","turn-based strategy game"],
+      "core_purpose":"The Battle for Wesnoth is an open-source turn-based tactical strategy game with a high-fantasy setting.",
+      "audience":"Players of strategy games and contributors to the game.",
+      "useful_actions":["Download or play Battle for Wesnoth","Read game or community documentation","Open the source repository"],
+      "central_capabilities":["single-player campaigns","online or hotseat multiplayer","turn-based tactical combat","multiple factions and units"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is a strategy-game development framework rather than a game","It is primarily a website"]
+    },
+    {
+      "id":"U15","repository":"arduino/ArduinoCore-avr","stratum":"hardware_embedded","source":"https://github.com/arduino/ArduinoCore-avr",
+      "acceptable_types":["embedded software core","Arduino AVR board support package","hardware software framework"],
+      "core_purpose":"ArduinoCore-avr provides the Arduino core and board support used to build sketches for AVR-based Arduino boards.",
+      "audience":"Arduino users and embedded developers targeting supported AVR boards.",
+      "useful_actions":["Use the AVR board support through the Arduino toolchain","Inspect the core and board definitions","Contribute fixes for supported AVR targets"],
+      "central_capabilities":["Arduino core APIs for AVR microcontrollers","board and variant definitions","build support for AVR-based Arduino boards"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is the Arduino desktop IDE","It is a general-purpose website"]
+    },
+    {
+      "id":"U16","repository":"raspberrypi/pico-sdk","stratum":"hardware_embedded","source":"https://github.com/raspberrypi/pico-sdk",
+      "acceptable_types":["embedded SDK","C/C++ microcontroller SDK","library and build system"],
+      "core_purpose":"The Raspberry Pi Pico SDK provides headers, libraries and a build system for writing C, C++ or assembly programs for RP-series microcontrollers such as Raspberry Pi Pico devices.",
+      "audience":"Embedded developers and C/C++ developers programming RP-series microcontroller devices.",
+      "useful_actions":["Read the Pico getting-started documentation","Set up the SDK and build an example","Read the SDK API documentation"],
+      "central_capabilities":["microcontroller hardware APIs","timers and synchronization","USB and multicore programming","Wi-Fi and Bluetooth support on applicable devices"],
+      "explicit_limits_or_unfinished":["Additional APIs not yet ready for the main SDK may live in pico-extras"],
+      "materially_wrong_claims":["It is a Raspberry Pi desktop application","It is only documentation"]
+    },
+    {
+      "id":"U17","repository":"mdn/content","stratum":"documentation_reference","source":"https://github.com/mdn/content",
+      "acceptable_types":["documentation content repository","reference collection source"],
+      "core_purpose":"This repository is the source content for MDN Web Docs, containing documentation about web technologies such as HTML, CSS, JavaScript, HTTP and Web APIs.",
+      "audience":"Web developers reading MDN and contributors maintaining MDN documentation.",
+      "useful_actions":["Read MDN Web Docs on the live site","Contribute documentation","Build a local preview when editing content"],
+      "central_capabilities":["large web-platform documentation collection","source content for the MDN site","local preview and contribution workflow"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is the MDN browser application itself","It is a JavaScript software library"]
+    },
+    {
+      "id":"U18","repository":"rust-lang/book","stratum":"documentation_reference","source":"https://github.com/rust-lang/book",
+      "acceptable_types":["book source repository","documentation or learning reference"],
+      "core_purpose":"This repository contains the source of The Rust Programming Language book, which teaches the Rust language and is available to read online.",
+      "audience":"People learning Rust and contributors maintaining or translating the book.",
+      "useful_actions":["Read the book online","Open the source to propose corrections","Join translation work"],
+      "central_capabilities":["source for the Rust book","online editions aligned with Rust release channels","translation and correction workflow"],
+      "explicit_limits_or_unfinished":["Published release-channel versions can lag corrections already present in the repository","Larger non-error revisions may wait for major revision periods"],
+      "materially_wrong_claims":["It is the Rust compiler","It is a software framework"]
+    },
+    {
+      "id":"U19","repository":"kubernetes/website","stratum":"documentation_reference","source":"https://github.com/kubernetes/website",
+      "acceptable_types":["documentation website source","documentation repository"],
+      "core_purpose":"This repository contains the assets and source required to build the Kubernetes website and documentation.",
+      "audience":"People reading Kubernetes documentation and contributors maintaining or localizing the docs site.",
+      "useful_actions":["Read the live Kubernetes documentation","Follow the documentation contribution guide","Build and preview the site locally"],
+      "central_capabilities":["Kubernetes documentation source","website build system","localization and contribution workflow"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is the Kubernetes orchestration software itself","It is a general web application framework"]
+    },
+    {
+      "id":"U20","repository":"ossu/computer-science","stratum":"course_curriculum","source":"https://github.com/ossu/computer-science",
+      "acceptable_types":["computer-science curriculum","self-directed learning program"],
+      "core_purpose":"OSSU Computer Science is a structured, free self-taught computer-science curriculum assembled from online learning materials to provide broad undergraduate-level grounding.",
+      "audience":"Self-directed learners who want a broad computer-science education and can study independently with community support.",
+      "useful_actions":["Start with the curriculum and prerequisites","Begin Intro CS if appropriate","Track progress through Core CS, Advanced CS and the final project"],
+      "central_capabilities":["structured sequence of online courses","core and advanced computer-science coverage","final project","progress-planning guidance"],
+      "explicit_limits_or_unfinished":["The curriculum requires significant independent study and prerequisite knowledge","Its timeline estimate depends on sustained study effort"],
+      "materially_wrong_claims":["It is a software application","It is a single programming course"]
+    },
+    {
+      "id":"U21","repository":"jwasham/coding-interview-university","stratum":"course_curriculum","source":"https://github.com/jwasham/coding-interview-university",
+      "acceptable_types":["study plan","learning curriculum or checklist"],
+      "core_purpose":"Coding Interview University is a large self-study plan covering computer-science and software-engineering topics to prepare for technical interviews.",
+      "audience":"People preparing for software-engineering technical interviews.",
+      "useful_actions":["Follow the study plan","Work through the listed technical topics","Use the checklist and linked learning resources"],
+      "central_capabilities":["ordered technical interview study topics","linked learning resources","self-directed checklist format"],
+      "explicit_limits_or_unfinished":["The author explicitly says readers may not need to study as much as the original personal plan"],
+      "materially_wrong_claims":["It is a university or accredited degree program","It is a software application"]
+    },
+    {
+      "id":"U22","repository":"mlabonne/llm-course","stratum":"course_curriculum","source":"https://github.com/mlabonne/llm-course",
+      "acceptable_types":["LLM course","learning curriculum"],
+      "core_purpose":"The LLM Course is a free learning curriculum covering large-language-model fundamentals, model-building techniques and LLM application engineering.",
+      "audience":"Learners who want to understand, build, fine-tune or deploy LLMs and LLM-based applications.",
+      "useful_actions":["Start with the appropriate course section","Study LLM fundamentals if needed","Follow the Scientist or Engineer learning tracks"],
+      "central_capabilities":["LLM fundamentals track","LLM scientist track","LLM application engineering and deployment track"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is an LLM software framework","It is a hosted AI application"]
+    },
+    {
+      "id":"U23","repository":"google-deepmind/alphafold","stratum":"research","source":"https://github.com/google-deepmind/alphafold",
+      "acceptable_types":["research software","model inference implementation","scientific software package"],
+      "core_purpose":"This repository provides the inference implementation for AlphaFold v2 for protein-structure prediction and related AlphaFold research assets.",
+      "audience":"Researchers and technical users running or studying AlphaFold predictions.",
+      "useful_actions":["Set up and run the AlphaFold inference pipeline","Read the technical documentation and papers","Use the supplied model and baseline resources where applicable"],
+      "central_capabilities":["AlphaFold v2 inference pipeline","AlphaFold-Multimer implementation","research model and prediction resources"],
+      "explicit_limits_or_unfinished":["AlphaFold-Multimer is described as work in progress and less stable than the monomer system"],
+      "materially_wrong_claims":["It is a general-purpose AI chatbot","It is only a research paper repository"]
+    },
+    {
+      "id":"U24","repository":"tensorflow/models","stratum":"research","source":"https://github.com/tensorflow/models",
+      "acceptable_types":["model collection","research and example repository","TensorFlow Model Garden"],
+      "core_purpose":"TensorFlow Model Garden contains implementations of machine-learning models and modeling solutions intended to demonstrate good TensorFlow practices for research and product development.",
+      "audience":"TensorFlow users, machine-learning researchers and developers using reference model implementations.",
+      "useful_actions":["Browse model implementations","Set up the repository and dependencies","Read model-specific documentation"],
+      "central_capabilities":["multiple TensorFlow model implementations","reference best-practice modeling code","official models used for testing and performance work"],
+      "explicit_limits_or_unfinished":["The repository is a collection rather than one model or one finished application","The project continues to add and update models"],
+      "materially_wrong_claims":["It is a single trained model","It is an end-user machine-learning application"]
+    },
+    {
+      "id":"U25","repository":"fivethirtyeight/data","stratum":"dataset","source":"https://github.com/fivethirtyeight/data",
+      "acceptable_types":["dataset and code collection","data repository"],
+      "core_purpose":"This repository publishes datasets and code behind FiveThirtyEight articles and graphics.",
+      "audience":"People analyzing, reproducing or learning from FiveThirtyEight's published data and code.",
+      "useful_actions":["Browse the dataset index","Open or download a dataset","Follow the accompanying story or code where provided"],
+      "central_capabilities":["collection of published datasets","supporting analysis code for articles and graphics","links between data and stories"],
+      "explicit_limits_or_unfinished":["Sports predictions and forecasts in the repository stopped being updated in June 2023"],
+      "materially_wrong_claims":["It is a live sports forecasting service","It is primarily a software library"]
+    },
+    {
+      "id":"U26","repository":"vega/vega-datasets","stratum":"dataset","source":"https://github.com/vega/vega-datasets",
+      "acceptable_types":["dataset collection","data package and example-data library"],
+      "core_purpose":"Vega Datasets is a central collection of more than 70 example datasets used by Vega, Vega-Lite, Altair and related visualization projects.",
+      "audience":"Visualization developers, learners and users of Vega-related tools who need stable example datasets.",
+      "useful_actions":["Install the vega-datasets package","Access datasets over HTTP or CDN","Browse dataset metadata and provenance"],
+      "central_capabilities":["curated visualization datasets","package and CDN access","dataset provenance and transformation scripts","machine-readable dataset catalog"],
+      "explicit_limits_or_unfinished":["Individual datasets have their own licensing terms","Some datasets intentionally contain inconsistencies for teaching or data-cleaning exercises"],
+      "materially_wrong_claims":["It is the Vega visualization engine itself","All datasets share one unrestricted data license"]
+    },
+    {
+      "id":"U27","repository":"obsidianmd/obsidian-sample-plugin","stratum":"plugin_extension","source":"https://github.com/obsidianmd/obsidian-sample-plugin",
+      "acceptable_types":["plugin template","sample Obsidian plugin","starter project"],
+      "core_purpose":"This repository is a sample and template for developing Obsidian plugins and demonstrates basic Obsidian plugin API features.",
+      "audience":"Developers learning to create Obsidian plugins.",
+      "useful_actions":["Use the repository as a template","Install dependencies and run the development build","Read Obsidian plugin API documentation"],
+      "central_capabilities":["sample ribbon action","sample command and modal","settings tab example","event and interval registration examples"],
+      "explicit_limits_or_unfinished":["It is a starter/sample implementation rather than a polished end-user plugin"],
+      "materially_wrong_claims":["It is the Obsidian application","It is a finished general-purpose Obsidian plugin for end users"]
+    },
+    {
+      "id":"U28","repository":"prettier/prettier-vscode","stratum":"plugin_extension","source":"https://github.com/prettier/prettier-vscode",
+      "acceptable_types":["Visual Studio Code extension","editor plugin"],
+      "core_purpose":"Prettier for Visual Studio Code is an editor extension that runs Prettier formatting inside VS Code to enforce consistent code style.",
+      "audience":"VS Code users and developers who want automatic Prettier formatting.",
+      "useful_actions":["Install the extension from the VS Code marketplace","Set it as the default formatter if desired","Configure formatting behavior"],
+      "central_capabilities":["Prettier formatting inside VS Code","support for many source and markup formats","editor formatting integration"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is the standalone Prettier core project","It is a full code editor"]
+    },
+    {
+      "id":"U29","repository":"sindresorhus/awesome","stratum":"mixed_reference_collection","source":"https://github.com/sindresorhus/awesome",
+      "acceptable_types":["curated reference list","list of topic-specific awesome lists"],
+      "core_purpose":"Awesome is a curated directory of high-quality topic-specific resource lists across programming, platforms, computer science and many other subjects.",
+      "audience":"People looking for curated technical resources and maintainers who want to create or contribute to awesome lists.",
+      "useful_actions":["Browse a topic category","Open a linked awesome list","Read the contribution or list-creation guidance"],
+      "central_capabilities":["organized directory of resource lists","broad technical topic coverage","contribution and list-creation guidance"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is a software application","It is a programming library"]
+    },
+    {
+      "id":"U30","repository":"public-apis/public-apis","stratum":"mixed_reference_collection","source":"https://github.com/public-apis/public-apis",
+      "acceptable_types":["curated API directory","reference collection"],
+      "core_purpose":"Public APIs is a community-curated directory of public APIs from many domains that developers can use in their own projects.",
+      "audience":"Software and web developers looking for public APIs and contributors maintaining the directory.",
+      "useful_actions":["Browse APIs by category","Open an API entry to evaluate it","Contribute corrections or new entries"],
+      "central_capabilities":["large categorized API list","community curation","links to third-party APIs across many domains"],
+      "explicit_limits_or_unfinished":[],
+      "materially_wrong_claims":["It is itself a single public API service","It is a software framework"]
+    }
+  ]
+}

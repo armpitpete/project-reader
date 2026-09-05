@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://armpitpete.github.io/project-reader/schemas/unseen-generalisation-expected-reading-v1.3.json",
+  "title": "Project Reader unseen benchmark expected reading",
+  "type": "object",
+  "required": ["schema_version", "baseline_project_reader_main", "records"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "baseline_project_reader_main": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "records": {
+      "type": "array",
+      "minItems": 30,
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "required": ["id", "repository", "stratum", "source", "acceptable_types", "core_purpose", "audience", "useful_actions", "central_capabilities", "explicit_limits_or_unfinished", "materially_wrong_claims"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^U[0-9]{2}(?:R[0-9]+)?$"},
+          "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+          "stratum": {"type": "string"},
+          "source": {"type": "string", "format": "uri"},
+          "acceptable_types": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "core_purpose": {"type": "string", "minLength": 10},
+          "audience": {"type": ["string", "null"]},
+          "useful_actions": {"type": "array", "items": {"type": "string"}},
+          "central_capabilities": {"type": "array", "items": {"type": "string"}},
+          "explicit_limits_or_unfinished": {"type": "array", "items": {"type": "string"}},
+          "materially_wrong_claims": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

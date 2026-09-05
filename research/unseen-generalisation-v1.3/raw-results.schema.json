@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://armpitpete.github.io/project-reader/schemas/unseen-generalisation-raw-results-v1.3.json",
+  "title": "Project Reader unseen benchmark raw results",
+  "type": "object",
+  "required": ["schema_version", "baseline_project_reader_main", "generated_at", "records"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "baseline_project_reader_main": {"const": "1332e0a6baab8b3dd03dff30473ac52edda2b52e"},
+    "generated_at": {"type": "string"},
+    "records": {
+      "type": "array",
+      "minItems": 30,
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "required": ["id", "repository", "status"],
+        "properties": {
+          "id": {"type": "string"},
+          "repository": {"type": "string"},
+          "status": {"enum": ["READ", "UNAVAILABLE"]},
+          "observed_repository": {"type": ["object", "null"]},
+          "readme_sha256": {"type": ["string", "null"]},
+          "reading": {"type": ["object", "null"]},
+          "error": {"type": ["string", "null"]}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
