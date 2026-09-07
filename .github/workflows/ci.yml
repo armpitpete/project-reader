@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux]
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -113,7 +113,7 @@ jobs:
           if-no-files-found: error
 
   live-public-reference:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux]
     timeout-minutes: 15
     env:
       PROJECT_READER_GITHUB_TOKEN: ${{ github.token }}
@@ -150,7 +150,7 @@ jobs:
           PY
 
   live-browser-acceptance:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux]
     timeout-minutes: 15
     env:
       GITHUB_TOKEN: ${{ github.token }}
@@ -172,7 +172,7 @@ jobs:
     needs:
       - test
       - live-browser-acceptance
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux]
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
